@@ -1,0 +1,6 @@
+{
+  "name": "AI Travel Prototype Spec",
+  "description": "An interactive high-fidelity UX specifications dashboard and functional screen-by-screen mobile device simulator for AI Travel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

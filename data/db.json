@@ -1,0 +1,3904 @@
+{
+  "users": [
+    {
+      "id": "shreyas",
+      "fullName": "Shreyas Aswini",
+      "username": "shreyas",
+      "email": "shreyas.tokyo@gmail.com",
+      "mobile": "+81 80-1234-5678",
+      "dob": "1995-10-12",
+      "gender": "Male",
+      "country": "Japan",
+      "state": "Tokyo",
+      "city": "Tokyo",
+      "address": "1-2-3 Crossing District, Tokyo",
+      "travelStyle": "Solo Traveler",
+      "budgetPref": "$1,500",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+      "selectedPreferences": [
+        "Anime Shopping",
+        "Local Food Stalls",
+        "Temples",
+        "Tech Gadgets"
+      ],
+      "dnaFoodie": 48.3766233766234,
+      "dnaHeritage": 85,
+      "dnaTech": 78,
+      "dnaAdventure": 40,
+      "travelArchetype": "Balanced Voyager",
+      "upcomingTrip": {
+        "city": "Tokyo",
+        "startDate": "2026-06-15",
+        "endDate": "2026-06-20"
+      },
+      "checklist": [
+        {
+          "id": "chk-1",
+          "text": "Passport & Japan eVisa Approved",
+          "checked": true
+        },
+        {
+          "id": "chk-2",
+          "text": "QR Boarding Pass (SQ-638)",
+          "checked": true
+        },
+        {
+          "id": "chk-3",
+          "text": "Prepaid Transit Pass Smart Wallet Card loaded",
+          "checked": false
+        },
+        {
+          "id": "chk-4",
+          "text": "Universal wall plug adapter packed",
+          "checked": true
+        },
+        {
+          "id": "chk-5",
+          "text": "JPY local cash exchanged (¥50,000)",
+          "checked": true
+        },
+        {
+          "id": "chk-6",
+          "text": "Booked Planets Digital Art Museum reservation voucher",
+          "checked": false
+        }
+      ]
+    }
+  ],
+  "itineraries": {
+    "shreyas.tokyo@gmail.com": [
+      {
+        "day": 1,
+        "theme": "Heritage and Culture",
+        "activities": [
+          {
+            "time": "08:00 AM",
+            "activity": "Breakfast at Local Cafe",
+            "description": "Start the day with a traditional breakfast at a local cafe, try sweet rice dumplings and a cup of coffee",
+            "locationName": "Main Street Cafe",
+            "cost": "$10",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 5 mins from the hotel",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The cafe is a local favorite, serving a variety of traditional dishes",
+            "checked": false
+          },
+          {
+            "time": "09:00 AM",
+            "activity": "Visit Asakusa Buddhist Temple",
+            "description": "Explore the historic temple, admire the architecture and learn about its significance",
+            "locationName": "Asakusa Buddhist Temple",
+            "cost": "Free",
+            "suggestedAttire": "Respectful attire, no shorts or tank tops",
+            "transport": "Board the Express Train to Station, walk 10 mins",
+            "ticketInfo": "No ticket required, but donations are welcome",
+            "placeDetails": "The temple is one of the oldest and most famous in the city, dating back to the 7th century",
+            "checked": false
+          },
+          {
+            "time": "11:00 AM",
+            "activity": "Walk through Lantern District",
+            "description": "Stroll through the historic district, admire the colorful lanterns and traditional shops",
+            "locationName": "Lantern District",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the temple",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The district is known for its beautiful lanterns and traditional architecture",
+            "checked": false
+          },
+          {
+            "time": "01:00 PM",
+            "activity": "Lunch at Local Food Stall",
+            "description": "Try some grilled chicken skewers and traditional beverage at a local food stall",
+            "locationName": "Food Stall Alley",
+            "cost": "$8",
+            "suggestedAttire": "Casual attire",
+            "transport": "Walk 5 mins from the district",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The food stall is a local favorite, serving a variety of traditional dishes",
+            "checked": false
+          },
+          {
+            "time": "02:30 PM",
+            "activity": "Visit Local Museum",
+            "description": "Learn about the history and culture of the city at a local museum",
+            "locationName": "City Museum",
+            "cost": "$12",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Board the Express Train to Station, walk 10 mins",
+            "ticketInfo": "Ticket required, available at the museum",
+            "placeDetails": "The museum features a collection of artifacts and exhibits showcasing the city's history and culture",
+            "checked": false
+          },
+          {
+            "time": "05:00 PM",
+            "activity": "Explore Electronics District",
+            "description": "Browse the latest gadgets and technology at a local electronics store",
+            "locationName": "Electronics District",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the museum",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The district is known for its wide variety of electronics and gadgets",
+            "checked": false
+          },
+          {
+            "time": "07:00 PM",
+            "activity": "Dinner at Local Restaurant",
+            "description": "Try some traditional dishes at a local restaurant, such as melon buns and soup",
+            "locationName": "Local Restaurant",
+            "cost": "$20",
+            "suggestedAttire": "Casual attire",
+            "transport": "Walk 5 mins from the district",
+            "ticketInfo": "No ticket required, but reservations recommended",
+            "placeDetails": "The restaurant is a local favorite, serving a variety of traditional dishes",
+            "checked": false
+          },
+          {
+            "time": "09:00 PM",
+            "activity": "Walk through Night Market",
+            "description": "Browse the stalls and shops at a local night market, try some street food and drinks",
+            "locationName": "Night Market",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the restaurant",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The night market is a popular spot for shopping and dining",
+            "checked": false
+          }
+        ]
+      },
+      {
+        "day": 2,
+        "theme": "Tech and Innovation",
+        "activities": [
+          {
+            "time": "08:00 AM",
+            "activity": "Breakfast at Futuristic Cafe",
+            "description": "Start the day with a futuristic breakfast at a themed cafe, try some robotic coffee",
+            "locationName": "Futuristic Cafe",
+            "cost": "$15",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 5 mins from the hotel",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The cafe is a unique spot, featuring robotic waiters and futuristic decor",
+            "checked": false
+          },
+          {
+            "time": "09:30 AM",
+            "activity": "Visit Tech Museum",
+            "description": "Explore the latest technology and innovations at a local tech museum",
+            "locationName": "Tech Museum",
+            "cost": "$18",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Board the Express Train to Station, walk 10 mins",
+            "ticketInfo": "Ticket required, available at the museum",
+            "placeDetails": "The museum features a collection of exhibits showcasing the latest technology and innovations",
+            "checked": false
+          },
+          {
+            "time": "12:00 PM",
+            "activity": "Lunch at Robotic Restaurant",
+            "description": "Try some futuristic food at a robotic restaurant, such as robotic sushi",
+            "locationName": "Robotic Restaurant",
+            "cost": "$25",
+            "suggestedAttire": "Casual attire",
+            "transport": "Walk 10 mins from the museum",
+            "ticketInfo": "No ticket required, but reservations recommended",
+            "placeDetails": "The restaurant is a unique spot, featuring robotic waiters and futuristic decor",
+            "checked": false
+          },
+          {
+            "time": "02:00 PM",
+            "activity": "Explore Virtual Reality Experience",
+            "description": "Try some virtual reality experiences at a local VR center",
+            "locationName": "Virtual Reality Center",
+            "cost": "$20",
+            "suggestedAttire": "Comfortable clothing and shoes",
+            "transport": "Walk 10 mins from the restaurant",
+            "ticketInfo": "Ticket required, available at the center",
+            "placeDetails": "The center features a variety of virtual reality experiences, including games and simulations",
+            "checked": false
+          },
+          {
+            "time": "04:30 PM",
+            "activity": "Visit Electronics Store",
+            "description": "Browse the latest gadgets and technology at a local electronics store",
+            "locationName": "Electronics Store",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the center",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The store features a wide variety of electronics and gadgets, including the latest smartphones and laptops",
+            "checked": false
+          },
+          {
+            "time": "07:00 PM",
+            "activity": "Dinner at Themed Restaurant",
+            "description": "Try some themed food at a local restaurant, such as sci-fi themed dishes",
+            "locationName": "Themed Restaurant",
+            "cost": "$25",
+            "suggestedAttire": "Casual attire",
+            "transport": "Walk 5 mins from the store",
+            "ticketInfo": "No ticket required, but reservations recommended",
+            "placeDetails": "The restaurant is a unique spot, featuring themed decor and dishes",
+            "checked": false
+          },
+          {
+            "time": "09:00 PM",
+            "activity": "Walk through Neon District",
+            "description": "Browse the stalls and shops at a local neon district, try some street food and drinks",
+            "locationName": "Neon District",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the restaurant",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The district is a popular spot for shopping and dining, featuring a variety of neon lights and decorations",
+            "checked": false
+          }
+        ]
+      },
+      {
+        "day": 3,
+        "theme": "Heritage and Culture",
+        "activities": [
+          {
+            "time": "08:00 AM",
+            "activity": "Breakfast at Traditional Tea House",
+            "description": "Start the day with a traditional breakfast at a local tea house, try some traditional beverage",
+            "locationName": "Traditional Tea House",
+            "cost": "$12",
+            "suggestedAttire": "Respectful attire, no shorts or tank tops",
+            "transport": "Walk 5 mins from the hotel",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The tea house is a local favorite, serving a variety of traditional dishes and beverages",
+            "checked": false
+          },
+          {
+            "time": "09:30 AM",
+            "activity": "Visit Golden Pavilion",
+            "description": "Explore the historic pavilion, admire the architecture and learn about its significance",
+            "locationName": "Golden Pavilion",
+            "cost": "$10",
+            "suggestedAttire": "Respectful attire, no shorts or tank tops",
+            "transport": "Board the Express Train to Station, walk 10 mins",
+            "ticketInfo": "Ticket required, available at the pavilion",
+            "placeDetails": "The pavilion is a historic landmark, featuring a beautiful golden exterior and peaceful gardens",
+            "checked": false
+          },
+          {
+            "time": "11:30 AM",
+            "activity": "Walk through Imperial Palace East Garden",
+            "description": "Stroll through the beautiful gardens, admire the architecture and learn about its history",
+            "locationName": "Imperial Palace East Garden",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the pavilion",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The garden is a beautiful spot, featuring a variety of plants and flowers, as well as a peaceful atmosphere",
+            "checked": false
+          },
+          {
+            "time": "01:00 PM",
+            "activity": "Lunch at Local Restaurant",
+            "description": "Try some traditional dishes at a local restaurant, such as soup and rice",
+            "locationName": "Local Restaurant",
+            "cost": "$15",
+            "suggestedAttire": "Casual attire",
+            "transport": "Walk 5 mins from the garden",
+            "ticketInfo": "No ticket required, but reservations recommended",
+            "placeDetails": "The restaurant is a local favorite, serving a variety of traditional dishes",
+            "checked": false
+          },
+          {
+            "time": "02:30 PM",
+            "activity": "Visit Traditional Craft Shop",
+            "description": "Browse the traditional crafts and souvenirs at a local shop",
+            "locationName": "Traditional Craft Shop",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the restaurant",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The shop features a variety of traditional crafts and souvenirs, including pottery and textiles",
+            "checked": false
+          },
+          {
+            "time": "04:30 PM",
+            "activity": "Explore Local Market",
+            "description": "Browse the stalls and shops at a local market, try some street food and drinks",
+            "locationName": "Local Market",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the shop",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The market is a popular spot for shopping and dining, featuring a variety of local goods and souvenirs",
+            "checked": false
+          },
+          {
+            "time": "07:00 PM",
+            "activity": "Dinner at Local Restaurant",
+            "description": "Try some traditional dishes at a local restaurant, such as grilled chicken skewers and traditional beverage",
+            "locationName": "Local Restaurant",
+            "cost": "$20",
+            "suggestedAttire": "Casual attire",
+            "transport": "Walk 5 mins from the market",
+            "ticketInfo": "No ticket required, but reservations recommended",
+            "placeDetails": "The restaurant is a local favorite, serving a variety of traditional dishes",
+            "checked": false
+          },
+          {
+            "time": "09:00 PM",
+            "activity": "Walk through Lantern District",
+            "description": "Browse the stalls and shops at a local lantern district, try some street food and drinks",
+            "locationName": "Lantern District",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the restaurant",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The district is a popular spot for shopping and dining, featuring a variety of lanterns and decorations",
+            "checked": false
+          }
+        ]
+      },
+      {
+        "day": 4,
+        "theme": "Anime and Manga",
+        "activities": [
+          {
+            "time": "08:00 AM",
+            "activity": "Breakfast at Anime-Themed Cafe",
+            "description": "Start the day with a themed breakfast at an anime-themed cafe, try some anime-themed food",
+            "locationName": "Anime-Themed Cafe",
+            "cost": "$12",
+            "suggestedAttire": "Casual attire",
+            "transport": "Walk 5 mins from the hotel",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The cafe is a unique spot, featuring anime-themed decor and dishes",
+            "checked": false
+          },
+          {
+            "time": "09:30 AM",
+            "activity": "Visit Anime and Manga Store",
+            "description": "Browse the anime and manga collections at a local store",
+            "locationName": "Anime and Manga Store",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the cafe",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The store features a wide variety of anime and manga, including rare and collectible items",
+            "checked": false
+          },
+          {
+            "time": "11:30 AM",
+            "activity": "Explore Anime and Manga District",
+            "description": "Browse the stalls and shops at a local anime and manga district, try some anime-themed food and drinks",
+            "locationName": "Anime and Manga District",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the store",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The district is a popular spot for anime and manga fans, featuring a variety of themed shops and stalls",
+            "checked": false
+          },
+          {
+            "time": "01:00 PM",
+            "activity": "Lunch at Anime-Themed Restaurant",
+            "description": "Try some anime-themed food at a local restaurant, such as anime-themed sushi",
+            "locationName": "Anime-Themed Restaurant",
+            "cost": "$18",
+            "suggestedAttire": "Casual attire",
+            "transport": "Walk 5 mins from the district",
+            "ticketInfo": "No ticket required, but reservations recommended",
+            "placeDetails": "The restaurant is a unique spot, featuring anime-themed decor and dishes",
+            "checked": false
+          },
+          {
+            "time": "02:30 PM",
+            "activity": "Visit Video Game Center",
+            "description": "Try some video games at a local game center, including anime-themed games",
+            "locationName": "Video Game Center",
+            "cost": "$15",
+            "suggestedAttire": "Comfortable clothing and shoes",
+            "transport": "Walk 10 mins from the restaurant",
+            "ticketInfo": "Ticket required, available at the center",
+            "placeDetails": "The center features a variety of video games, including anime-themed games and rare consoles",
+            "checked": false
+          },
+          {
+            "time": "04:30 PM",
+            "activity": "Explore Cosplay Shop",
+            "description": "Browse the cosplay collections at a local shop, try some cosplay outfits",
+            "locationName": "Cosplay Shop",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the center",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The shop features a wide variety of cosplay outfits and accessories, including rare and collectible items",
+            "checked": false
+          },
+          {
+            "time": "07:00 PM",
+            "activity": "Dinner at Anime-Themed Restaurant",
+            "description": "Try some anime-themed food at a local restaurant, such as anime-themed ramen",
+            "locationName": "Anime-Themed Restaurant",
+            "cost": "$20",
+            "suggestedAttire": "Casual attire",
+            "transport": "Walk 5 mins from the shop",
+            "ticketInfo": "No ticket required, but reservations recommended",
+            "placeDetails": "The restaurant is a unique spot, featuring anime-themed decor and dishes",
+            "checked": false
+          },
+          {
+            "time": "09:00 PM",
+            "activity": "Walk through Anime and Manga District",
+            "description": "Browse the stalls and shops at a local anime and manga district, try some anime-themed food and drinks",
+            "locationName": "Anime and Manga District",
+            "cost": "Free",
+            "suggestedAttire": "Comfortable walking shoes and light jacket",
+            "transport": "Walk 10 mins from the restaurant",
+            "ticketInfo": "No ticket required",
+            "placeDetails": "The district is a popular spot for anime and manga fans, featuring a variety of themed shops and stalls",
+            "checked": false
+          }
+        ]
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Shibuya_Tokyo,Japanese,Anime,Street Food,Historical Sites_92_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Asakusa Old Town",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Experience ancient Tokyo with street food and temples",
+          "tags": [
+            "Heritage",
+            "Food",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Tokyo's electronic and anime hub with unique eats",
+          "tags": [
+            "Tech",
+            "Anime",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Nikko World Heritage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Historical sites and ornate temples near Tokyo",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Shimokitazawa Food Street",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Vibrant food street with international and Japanese cuisine",
+          "tags": [
+            "Food",
+            "Street",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Ginza Shopping District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Luxury shopping and dining in Tokyo's upscale area",
+          "tags": [
+            "Luxury",
+            "Food",
+            "Shopping"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781594031496
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Shibuya_Tokyo,Japanese,Anime,Street Food,Historical Sites_92_85_78_40",
+      "category": "☀️ Summer",
+      "places": [
+        {
+          "name": "Taipei Night Markets",
+          "country": "Taiwan",
+          "countryCode": "TWN",
+          "rating": 4.9,
+          "desc": "Savor street food and anime culture in vibrant night markets",
+          "tags": [
+            "Foodie",
+            "Street Food",
+            "Nightlife"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Immerse in Tokyo's electronic and anime hub with robotic features",
+          "tags": [
+            "Tech",
+            "Anime",
+            "Gaming"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Discover historical sites and temples with vibrant food scenes",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Bangkok Street Food",
+          "country": "Thailand",
+          "countryCode": "THA",
+          "rating": 4.6,
+          "desc": "Explore bustling streets for unique culinary experiences and historical sites",
+          "tags": [
+            "Foodie",
+            "Street Food",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Seoul Myeong-dong",
+          "country": "South Korea",
+          "countryCode": "KOR",
+          "rating": 4.5,
+          "desc": "Experience K-pop, anime, and tech in a vibrant shopping district",
+          "tags": [
+            "Tech",
+            "K-pop",
+            "Shopping"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781594032209
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_92_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Akihabara Electronic Town",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Tokyo's electronic and anime hub",
+          "tags": [
+            "Tech",
+            "Anime"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Shibuya Crossing",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Iconic Tokyo street food and culture",
+          "tags": [
+            "Food",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Historic Kyoto shrine with anime connections",
+          "tags": [
+            "Heritage",
+            "Anime"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Tsukiji Outer Market",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Fresh sushi and Tokyo's seafood haven",
+          "tags": [
+            "Food",
+            "Market"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Asakusa Kannon Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Ancient Tokyo temple with street food",
+          "tags": [
+            "Heritage",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599468892
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_92_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Shibuya Crossing Tokyo",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Experience Tokyo's vibrant streets and anime culture",
+          "tags": [
+            "Neon",
+            "Anime",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Discover historic Japanese heritage and scenic hiking trails",
+          "tags": [
+            "Culture",
+            "Heritage",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Explore Tokyo's electronic and anime hub with street food",
+          "tags": [
+            "Tech",
+            "Anime",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Asakusa Kannon Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Visit ancient Japanese temple with traditional street food",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Ikebukuro Otome Road",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Experience Tokyo's unique anime and manga culture",
+          "tags": [
+            "Anime",
+            "Manga",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599468930
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_92_85_78_40",
+      "category": "ðŸ‘©â€â¤ï¸â€ðŸ‘¨ Couple / Romantic",
+      "places": [
+        {
+          "name": "Tokyo Neon Districts",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Vibrant streets, anime hubs, and street food",
+          "tags": [
+            "Neon",
+            "Foodie",
+            "Tech"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Gion Streets",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Historical sites, culture, and traditional cuisine",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Akihabara Electronic Town",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Anime, manga, and electronic gaming hub",
+          "tags": [
+            "Tech",
+            "Gaming",
+            "Anime"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Dotonbori Food Street",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Street food, neon lights, and unique cuisine",
+          "tags": [
+            "Foodie",
+            "Street Food",
+            "Neon"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hiroshima Miyajima Island",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Historical sites, scenic views, and local cuisine",
+          "tags": [
+            "Heritage",
+            "Nature",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599484450
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_89.50219092431007_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Tokyo Akihabara",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Experience Tokyo's vibrant anime and tech culture",
+          "tags": [
+            "Anime",
+            "Tech"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Gion District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Immerse in traditional Japanese heritage and culture",
+          "tags": [
+            "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Dotonbori",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Discover Osaka's famous street food and neon nightlife",
+          "tags": [
+            "Food",
+            "Nightlife"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hiroshima Miyajima",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Explore historic sites and try local Japanese cuisine",
+          "tags": [
+            "History",
+            "Foodie"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fukuoka Tenjin",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Experience Fukuoka's unique food scene and cultural heritage",
+          "tags": [
+            "Food",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599971961
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_89.50219092431007_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Tokyo Shinjuku",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Experience Tokyo's vibrant streets, anime, and street food",
+          "tags": [
+            "Culture",
+            "Foodie",
+            "Tech"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Gion District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Discover traditional Japanese heritage and historical sites",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Zen"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Akihabara Electronic Town",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Explore Tokyo's electronic and anime hub",
+          "tags": [
+            "Tech",
+            "Sci-Fi",
+            "Gaming"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Dotonbori",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Indulge in Osaka's street food and nightlife",
+          "tags": [
+            "Foodie",
+            "Nightlife",
+            "Entertainment"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hiroshima Miyajima Island",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Visit historic Miyajima Island and try local street food",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599971980
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_68.72297014508928_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Tokyo Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Experience Tokyo's vibrant anime culture",
+          "tags": [
+            "Anime",
+            "Tech"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Discover historic Japanese heritage site",
+          "tags": [
+            "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Singapore Street Food Scene",
+          "country": "Singapore",
+          "countryCode": "SGP",
+          "rating": 4.7,
+          "desc": "Savor diverse street food flavors",
+          "tags": [
+            "Foodie",
+            "Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Seoul Myeong-dong Shopping District",
+          "country": "South Korea",
+          "countryCode": "KOR",
+          "rating": 4.6,
+          "desc": "Explore bustling streets of Korean culture",
+          "tags": [
+            "Culture",
+            "Shopping"
+          ],
+          "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hong Kong Victoria Peak",
+          "country": "Hong Kong",
+          "countryCode": "HKG",
+          "rating": 4.5,
+          "desc": "Enjoy panoramic views of the city",
+          "tags": [
+            "Adventure",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599973028
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_68.72297014508928_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Tokyo Shibuya Crossing",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Experience Tokyo's vibrant street food and anime culture",
+          "tags": [
+            "Street Food",
+            "Anime",
+            "Neon"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Discover historic temples and try local Japanese cuisine",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Zen"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Explore Tokyo's electronic and anime hub with street food",
+          "tags": [
+            "Tech",
+            "Anime",
+            "Gaming"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Arashiyama Bamboo Forest",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Find serenity in Kyoto's natural beauty and historic sites",
+          "tags": [
+            "Nature",
+            "Heritage",
+            "Serenity"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Dotonbori",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Indulge in Osaka's street food and vibrant entertainment scene",
+          "tags": [
+            "Foodie",
+            "Entertainment",
+            "Neon"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599973129
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_56.16883116883117_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Tokyo Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Explore Tokyo's electronic and anime hub",
+          "tags": [
+            "Tech",
+            "Anime",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Discover Kyoto's famous orange torii gates",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Singapore Hawker Centers",
+          "country": "Singapore",
+          "countryCode": "SGP",
+          "rating": 4.7,
+          "desc": "Savor street food in a multicultural city",
+          "tags": [
+            "Foodie",
+            "Street Food",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Seoul Myeong-dong Shopping District",
+          "country": "South Korea",
+          "countryCode": "KOR",
+          "rating": 4.6,
+          "desc": "Experience K-pop and Korean street food",
+          "tags": [
+            "Culture",
+            "Foodie",
+            "Shopping"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hong Kong Victoria Peak",
+          "country": "Hong Kong",
+          "countryCode": "HKG",
+          "rating": 4.5,
+          "desc": "Enjoy panoramic views of a neon city",
+          "tags": [
+            "Tech",
+            "Cityscape",
+            "Adventure"
+          ],
+          "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599973286
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_56.16883116883117_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Shibuya Crossing",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Experience Tokyo's vibrant street food and anime culture",
+          "tags": [
+            "Culture",
+            "Food",
+            "Tech"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Discover historic Japanese heritage and scenic hiking trails",
+          "tags": [
+            "Heritage",
+            "Nature",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Explore Tokyo's electronic and anime hub with unique street food",
+          "tags": [
+            "Tech",
+            "Food",
+            "Anime"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Meiji Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Visit a serene Shinto shrine with beautiful gardens and walking trails",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Asakusa Kannon Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Experience historic Japanese culture and try traditional street food",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599973696
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_39.7186279296875_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Tokyo Akihabara",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Neon-lit streets, anime, and tech hub",
+          "tags": [
+            "Tech",
+            "Anime",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Historical site with thousand red gates",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Dotonbori",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Street food and vibrant entertainment district",
+          "tags": [
+            "Foodie",
+            "Culture",
+            "Entertainment"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hiroshima Peace Memorial",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Historical site and museum for heritage lovers",
+          "tags": [
+            "Heritage",
+            "History",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Nara Todaiji Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Ancient temple with historical significance",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599974632
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_39.7186279296875_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Tokyo Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Neon city with anime, manga, and street food",
+          "tags": [
+            "Tech",
+            "Anime",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Historical site with thousands of vermillion gates",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Dotonbori Street Food",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Vibrant street food scene with local delicacies",
+          "tags": [
+            "Foodie",
+            "Street Food",
+            "Nightlife"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hiroshima Peace Memorial Park",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Historical site with somber reminders of the past",
+          "tags": [
+            "Heritage",
+            "History",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Nara Todai-ji Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Ancient temple with historical and cultural significance",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599974875
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_16.77489838042816_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Tokyo's electronic and anime hub",
+          "tags": [
+            "Tech",
+            "Anime",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Historic shrine with thousands of gates",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Shibuya Crossing",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Tokyo's famous scramble crossing",
+          "tags": [
+            "Culture",
+            "Tech",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Meiji Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Serene Shinto shrine in Tokyo",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Asakusa Kannon Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Ancient Buddhist temple in Tokyo",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599974940
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_17.2077922077922_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Tokyo Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Explore Tokyo's electronic and anime hub",
+          "tags": [
+            "Tech",
+            "Anime",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Discover Kyoto's iconic thousand red gates",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Dotonbori Neighborhood",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Experience Osaka's vibrant street food scene",
+          "tags": [
+            "Food",
+            "Street Food",
+            "Nightlife"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hiroshima Peace Memorial Park",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Visit Hiroshima's historic peace memorial site",
+          "tags": [
+            "Heritage",
+            "History",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Nara Todai-ji Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Explore Nara's ancient Buddhist temple complex",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599975315
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_16.77489838042816_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Shibuya Crossing",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Experience Tokyo's vibrant streets and anime culture",
+          "tags": [
+            "Culture",
+            "Tech"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Discover Kyoto's historic temples and traditional Japanese heritage",
+          "tags": [
+            "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Explore Tokyo's electronic and anime hub with unique street food",
+          "tags": [
+            "Tech",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Meiji Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Visit a serene Shinto shrine in the heart of Tokyo's nature",
+          "tags": [
+            "Heritage",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Asakusa Kannon Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Immerse in traditional Japanese culture and historic sites",
+          "tags": [
+            "Culture",
+            "Heritage"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599975362
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_17.2077922077922_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Tokyo Asakusa",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Experience historic temples and anime culture",
+          "tags": [
+            "Culture",
+            "Heritage"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Discover iconic red gates and Japanese heritage",
+          "tags": [
+            "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Explore Tokyo's electronic and anime hub",
+          "tags": [
+            "Tech",
+            "Anime"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Nara Park",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Visit ancient temples and friendly deer in nature",
+          "tags": [
+            "Heritage",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Shibuya Crossing",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Experience Tokyo's busiest street food and culture",
+          "tags": [
+            "Food",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599976451
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_61.796550007609575_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599977074
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_30.194805194805184_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Tokyo's electronic and anime hub",
+          "tags": [
+            "Culture",
+            "Tech"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Historic shrine with thousands of gates",
+          "tags": [
+            "Heritage",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Shibuya Crossing",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Tokyo's famous scramble crossing",
+          "tags": [
+            "Culture",
+            "Street"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Meiji Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Serene Shinto shrine in Tokyo",
+          "tags": [
+            "Heritage",
+            "Zen"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Asakusa Kannon Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Ancient Buddhist temple in Tokyo",
+          "tags": [
+            "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599977120
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_30.194805194805184_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Tokyo's electronic and anime hub",
+          "tags": [
+            "Tech",
+            "Anime"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Famous for thousands of vermilion torii gates",
+          "tags": [
+            "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Shibuya Crossing",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Busy and iconic Tokyo street food scene",
+          "tags": [
+            "Foodie",
+            "Street"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Meiji Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Scenic Shinto shrine in a tranquil forested area",
+          "tags": [
+            "Heritage",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Asakusa Kannon Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Ancient Buddhist temple with traditional street food",
+          "tags": [
+            "Culture",
+            "Heritage"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599977200
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_61.796550007609575_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599977236
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_66.55844155844154_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599978085
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_66.55844155844154_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599978213
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_67.42426884638796_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599978342
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_67.42426884638796_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599978408
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_66.12556754768667_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599979060
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_66.12556754768667_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599979132
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_64.39395260501216_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599979536
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_64.39395260501216_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599979765
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_63.96103896103895_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599979946
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_63.96103896103895_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599980172
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_63.52816495028408_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599980284
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_63.52816495028408_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599980434
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_62.66233766233766_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599980934
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_62.66233766233766_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599981118
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_61.79655000760958_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599981327
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_61.79655000760958_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599981460
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_55.735957158076324_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599982701
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_49.24245066456983_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599983538
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_49.24245066456983_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599983599
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_48.3766233766234_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599983778
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_48.3766233766234_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Crossing District Neon Night Stroll",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
+          "tags": [
+            "Street Food",
+            "Japanese",
+            "Tokyo",
+            "Local Street Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Classic Zen Gardens",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
+          "tags": [
+            "Historical Tours",
+            "Japanese",
+            "Zen",
+            "Kyoto"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599983861
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_55.735957158076324_85_78_40",
+      "category": "ðŸ‘¤ Solo Traveler",
+      "places": [
+        {
+          "name": "Tokyo Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Immerse in anime, manga, and tech culture",
+          "tags": [
+            "Anime",
+            "Tech",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Discover historic gates and Japanese heritage",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Dotonbori Street Food",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Savor Japanese street food and vibrant nightlife",
+          "tags": [
+            "Foodie",
+            "Street",
+            "Nightlife"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hiroshima Miyajima Island",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Explore historic landmarks and serene nature",
+          "tags": [
+            "Heritage",
+            "Nature",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Nara Todaiji Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Visit ancient temples and experience Japanese culture",
+          "tags": [
+            "Culture",
+            "Heritage",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781599983947
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_48.3766233766234_85_78_40",
+      "category": "ðŸ‘©â€â¤ï¸â€ðŸ‘¨ Couple / Romantic",
+      "places": [
+        {
+          "name": "Tokyo Shinjuku",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Experience Tokyo's vibrant streets, anime culture, and historical sites",
+          "tags": [
+            "Culture",
+            "Tech",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Discover Kyoto's famous red gates, temples, and traditional Japanese cuisine",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Dotonbori",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Immerse in Osaka's street food, neon lights, and entertainment district",
+          "tags": [
+            "Food",
+            "Tech",
+            "Adventure"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hiroshima Miyajima",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Explore Hiroshima's historic sites, scenic islands, and local seafood",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Nara Todaiji Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Visit Nara's ancient temples, friendly deer, and traditional Japanese architecture",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781600001144
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Tokyo_Anime Shopping,Local Food Stalls,Temples,Tech Gadgets_48.3766233766234_85_78_40",
+      "category": "ðŸ‘©â€â¤ï¸â€ðŸ‘¨ Couple / Romantic",
+      "places": [
+        {
+          "name": "Taipei Night Markets",
+          "country": "Taiwan",
+          "countryCode": "TWN",
+          "rating": 4.7,
+          "desc": "Experience vibrant night markets with local food and tech gadgets",
+          "tags": [
+            "Food",
+            "Tech",
+            "Nightlife"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Discover iconic red gates and temples in a cultural hub",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Zen"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Seoul Myeong-dong",
+          "country": "South Korea",
+          "countryCode": "KOR",
+          "rating": 4.6,
+          "desc": "Explore a bustling shopping district with anime and local food",
+          "tags": [
+            "Shopping",
+            "Food",
+            "Anime"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hong Kong Temple Street",
+          "country": "Hong Kong",
+          "countryCode": "HKG",
+          "rating": 4.8,
+          "desc": "Visit a famous street market with fortune tellers and local eats",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nightlife"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Singapore Gardens by the Bay",
+          "country": "Singapore",
+          "countryCode": "SGP",
+          "rating": 4.5,
+          "desc": "Marvel at stunning botanical gardens with futuristic features",
+          "tags": [
+            "Nature",
+            "Tech",
+            "Gardens"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781612424519
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Tokyo_Anime Shopping,Local Food Stalls,Temples,Tech Gadgets_48.3766233766234_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Anime, tech, and local food stalls in Tokyo's electronic hub",
+          "tags": [
+            "Tech",
+            "Anime"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Historic temple with thousands of vermilion gates",
+          "tags": [
+            "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Shibuya Crossing",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Tokyo's busiest intersection with neon lights and local food",
+          "tags": [
+            "Tech",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Asakusa Kannon Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Ancient Buddhist temple with anime and local food nearby",
+          "tags": [
+            "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Ikebukuro Otome Road",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Shopping district for anime and manga fans with local eateries",
+          "tags": [
+            "Anime",
+            "Shopping"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1781612424575
+    }
+  ],
+  "squads": []
+}

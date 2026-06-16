@@ -1,0 +1,261 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "system-ui", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Outfit", "Space Grotesk", sans-serif;
+}
+
+/* ═══════════════════════════════════════════
+   AIRA TRAVEL APP — PREMIUM DESIGN SYSTEM
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* ─── Primary Travel Palette ─── */
+  --aira-sunset: #FF6B35;
+  --aira-sunset-light: #FF8F66;
+  --aira-sunset-dark: #E55A28;
+  --aira-ocean: #00B4D8;
+  --aira-ocean-light: #48CAE4;
+  --aira-ocean-dark: #0096B7;
+  --aira-tropical: #06D6A0;
+  --aira-gold: #FFD166;
+  --aira-gold-dark: #F0B429;
+  --aira-coral: #FF477E;
+  --aira-royal: #7B2FF7;
+  --aira-sky-start: #667EEA;
+  --aira-sky-end: #FF6B35;
+
+  /* ─── Backgrounds ─── */
+  --aira-dark-bg: #0A1628;
+  --aira-dark-surface: #1A2744;
+  --aira-dark-card: #1E3050;
+  --aira-dark-border: rgba(255, 255, 255, 0.08);
+
+  /* ─── Chat Map ─── */
+  --map-bg: #0D1B2A;
+  --map-line: rgba(0, 180, 216, 0.15);
+  --map-marker-glow: rgba(255, 107, 53, 0.6);
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   KEYFRAME ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+/* Smooth entrance fade */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Slow compass spin */
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}
+
+/* 🌍 Earth/Map pan drift for chat background */
+@keyframes earthPan {
+  0% { transform: scale(1.2) translate(0%, 0%); }
+  25% { transform: scale(1.2) translate(-3%, -2%); }
+  50% { transform: scale(1.2) translate(-5%, 0%); }
+  75% { transform: scale(1.2) translate(-2%, 2%); }
+  100% { transform: scale(1.2) translate(0%, 0%); }
+}
+.animate-earth-pan {
+  animation: earthPan 60s ease-in-out infinite;
+}
+
+/* Glowing marker pulse */
+@keyframes markerPulse {
+  0%, 100% { 
+    box-shadow: 0 0 4px 2px var(--map-marker-glow);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 12px 6px var(--map-marker-glow);
+    transform: scale(1.3);
+  }
+}
+.animate-marker-pulse {
+  animation: markerPulse 2.5s ease-in-out infinite;
+}
+
+/* Marker pulse — varied timing */
+.animate-marker-pulse-delay-1 { animation: markerPulse 2.5s ease-in-out 0.5s infinite; }
+.animate-marker-pulse-delay-2 { animation: markerPulse 2.5s ease-in-out 1s infinite; }
+.animate-marker-pulse-delay-3 { animation: markerPulse 2.5s ease-in-out 1.5s infinite; }
+
+/* Floating parallax */
+@keyframes floatUpDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float {
+  animation: floatUpDown 4s ease-in-out infinite;
+}
+.animate-float-slow {
+  animation: floatUpDown 6s ease-in-out infinite;
+}
+
+/* Premium shimmer effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(
+    90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.08) 50%, 
+    rgba(255,255,255,0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Dynamic gradient background */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+/* Aurora glow behind device frame */
+@keyframes auroraGlow {
+  0%, 100% { 
+    opacity: 0.3;
+    filter: blur(60px);
+    transform: scale(1) rotate(0deg);
+  }
+  33% { 
+    opacity: 0.5;
+    filter: blur(80px);
+    transform: scale(1.1) rotate(1deg);
+  }
+  66% {
+    opacity: 0.4;
+    filter: blur(70px);
+    transform: scale(1.05) rotate(-1deg);
+  }
+}
+.animate-aurora {
+  animation: auroraGlow 10s ease-in-out infinite;
+}
+
+/* Destination card hover lift */
+@keyframes cardLift {
+  from { transform: translateY(0) scale(1); }
+  to { transform: translateY(-4px) scale(1.02); }
+}
+
+/* Globe spinner for typing indicator */
+@keyframes globeSpin {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+.animate-globe-spin {
+  animation: globeSpin 2s linear infinite;
+}
+
+/* Warm ping */
+@keyframes warmPing {
+  0% { transform: scale(1); opacity: 1; }
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+.animate-warm-ping {
+  animation: warmPing 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ═══════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════ */
+
+/* Glassmorphic card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Warm gradient text */
+.text-gradient-sunset {
+  background: linear-gradient(135deg, #FF6B35, #FF477E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-ocean {
+  background: linear-gradient(135deg, #00B4D8, #06D6A0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #FFD166, #FF6B35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Scrollbar styling */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* World map grid overlay */
+.map-grid-overlay {
+  background-image:
+    linear-gradient(rgba(0, 180, 216, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 180, 216, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Destination marker tooltip connector */
+.marker-connector {
+  position: relative;
+}
+.marker-connector::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 8px;
+  background: rgba(255, 107, 53, 0.5);
+}
