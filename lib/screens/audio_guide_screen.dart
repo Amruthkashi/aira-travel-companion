@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/utils/sound_synthesizer.dart';
+import '../core/utils/tts_helper.dart';
+import '../core/services/ai_service.dart';
 
 class AudioGuideScreen extends ConsumerStatefulWidget {
   const AudioGuideScreen({super.key});
@@ -47,6 +49,13 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
   double _playbackSpeed = 1.0;
   bool _beaconScanning = false;
 
+  // Translation & Audio Guide State
+  String _selectedLang = 'English';
+  bool _translating = false;
+  String? _activeTranslation;
+  String? _activeRomaji;
+  final Map<String, Map<String, String>> _translationCache = {};
+
   @override
   void initState() {
     super.initState();
@@ -60,10 +69,11 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
   void dispose() {
     _pulseController.dispose();
     _progressTimer?.cancel();
+    TtsHelper.stop();
     super.dispose();
   }
 
-  void _togglePlayTrack(Map<String, dynamic> track) {
+  void _togglePlayTrack(Map<String, dynamic> track) async {
     final guideState = ref.read(audioGuideProvider);
     final isCurrent = guideState.activeTrackId == track['id'];
 
@@ -72,13 +82,67 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
       _progressTimer?.cancel();
       _pulseController.stop();
       ref.read(audioGuideProvider.notifier).playAudioTrack(track['id']);
+      await TtsHelper.stop();
       SoundSynthesizer.playTone(frequency: 440, durationSeconds: 0.15, name: 'audio_pause.wav');
     } else {
       // Play
       _progressTimer?.cancel();
+      await TtsHelper.stop();
+      
+      String speakText = track['description'];
+      String targetLang = _selectedLang;
+      
+      if (targetLang != 'English') {
+        final cacheKey = '${track['id']}_$targetLang';
+        if (_translationCache.containsKey(cacheKey)) {
+          final cached = _translationCache[cacheKey]!;
+          setState(() {
+            _activeTranslation = cached['tr'];
+            _activeRomaji = cached['rom'];
+          });
+          speakText = cached['tr'] ?? track['description'];
+        } else {
+          setState(() {
+            _translating = true;
+          });
+          try {
+            final res = await AiService.translateText(
+              text: track['description'],
+              sourceLang: 'English',
+              targetLang: targetLang,
+            );
+            final tr = res['translation'] ?? '';
+            final rom = res['romaji'] ?? '';
+            _translationCache[cacheKey] = {'tr': tr, 'rom': rom};
+            if (mounted) {
+              setState(() {
+                _activeTranslation = tr;
+                _activeRomaji = rom;
+                _translating = false;
+              });
+            }
+            speakText = tr;
+          } catch (e) {
+            print('Translation failed: $e');
+            if (mounted) {
+              setState(() {
+                _translating = false;
+              });
+            }
+          }
+        }
+      } else {
+        setState(() {
+          _activeTranslation = null;
+          _activeRomaji = null;
+        });
+      }
+
       ref.read(audioGuideProvider.notifier).playAudioTrack(track['id']);
       _pulseController.repeat();
-      SoundSynthesizer.playTone(frequency: track['frequency'], endFrequency: track['frequency'] + 200, durationSeconds: 0.3, name: 'audio_play.wav');
+      
+      // Play real audio read-aloud via phone speaker
+      await TtsHelper.speak(speakText, targetLang);
 
       // Progress Simulation
       double currentProgress = isCurrent ? guideState.progress : 0.0;
@@ -90,6 +154,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
           _progressTimer?.cancel();
           _pulseController.stop();
           ref.read(audioGuideProvider.notifier).playAudioTrack(track['id']); // Reset play state
+          TtsHelper.stop();
           SoundSynthesizer.playUnlockChime(); // Play complete chime
         } else {
           ref.read(audioGuideProvider.notifier).updateAudioProgress(currentProgress);
@@ -137,12 +202,42 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
+          // Dynamic translation language selector
+          DropdownButton<String>(
+            value: _selectedLang,
+            dropdownColor: const Color(0xFF0F172A),
+            style: const TextStyle(color: Color(0xFF818CF8), fontWeight: FontWeight.bold, fontSize: 12),
+            underline: const SizedBox(),
+            onChanged: (v) {
+              setState(() {
+                _selectedLang = v!;
+              });
+              final guideState = ref.read(audioGuideProvider);
+              if (guideState.activeTrackId != null && guideState.isPlaying) {
+                final currentTrack = _tracks.firstWhere((t) => t['id'] == guideState.activeTrackId);
+                _togglePlayTrack(currentTrack); // Pause it
+                _togglePlayTrack(currentTrack); // Play in new language
+              }
+            },
+            items: const [
+              DropdownMenuItem(value: 'English', child: Text('English')),
+              DropdownMenuItem(value: 'Japanese', child: Text('Japanese')),
+              DropdownMenuItem(value: 'French', child: Text('French')),
+              DropdownMenuItem(value: 'Spanish', child: Text('Spanish')),
+              DropdownMenuItem(value: 'German', child: Text('German')),
+              DropdownMenuItem(value: 'Italian', child: Text('Italian')),
+              DropdownMenuItem(value: 'Chinese', child: Text('Chinese')),
+              DropdownMenuItem(value: 'Korean', child: Text('Korean')),
+            ],
+          ),
+          const SizedBox(width: 8),
           IconButton(
             icon: _beaconScanning
                 ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Color(0xFF818CF8), strokeWidth: 2))
                 : const Icon(Icons.bluetooth_searching, color: Color(0xFF818CF8)),
             onPressed: _beaconScanning ? null : _scanBluetoothBeacon,
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(
@@ -234,6 +329,54 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                   activeTrack != null ? 'Location: ${activeTrack['location']}' : 'Stand near landmarks to activate guides',
                   style: const TextStyle(color: Colors.white30, fontSize: 11),
                 ),
+                
+                // Active Translation Overlay
+                if (_translating) ...[
+                  const SizedBox(height: 12),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: CircularProgressIndicator(color: Color(0xFF818CF8), strokeWidth: 1.5),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Translating guide...',
+                        style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ] else if (_activeTranslation != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E293B).withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFF334155).withValues(alpha: 0.5)),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          _activeTranslation!,
+                          style: const TextStyle(color: Color(0xFF38BDF8), fontSize: 12, fontWeight: FontWeight.bold, height: 1.4),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (_activeRomaji != null && _activeRomaji!.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            _activeRomaji!,
+                            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 9.5, fontStyle: FontStyle.italic),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
                 
                 // Track progress slider
                 if (activeTrack != null) ...[

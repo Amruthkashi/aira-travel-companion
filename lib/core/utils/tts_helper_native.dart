@@ -30,3 +30,11 @@ Future<void> speakText(String text, String targetLang) async {
     print('Native TTS execution failed: $e');
   }
 }
+
+Future<void> stopTts() async {
+  try {
+    await _flutterTts.stop();
+  } catch (e) {
+    print('Native TTS stop failed: $e');
+  }
+}

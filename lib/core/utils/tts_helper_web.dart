@@ -31,3 +31,15 @@ Future<void> speakText(String text, String targetLang) async {
     print('Web TTS execution failed: $e');
   }
 }
+
+Future<void> stopTts() async {
+  try {
+    js.context.callMethod('eval', ['''
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    ''']);
+  } catch (e) {
+    print('Web TTS stop failed: $e');
+  }
+}
