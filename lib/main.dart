@@ -21,7 +21,7 @@ class AiraTravelApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Aira â€” Your Premium AI Travel Companion',
+      title: 'Aira — Your Premium AI Travel Companion',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light, // Base light theme for standard pages
       theme: ThemeData(

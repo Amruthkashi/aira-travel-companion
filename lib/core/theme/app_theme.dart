@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Brand Color Palette Tokens â€” Travel-Inspired Design System
+  // Brand Color Palette Tokens — Travel-Inspired Design System
   static const Color darkBg = Color(0xFF090A0F); // Premium Obsidian Midnight Background
   static const Color darkSurface = Color(0xFF141624); // Amethyst Black Card Surface
   static const Color lightBg = Color(0xFFFFF8F0); // Warm Cream Background

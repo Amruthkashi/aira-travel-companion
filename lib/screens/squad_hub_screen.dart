@@ -365,7 +365,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
     ref.read(itineraryProvider.notifier).addActivity(dayIndex, activityItem);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Added "${s['activity']}" to Day ${dayIndex + 1} of your Personal Itinerary! ðŸ“…'),
+        content: Text('Added "${s['activity']}" to Day ${dayIndex + 1} of your Personal Itinerary! 📅'),
         backgroundColor: const Color(0xFF06D6A0),
       ),
     );
@@ -393,7 +393,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Added "${s['activity']}" to Squad Bookings & Activities! ðŸš¢'),
+          content: Text('Added "${s['activity']}" to Squad Bookings & Activities! 🚢'),
           backgroundColor: const Color(0xFF00B4D8),
         ),
       );
@@ -530,7 +530,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                             Text(squad['destination'] ?? '', style: const TextStyle(color: Color(0xFFFFD166), fontSize: 14, fontWeight: FontWeight.w600)),
                             const Spacer(),
                             if (squad['startDate'] != null && squad['startDate'].toString().isNotEmpty)
-                              Text('${squad['startDate']} â†’ ${squad['endDate'] ?? ''}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                              Text('${squad['startDate']} → ${squad['endDate'] ?? ''}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -802,7 +802,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
               const SizedBox(height: 6),
               Text('\$${totalSpent.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900)),
               const SizedBox(height: 4),
-              Text('${expenses.length} expenses Â· ${members.length} members', style: const TextStyle(color: Colors.white38, fontSize: 12)),
+              Text('${expenses.length} expenses · ${members.length} members', style: const TextStyle(color: Colors.white38, fontSize: 12)),
             ],
           ),
         ),
@@ -1054,7 +1054,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text('by ${poll['createdByName'] ?? ''} Â· $totalVotes votes', style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                Text('by ${poll['createdByName'] ?? ''} · $totalVotes votes', style: const TextStyle(color: Colors.white38, fontSize: 11)),
                 const SizedBox(height: 12),
                 ...List.generate((poll['options'] as List).length, (i) {
                   final opt = poll['options'][i];
@@ -1551,10 +1551,10 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                           dropdownColor: const Color(0xFF0A1628),
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                           items: const [
-                            DropdownMenuItem(value: 'flight', child: Row(children: [Icon(Icons.flight, color: Color(0xFF00B4D8), size: 16), SizedBox(width: 8), Text('Flight Ticket âœˆï¸')])),
-                            DropdownMenuItem(value: 'hotel', child: Row(children: [Icon(Icons.hotel, color: Color(0xFF06D6A0), size: 16), SizedBox(width: 8), Text('Hotel Stay ðŸ¨')])),
-                            DropdownMenuItem(value: 'transport', child: Row(children: [Icon(Icons.directions_train, color: Color(0xFFFFD166), size: 16), SizedBox(width: 8), Text('Train/Commute ðŸš„')])),
-                            DropdownMenuItem(value: 'attraction', child: Row(children: [Icon(Icons.local_activity, color: Color(0xFFFF477E), size: 16), SizedBox(width: 8), Text('Attraction Ticket ðŸŽ«')])),
+                            DropdownMenuItem(value: 'flight', child: Row(children: [Icon(Icons.flight, color: Color(0xFF00B4D8), size: 16), SizedBox(width: 8), Text('Flight Ticket ✈️')])),
+                            DropdownMenuItem(value: 'hotel', child: Row(children: [Icon(Icons.hotel, color: Color(0xFF06D6A0), size: 16), SizedBox(width: 8), Text('Hotel Stay 🏨')])),
+                            DropdownMenuItem(value: 'transport', child: Row(children: [Icon(Icons.directions_train, color: Color(0xFFFFD166), size: 16), SizedBox(width: 8), Text('Train/Commute 🚄')])),
+                            DropdownMenuItem(value: 'attraction', child: Row(children: [Icon(Icons.local_activity, color: Color(0xFFFF477E), size: 16), SizedBox(width: 8), Text('Attraction Ticket 🎟️')])),
                           ],
                           onChanged: (val) {
                             if (val != null) {

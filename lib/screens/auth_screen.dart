@@ -981,7 +981,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white.withOpacity(0.08),
-              hintText: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
+              hintText: '••••••••',
               hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -1251,7 +1251,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildFormLabel('Password'),
-                    _buildCompactTextField(controller: _passwordController, hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢', obscure: true),
+                    _buildCompactTextField(controller: _passwordController, hint: '••••••••', obscure: true),
                   ],
                 ),
               ),
@@ -1261,7 +1261,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildFormLabel('Confirm Password'),
-                    _buildCompactTextField(controller: _confirmPasswordController, hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢', obscure: true),
+                    _buildCompactTextField(controller: _confirmPasswordController, hint: '••••••••', obscure: true),
                   ],
                 ),
               ),
@@ -1846,15 +1846,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               errorBuilder: (context, error, stackTrace) {
                                 final nameStr = item['name'] ?? '';
                                 final cat = item['tag'] ?? '';
-                                String emoji = 'âœˆï¸';
+                                String emoji = '✈️';
                                 if (cat == 'Foods') {
-                                  emoji = 'ðŸ£';
+                                  emoji = '🍣';
                                 } else if (cat == 'Activities') {
-                                  emoji = 'ðŸ§—';
+                                  emoji = '🧘';
                                 } else if (cat == 'Places to Visit') {
-                                  emoji = 'ðŸ›ï¸';
+                                  emoji = '🏛️';
                                 } else if (cat == 'Dining Experiences') {
-                                  emoji = 'ðŸ½ï¸';
+                                  emoji = '🍽️';
                                 }
                                 final initial = nameStr.substring(0, nameStr.length < 2 ? nameStr.length : 2).toUpperCase();
                                 return Container(

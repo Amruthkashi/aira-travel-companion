@@ -93,7 +93,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
           ),
           
           // Persistent Floating SOS button (pulsing red circle)
-          if (!_sosActive)
+          if (!_sosActive && selectedIndex != 1)
             Positioned(
               bottom: 16,
               right: 16,

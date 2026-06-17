@@ -147,17 +147,17 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _tabItem('flights', 'âœˆï¸ Flights', bookedFlights.isNotEmpty),
+                  _tabItem('flights', '✈️ Flights', bookedFlights.isNotEmpty),
                   const SizedBox(width: 8),
-                  _tabItem('hotels', 'ðŸ¨ Stays', bookedHotels.isNotEmpty),
+                  _tabItem('hotels', '🏨 Stays', bookedHotels.isNotEmpty),
                   const SizedBox(width: 8),
-                  _tabItem('cruise', 'ðŸš¢ Cruises', bookedCruises.isNotEmpty),
+                  _tabItem('cruise', '🚢 Cruises', bookedCruises.isNotEmpty),
                   const SizedBox(width: 8),
-                  _tabItem('bus', 'ðŸšŒ Bus Stops', bookedBuses.isNotEmpty),
+                  _tabItem('bus', '🚌 Bus Stops', bookedBuses.isNotEmpty),
                   const SizedBox(width: 8),
-                  _tabItem('cabs', 'ðŸš– Cab Dispatch', _cabDispatched),
+                  _tabItem('cabs', '🚕 Cab Dispatch', _cabDispatched),
                   const SizedBox(width: 8),
-                  _tabItem('tickets', 'ðŸŽŸï¸ Tickets', true),
+                  _tabItem('tickets', '🎫 Tickets', true),
                 ],
               ),
             ),
@@ -209,7 +209,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
         return _buildEmptyState('No Flight reservations found.', 'Browse outbound flight packages and book one to register.', '/flights');
       }
       return Column(
-        children: flights.map((f) => _buildBookingCard(f.label, 'Class: Economy â€¢ Gate: Terminal 1', Icons.flight_takeoff)).toList(),
+        children: flights.map((f) => _buildBookingCard(f.label, 'Class: Economy • Gate: Terminal 1', Icons.flight_takeoff)).toList(),
       );
     }
 
@@ -218,7 +218,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
         return _buildEmptyState('No hotel lodgings confirmed.', 'Find your optimal capsules or design stays and lock a room.', '/hotels');
       }
       return Column(
-        children: hotels.map((h) => _buildBookingCard(h.label, 'Check-in: 03:00 PM â€¢ Room: 402', Icons.hotel)).toList(),
+        children: hotels.map((h) => _buildBookingCard(h.label, 'Check-in: 03:00 PM • Room: 402', Icons.hotel)).toList(),
       );
     }
 
@@ -227,7 +227,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
       if (cruiseExpenses.isNotEmpty && !_bookingAnotherCruise) {
         return Column(
           children: [
-            ...cruiseExpenses.map((c) => _buildBookingCard(c.label, 'Boarding: 06:00 PM â€¢ Dock: Pier 3', Icons.directions_boat)),
+            ...cruiseExpenses.map((c) => _buildBookingCard(c.label, 'Boarding: 06:00 PM • Dock: Pier 3', Icons.directions_boat)),
             const SizedBox(height: 12),
             OutlinedButton(
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF2563EB))),
@@ -318,7 +318,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
       if (busExpenses.isNotEmpty && !_bookingAnotherBus) {
         return Column(
           children: [
-            ...busExpenses.map((b) => _buildBookingCard(b.label, 'Status: Confirmed â€¢ Seat: Row 5', Icons.directions_bus)),
+            ...busExpenses.map((b) => _buildBookingCard(b.label, 'Status: Confirmed • Seat: Row 5', Icons.directions_bus)),
             const SizedBox(height: 12),
             OutlinedButton(
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF2563EB))),
@@ -535,7 +535,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(t['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white)),
-                      Text('Scheduled: ${t['time']} â€¢ code: ${t['code']}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                      Text('Scheduled: ${t['time']} • code: ${t['code']}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
                     ],
                   ),
                 ),

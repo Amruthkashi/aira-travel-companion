@@ -324,7 +324,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '@$user â€¢ $archetype',
+                  '@$user • $archetype',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF94A3B8),
@@ -419,7 +419,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ],
               ),
               const Text(
-                'ðŸ§',
+                '🐧',
                 style: TextStyle(fontSize: 22),
               ),
             ],
@@ -436,7 +436,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Â¥$formattedBalance JPY',
+            '¥$formattedBalance JPY',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 32,
@@ -512,7 +512,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                       decoration: const InputDecoration(
                         isDense: true,
-                        labelText: 'Top-Up amount (Â¥)',
+                        labelText: 'Top-Up amount (¥)',
                         labelStyle: TextStyle(color: Colors.white70, fontSize: 11),
                         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white54)),
                         focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
@@ -588,7 +588,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'ROOM KEY â€¢ GRACERY HOTEL',
+                      'ROOM KEY • GRACERY HOTEL',
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w900,
@@ -598,7 +598,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _nfcUnlocked ? 'Room 1402 â€¢ Stay Active' : 'Room 1402 â€¢ Stay ID 78229',
+                      _nfcUnlocked ? 'Room 1402 • Stay Active' : 'Room 1402 • Stay ID 78229',
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
@@ -902,28 +902,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _dnaSlider(
-            emoji: 'ðŸœ',
+            emoji: '🍜',
             title: 'Foodie Vibe',
             val: userProfileState.dnaFoodie,
             key: 'foodie',
             activeColor: const Color(0xFF0D9488),
           ),
           _dnaSlider(
-            emoji: 'â›©ï¸',
+            emoji: '⛩️',
             title: 'Heritage Path',
             val: userProfileState.dnaHeritage,
             key: 'heritage',
             activeColor: const Color(0xFF4F46E5),
           ),
           _dnaSlider(
-            emoji: 'ðŸ§³',
+            emoji: '🧳',
             title: 'Otaku & Tech',
             val: userProfileState.dnaTech,
             key: 'tech',
             activeColor: const Color(0xFF7C3AED),
           ),
           _dnaSlider(
-            emoji: 'ðŸŒ¿',
+            emoji: '🌿',
             title: 'Active Nature',
             val: userProfileState.dnaAdventure,
             key: 'adventure',
@@ -1110,7 +1110,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         child: Column(
                           children: [
                             const Text(
-                              'Skyline Airlines â€¢ SQ-638',
+                              'Skyline Airlines • SQ-638',
                               style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8)),
                             ),
                             const SizedBox(height: 4),
@@ -1135,7 +1135,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text(
-                                'Jun 15 â€¢ 11h 15m',
+                                'Jun 15 • 11h 15m',
                                 style: TextStyle(
                                   fontSize: 9,
                                   fontWeight: FontWeight.w900,
@@ -1351,7 +1351,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         children: [
                           const Text('CHECK-IN', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8))),
                           const SizedBox(height: 2),
-                          Text('Jun 16 â€¢ 3:00 PM', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.white70)),
+                          Text('Jun 16 • 3:00 PM', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.white70)),
                         ],
                       ),
                       Column(

@@ -154,7 +154,7 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
                                   ),
                                 ),
                                 Text(
-                                  'â˜… ${hotel['rating']}',
+                                  '★ ${hotel['rating']}',
                                   style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amber, fontSize: 12),
                                 ),
                               ],

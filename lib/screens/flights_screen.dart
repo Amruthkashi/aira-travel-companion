@@ -188,7 +188,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${flight['airline']} â€¢ ${flight['code']}',
+                                  '${flight['airline']} • ${flight['code']}',
                                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
                                 ),
                                 const SizedBox(height: 2),

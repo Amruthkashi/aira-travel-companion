@@ -14,12 +14,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  String selectedCategory = 'ðŸ‘¤ Solo Traveler';
+  String selectedCategory = '👤 Solo Traveler';
   final Set<String> likedDestinations = {"Santorini", "Amalfi Coast"};
   final Set<String> _connectedBuddies = {};
 
   final Map<String, List<Map<String, dynamic>>> _destinationsDb = {
-    "ðŸ‘¤ Solo Traveler": [
+    "👤 Solo Traveler": [
       {
         "name": "Tokyo Crossing District",
         "country": "Japan",
@@ -66,7 +66,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         "tags": ["Extreme", "Social", "Scenic"]
       }
     ],
-    "ðŸ‘©â€â¤ï¸â€ðŸ‘¨ Couple / Romantic": [
+    "👩‍❤️‍👨 Couple / Romantic": [
       {
         "name": "Oia Santorini",
         "country": "Greece",
@@ -113,7 +113,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         "tags": ["Private", "Tropical", "Lagoon"]
       }
     ],
-    "â˜€ï¸ Summer Beach": [
+    "☀️ Summer Beach": [
       {
         "name": "Uluwatu Temple",
         "country": "Indonesia",
@@ -160,7 +160,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         "tags": ["Active", "Food", "Beaches"]
       }
     ],
-    "ðŸ‘¨ðŸ‘© Family Fun": [
+    "👨‍👩‍👦 Family Fun": [
       {
         "name": "Disneyland Tokyo",
         "country": "Japan",
@@ -425,7 +425,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 Text(
-                  '$firstName ðŸ‘‹',
+                  '$firstName 👋',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -505,17 +505,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final String temp;
     final String lowercaseCity = city.toLowerCase();
     if (lowercaseCity.contains('tokyo') || lowercaseCity.contains('shibuya')) {
-      temp = '22Â°C';
+      temp = '22°C';
     } else if (lowercaseCity.contains('kyoto')) {
-      temp = '18Â°C';
+      temp = '18°C';
     } else if (lowercaseCity.contains('paris')) {
-      temp = '20Â°C';
+      temp = '20°C';
     } else if (lowercaseCity.contains('rome')) {
-      temp = '26Â°C';
+      temp = '26°C';
     } else if (lowercaseCity.contains('bali')) {
-      temp = '30Â°C';
+      temp = '30°C';
     } else {
-      temp = '24Â°C';
+      temp = '24°C';
     }
 
     return SingleChildScrollView(
@@ -526,7 +526,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           _buildMetricPill(
             icon: Icons.cloud_queue,
             iconColor: Colors.amber,
-            text: '$city â€¢ $temp',
+            text: '$city • $temp',
           ),
           const SizedBox(width: 8),
           _buildMetricPill(
@@ -1474,10 +1474,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildDiscoverPlaces() {
     final List<String> categories = [
-      "ðŸ‘¤ Solo Traveler",
-      "ðŸ‘©â€â¤ï¸â€ðŸ‘¨ Couple / Romantic",
-      "â˜€ï¸ Summer Beach",
-      "ðŸ‘¨ðŸ‘© Family Fun"
+      "👤 Solo Traveler",
+      "👩‍❤️‍👨 Couple / Romantic",
+      "☀️ Summer Beach",
+      "👨‍👩‍👦 Family Fun"
     ];
 
     return Column(
@@ -1712,7 +1712,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           ),
                                           const SizedBox(height: 1),
                                           Text(
-                                            '$countryCode â€¢ ${item['country'] ?? ""}',
+                                            '$countryCode • ${item['country'] ?? ""}',
                                             style: const TextStyle(
                                               fontSize: 9.5,
                                               color: Color(0xFF00B4D8), // Indigo 400
@@ -1921,10 +1921,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.network(
-                  item['image'],
+                  (item['image'] != null && item['image'].toString().isNotEmpty)
+                      ? item['image']
+                      : 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=400',
                   height: 160,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 160,
+                    color: const Color(0xFF1A2744),
+                    child: const Icon(Icons.image, color: Colors.white24, size: 40),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -1949,7 +1956,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                '$countryCode â€¢ ${item['country']}',
+                '$countryCode • ${item['country']}',
                 style: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 13),
               ),
               const SizedBox(height: 12),
@@ -2021,7 +2028,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 'image': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
                 'itinerary': [
                   {'time': '04:00 PM', 'activity': 'Sky View Deck view', 'location': 'Sky View Deck'},
-                  {'time': '07:00 PM', 'activity': 'Geek Town themed cafÃ© tour', 'location': 'Geek Town'},
+                  {'time': '07:00 PM', 'activity': 'Geek Town themed café tour', 'location': 'Geek Town'},
                 ],
               },
               {
@@ -2082,7 +2089,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Matching destination & dates: $tripCity â€¢ $dateRangeStr',
+                    'Matching destination & dates: $tripCity • $dateRangeStr',
                     style: const TextStyle(
                       color: Color(0xFF94A3B8),
                       fontSize: 12,
@@ -2238,7 +2245,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     _showBuddyItineraryModal(buddy);
                                   },
                                   child: const Text(
-                                    'Itinerary âž”',
+                                    'Itinerary ➔',
                                     style: TextStyle(
                                       color: Color(0xFF00B4D8),
                                       fontSize: 10,
@@ -2308,7 +2315,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'ðŸ“ ${item['location']!}',
+                                  '📍 ${item['location']!}',
                                   style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
                                 ),
                               ],
@@ -2858,7 +2865,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
-                                        '${members.length}ðŸ‘¥',
+                                        '${members.length}👥',
                                         style: const TextStyle(
                                           fontSize: 11,
                                           color: Color(0xFF00B4D8),
@@ -3040,7 +3047,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       onSquadJoined();
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Joined the squad! ðŸŽ‰'), backgroundColor: Color(0xFF06D6A0)),
+                          const SnackBar(content: Text('Joined the squad! 🎉'), backgroundColor: Color(0xFF06D6A0)),
                         );
                       }
                     } catch (e) {

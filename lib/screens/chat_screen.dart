@@ -678,11 +678,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
-                    _presetChip('ðŸ´ Delhi Food?'),
+                    _presetChip('🍴 Delhi Food?'),
                     const SizedBox(width: 8),
-                    _presetChip('â›°ï¸ Manali Snow?'),
+                    _presetChip('⛰️ Manali Snow?'),
                     const SizedBox(width: 8),
-                    _presetChip('ðŸµ Assam Tea?'),
+                    _presetChip('🍵 Assam Tea?'),
                   ],
                 ),
               ),

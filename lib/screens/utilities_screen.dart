@@ -98,7 +98,7 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _customsRow(Icons.payments_outlined, 'Cash Caps', 'Declare if carrying > Â¥1,000,000 equivalent cash value.'),
+                  _customsRow(Icons.payments_outlined, 'Cash Caps', 'Declare if carrying > ¥1,000,000 equivalent cash value.'),
                   _customsRow(Icons.liquor_outlined, 'Alcohol Limit', 'Tax-free allowance limits to 3 bottles (760ml each).'),
                   _customsRow(Icons.filter_vintage_outlined, 'Prohibited Items', 'Strictly forbidden: fresh fruits, meats, narcotics, and firearms.'),
                   _customsRow(Icons.shopping_bag_outlined, 'Tax-Free Purchases', 'Keep receipts attached to passport details for customs review at airport.'),

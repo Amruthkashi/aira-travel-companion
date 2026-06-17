@@ -130,19 +130,19 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   String _getCategoryEmoji(String cat) {
     switch (cat) {
       case 'Flights & Transit':
-        return 'âœˆï¸';
+        return '✈️';
       case 'Bed & Hotels':
-        return 'ðŸ¨';
+        return '🏨';
       case 'Local Dine-Out':
-        return 'ðŸœ';
+        return '🍜';
       case 'Metros & Taxis':
-        return 'ðŸš‡';
+        return '🚇';
       case 'Sightseeing & Shows':
-        return 'â›©ï¸';
+        return '⛩️';
       case 'Souvenirs & Anime':
-        return 'ðŸ›ï¸';
+        return '🛍️';
       default:
-        return 'ðŸ’°';
+        return '💰';
     }
   }
 
@@ -154,8 +154,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   }
 
   String get _currencySymbol {
-    if (_selectedCurrency == 'INR') return 'â‚¹';
-    if (_selectedCurrency == 'JPY') return 'Â¥';
+    if (_selectedCurrency == 'INR') return '₹';
+    if (_selectedCurrency == 'JPY') return '¥';
     return '\$';
   }
 
@@ -269,7 +269,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                             ),
                             ...matchingExpenses.map((exp) => _buildLogTile(
                               title: exp.label,
-                              subtitle: '${exp.category} â€¢ ${exp.date}',
+                              subtitle: '${exp.category} • ${exp.date}',
                               usdAmount: exp.amount,
                               isItinerary: false,
                               onDelete: () {
@@ -286,7 +286,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                             ),
                             ...matchingActivities.map((act) => _buildLogTile(
                               title: act.activity,
-                              subtitle: '${act.locationName} â€¢ Scheduled',
+                              subtitle: '${act.locationName} • Scheduled',
                               usdAmount: act.usdCost,
                               isItinerary: true,
                             )),
@@ -498,8 +498,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             child: Row(
               children: [
                 _buildCurrencyPill('USD', 'USD (\$)'),
-                _buildCurrencyPill('INR', 'INR (â‚¹)'),
-                _buildCurrencyPill('JPY', 'JPY (Â¥)'),
+                _buildCurrencyPill('INR', 'INR (₹)'),
+                _buildCurrencyPill('JPY', 'JPY (¥)'),
               ],
             ),
           ),
@@ -1338,7 +1338,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Â¥${jpyOutput.round().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                  '¥${jpyOutput.round().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
                   style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF00B4D8)),
                 ),
                 if (_taxFreeReduction) ...[
@@ -1348,7 +1348,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                       const Icon(Icons.verified, color: Color(0xFF06D6A0), size: 12),
                       const SizedBox(width: 4),
                       Text(
-                        'Tax Savings: Â¥${taxSavings.round()} (10% saved)',
+                        'Tax Savings: ¥${taxSavings.round()} (10% saved)',
                         style: const TextStyle(fontSize: 10.5, color: Color(0xFF06D6A0), fontWeight: FontWeight.bold),
                       ),
                     ],

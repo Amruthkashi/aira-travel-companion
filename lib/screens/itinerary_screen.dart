@@ -75,7 +75,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 _modalField('Attire Suggested / Dress Code', attireCtrl),
                 _modalField('Local Transport Directions', transportCtrl),
                 _modalField('Ticketing & Booking Info', ticketCtrl),
-                _modalField(r'Activity Expense Cost (e.g. $20 or Â¥3,000)', costCtrl),
+                _modalField(r'Activity Expense Cost (e.g. $20 or ¥3,000)', costCtrl),
                 _modalField('Place Details / Fun Facts', placeCtrl, maxLines: 2),
                 _modalField('Description Notes', descCtrl, maxLines: 3),
                 const SizedBox(height: 20),
