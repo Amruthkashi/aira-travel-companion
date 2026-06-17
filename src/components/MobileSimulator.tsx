@@ -568,9 +568,9 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
   // Innovative Profile Screen States
   const [ecoOffsetDone, setEcoOffsetDone] = useState(false);
   const [expandedTicket, setExpandedTicket] = useState<'flight' | 'hotel' | null>(null);
-  const [Prepaid Transit PassBalance, setPrepaid Transit PassBalance] = useState(2500); // in Yen (¥)
-  const [Prepaid Transit PassTopUpOpen, setPrepaid Transit PassTopUpOpen] = useState(false);
-  const [Prepaid Transit PassGateState, setPrepaid Transit PassGateState] = useState<'idle' | 'scanning' | 'success'>('idle');
+  const [prepaidTransitPassBalance, setprepaidTransitPassBalance] = useState(2500); // in Yen (¥)
+  const [prepaidTransitPassTopUpOpen, setprepaidTransitPassTopUpOpen] = useState(false);
+  const [prepaidTransitPassGateState, setprepaidTransitPassGateState] = useState<'idle' | 'scanning' | 'success'>('idle');
   const [nfcKeyScanning, setNfcKeyScanning] = useState(false);
   const [nfcKeyUnlocked, setNfcKeyUnlocked] = useState(false);
   const [walletAdded, setWalletAdded] = useState(false);
@@ -5889,7 +5889,7 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
                   <div className="mt-5 relative z-10">
                     <span className="text-[8px] font-mono font-bold text-emerald-100 uppercase tracking-wider block">NFC CARD BALANCE</span>
                     <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="text-2xl font-black font-mono">¥{Prepaid Transit PassBalance.toLocaleString()}</span>
+                      <span className="text-2xl font-black font-mono">¥{prepaidTransitPassBalance.toLocaleString()}</span>
                       <span className="text-[9px] text-emerald-100/80 font-mono">JPY</span>
                     </div>
                   </div>
@@ -5901,26 +5901,26 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
                     <button
                       onClick={() => {
                         playBeep('success');
-                        setPrepaid Transit PassTopUpOpen(!Prepaid Transit PassTopUpOpen);
+                        setprepaidTransitPassTopUpOpen(!prepaidTransitPassTopUpOpen);
                       }}
                       className="px-3 py-1.5 bg-slate-950/40 hover:bg-slate-950/60 border border-white/10 rounded-xl text-[10px] font-bold text-white transition-all active:scale-95 flex items-center gap-1"
                     >
                       <CreditCard className="w-3.5 h-3.5" />
-                      {Prepaid Transit PassTopUpOpen ? 'Close Top-Up' : 'Top Up (Yen)'}
+                      {prepaidTransitPassTopUpOpen ? 'Close Top-Up' : 'Top Up (Yen)'}
                     </button>
 
                     <button
                       onClick={() => {
-                        if (Prepaid Transit PassBalance < 200) {
+                        if (prepaidTransitPassBalance < 200) {
                           alert('Insufficient Prepaid Transit Pass balance! Please top up.');
                           return;
                         }
                         // Start simulated scanning sequence
-                        setPrepaid Transit PassGateState('scanning');
+                        setprepaidTransitPassGateState('scanning');
                         setTimeout(() => {
                           playBeep('Prepaid Transit Pass');
-                          setPrepaid Transit PassBalance(prev => prev - 200);
-                          setPrepaid Transit PassGateState('success');
+                          setprepaidTransitPassBalance(prev => prev - 200);
+                          setprepaidTransitPassGateState('success');
                           
                           // Add to expenses ledger
                           const newExp: TravelExpense = {
@@ -5934,24 +5934,24 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
                           setXpPoints(prev => prev + 15);
                           
                           // Reset gate state back to idle after a delay
-                          setTimeout(() => setPrepaid Transit PassGateState('idle'), 3000);
+                          setTimeout(() => setprepaidTransitPassGateState('idle'), 3000);
                         }, 1200);
                       }}
-                      disabled={Prepaid Transit PassGateState !== 'idle'}
+                      disabled={prepaidTransitPassGateState !== 'idle'}
                       className={`px-3.5 py-1.5 rounded-xl text-[10px] font-black transition-all active:scale-95 shadow-sm text-center ${
-                        Prepaid Transit PassGateState === 'scanning'
+                        prepaidTransitPassGateState === 'scanning'
                           ? 'bg-amber-400 text-slate-950 animate-pulse cursor-default'
-                          : Prepaid Transit PassGateState === 'success'
+                          : prepaidTransitPassGateState === 'success'
                           ? 'bg-white text-emerald-700 cursor-default'
                           : 'bg-white text-slate-900 hover:bg-slate-50'
                       }`}
                     >
-                      {Prepaid Transit PassGateState === 'scanning' ? 'Tapping NFC Gate...' : Prepaid Transit PassGateState === 'success' ? '✓ Gate Opened (¥200)' : 'Tap Gate at Station'}
+                      {prepaidTransitPassGateState === 'scanning' ? 'Tapping NFC Gate...' : prepaidTransitPassGateState === 'success' ? '✓ Gate Opened (¥200)' : 'Tap Gate at Station'}
                     </button>
                   </div>
 
                   {/* Interactive Top Up slider panel inside card */}
-                  {Prepaid Transit PassTopUpOpen && (
+                  {prepaidTransitPassTopUpOpen && (
                     <div className="mt-4 p-3 bg-slate-950/85 rounded-2xl border border-white/10 space-y-2 animate-fade-in relative z-10 text-left">
                       <span className="text-[8px] font-mono font-black text-[#FFD166] block tracking-wider uppercase">Select Top-Up Amount (Simulated charging)</span>
                       <div className="grid grid-cols-3 gap-1.5">
@@ -5960,7 +5960,7 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
                             key={amt}
                             onClick={() => {
                               playBeep('success');
-                              setPrepaid Transit PassBalance(prev => prev + amt);
+                              setprepaidTransitPassBalance(prev => prev + amt);
                               
                               // Charge travel budget (approx $1 USD = 150 Yen)
                               const chargedUSD = Math.round((amt / 150) * 100) / 100;
@@ -5974,7 +5974,7 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
                               setExpenses(prev => [newExp, ...prev]);
                               setXpPoints(prev => prev + Math.floor(amt / 100)); // grant XP
                               
-                              setPrepaid Transit PassTopUpOpen(false);
+                              setprepaidTransitPassTopUpOpen(false);
                               alert(`Successfully topped up card with ¥${amt.toLocaleString()}! Charged $${chargedUSD} USD to your Travel Budget ledger.`);
                             }}
                             className="py-1.5 bg-emerald-700 hover:bg-[#06D6A0] border border-emerald-500 rounded-lg text-[9px] font-mono font-bold text-white text-center transition-all active:scale-95"
@@ -6402,7 +6402,7 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
                       setXpPoints(2450);
                       setEcoOffsetDone(false);
                       setExpandedTicket(null);
-                      setPrepaid Transit PassBalance(2500);
+                      setprepaidTransitPassBalance(2500);
                       setNfcKeyUnlocked(false);
                       setDnaFoodie(92);
                       setDnaHeritage(85);
