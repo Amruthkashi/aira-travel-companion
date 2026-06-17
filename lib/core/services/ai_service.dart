@@ -19,14 +19,14 @@ class AiService {
       }
     } catch (_) {}
 
-    if (kIsWeb) return 'http://localhost:3005';
+    if (kIsWeb) return 'https://aira-travel-companian.onrender.com';
     try {
       if (Platform.isAndroid) {
-        return 'http://10.0.2.2:3005'; // Android Emulator loopback
+        return 'https://aira-travel-companian.onrender.com'; // Deployed Render Server
       }
-      return 'http://localhost:3005'; // iOS simulator or desktop
+      return 'https://aira-travel-companian.onrender.com'; // Deployed Render Server
     } catch (_) {
-      return 'http://localhost:3005';
+      return 'https://aira-travel-companian.onrender.com';
     }
   }
 
