@@ -890,16 +890,14 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   @override
   Widget build(BuildContext context) {
     final itinerary = ref.watch(itineraryProvider);
-    final themeMode = ref.watch(themeModeProvider);
-    final isDark = themeMode == ThemeMode.dark;
-
-    final bgColor = isDark ? const Color(0xFF0A1628) : const Color(0xFFF8FAFC);
-    final cardColor = isDark ? const Color(0xFF1A2744) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final mutedTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
-    final pillActive = isDark ? const Color(0xFF2563EB) : const Color(0xFF4F46E5);
-    final pillInactive = isDark ? const Color(0xFF1A2744) : Colors.white;
+    const isDark = true;
+    const bgColor = Color(0xFF0A1628);
+    const cardColor = Color(0xFF1A2744);
+    const textColor = Colors.white;
+    const mutedTextColor = Color(0xFF94A3B8);
+    const borderColor = Color(0xFF334155);
+    const pillActive = Color(0xFF2563EB);
+    const pillInactive = Color(0xFF1A2744);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -912,60 +910,36 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E1E38) : const Color(0xFFEEF2FF),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      'CHRONO WATCH',
-                      style: TextStyle(
-                        color: Color(0xFF4F46E5),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                        letterSpacing: 0.5,
+                  const Row(
+                    children: [
+                      Icon(Icons.schedule, color: Color(0xFF2563EB), size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'HOURLY SCHEDULE',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                          letterSpacing: 0.5,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                   Row(
                     children: [
                       IconButton(
                         tooltip: 'Share Itinerary (HTML)',
-                        icon: Icon(Icons.share_rounded, color: textColor, size: 20),
+                        icon: const Icon(Icons.share_rounded, color: Colors.white, size: 20),
                         onPressed: _showShareItineraryDialog,
                       ),
                       IconButton(
                         tooltip: 'Simulate Time',
                         icon: Icon(
                           Icons.more_time_rounded,
-                          color: _useMockTime ? Colors.amberAccent : textColor,
+                          color: _useMockTime ? Colors.amberAccent : Colors.white,
                           size: 20,
                         ),
                         onPressed: _showTimeSimulatorDialog,
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        tooltip: isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme',
-                        icon: Icon(
-                          isDark ? Icons.light_mode : Icons.dark_mode,
-                          color: const Color(0xFF4F46E5),
-                          size: 20,
-                        ),
-                        onPressed: () {
-                          ref.read(themeModeProvider.notifier).state =
-                              isDark ? ThemeMode.light : ThemeMode.dark;
-                        },
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'XP Level Progress',
-                        style: TextStyle(
-                          color: mutedTextColor,
-                          fontFamily: 'monospace',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
                       ),
                     ],
                   ),
@@ -1048,7 +1022,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   }
 
   Widget _buildTransportSyncCard(ItineraryDay dayObj, Color textColor, Color mutedTextColor) {
-    final isDark = ref.read(themeModeProvider) == ThemeMode.dark;
+    const isDark = true;
 
     // Detect primary event type of the day
     String syncTitle = 'DAY ${_activeDay + 1} ACTIVITY SYNC';
@@ -1426,7 +1400,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   }
 
   Widget _buildItineraryBody(List<ItineraryDay> itinerary, Color cardColor, Color textColor, Color mutedTextColor, Color borderColor) {
-    final isDark = ref.read(themeModeProvider) == ThemeMode.dark;
+    const isDark = true;
     if (itinerary.isEmpty) {
       return Center(
         child: SingleChildScrollView(

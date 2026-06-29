@@ -90,13 +90,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final connectionStatus = ref.watch(serverConnectionProvider);
     final serverUrl = ref.watch(serverUrlProvider);
 
-    final themeMode = ref.watch(themeModeProvider);
-    final isDark = themeMode == ThemeMode.dark;
-    final bgColor = isDark ? const Color(0xFF0A1628) : const Color(0xFFF8FAFC);
-    final cardColor = isDark ? const Color(0xFF1A2744) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final mutedTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    const isDark = true;
+    const bgColor = Color(0xFF0A1628);
+    const cardColor = Color(0xFF1A2744);
+    const textColor = Colors.white;
+    const mutedTextColor = Color(0xFF94A3B8);
+    const borderColor = Color(0xFF334155);
 
     return Scaffold(
       backgroundColor: bgColor,

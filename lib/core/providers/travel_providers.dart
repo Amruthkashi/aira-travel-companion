@@ -1555,6 +1555,3 @@ final dayScheduleProvider = StateNotifierProvider<DayScheduleNotifier, List<List
 });
 
 final draftItineraryProvider = StateProvider<DraftItinerary?>((ref) => null);
-
-// 17. App Theme Mode Provider
-final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.dark);
