@@ -214,7 +214,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
     await AiService.saveItinerary(email, hourlyItinerary);
 
     // 4. Update Riverpod client state
-    ref.read(itineraryProvider.notifier).state = hourlyItinerary;
+    ref.read(itineraryProvider.notifier).setItinerary(hourlyItinerary);
 
     SoundSynthesizer.playTone(
       frequency: 960,
@@ -475,24 +475,82 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                 _buildFormField('TRAVEL STYLE & PREFERENCES', _preferencesCtrl, 'e.g. Anime Shopping, Food Stalls, Temples', maxLines: 2),
                 const SizedBox(height: 32),
 
-                // Compile Button
+                // Full Wizard Button (Primary CTA)
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF10B981),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 6,
+                    ),
+                    onPressed: () {
+                      // Pass form data to wizard providers
+                      if (_destCtrl.text.isNotEmpty) {
+                        ref.read(tripBookingsProvider.notifier).setDestination(_destCtrl.text);
+                      }
+                      // Pre-fill flight if source/dest provided
+                      if (_sourceCtrl.text.isNotEmpty && _destCtrl.text.isNotEmpty) {
+                        ref.read(tripBookingsProvider.notifier).addFlight(FlightBooking(
+                          id: 'flt-prefill-${DateTime.now().millisecondsSinceEpoch}',
+                          airline: _providerCtrl.text.isNotEmpty ? _providerCtrl.text : 'Airline',
+                          flightNumber: _pnrCtrl.text.isNotEmpty ? _pnrCtrl.text.split('-').first : '',
+                          pnr: _pnrCtrl.text,
+                          departureCity: _sourceCtrl.text,
+                          arrivalCity: _destCtrl.text,
+                          departureDate: _datesCtrl.text.split(' to ').isNotEmpty ? _datesCtrl.text.split(' to ').first : '',
+                          arrivalDate: _datesCtrl.text.split(' to ').length > 1 ? _datesCtrl.text.split(' to ').last : '',
+                          seatClass: 'Economy',
+                          passengers: int.tryParse(_travelersCtrl.text) ?? 1,
+                          flightType: 'going',
+                        ));
+                      }
+                      context.push('/itinerary-wizard/bookings');
+                    },
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.auto_awesome, color: Colors.white, size: 20),
+                        SizedBox(width: 10),
+                        Text(
+                          'FULL ITINERARY WIZARD',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Quick Compile Button (Secondary CTA)
                 SizedBox(
                   width: double.infinity,
                   height: 52,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFF2563EB)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 4,
+                      foregroundColor: const Color(0xFF60A5FA),
                     ),
                     onPressed: _startHourlyCompileSimulation,
-                    child: const Text(
-                      'COMPILE GROUNDED ITINERARY',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.bolt, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          'QUICK COMPILE (AI ONLY)',
+                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 0.5),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
+
               ],
             ),
           ),
@@ -566,13 +624,40 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
               builder: (context, child) {
                 return Theme(
                   data: Theme.of(context).copyWith(
+                    appBarTheme: const AppBarTheme(
+                      backgroundColor: Color(0xFF1A2744),
+                      foregroundColor: Colors.white,
+                      iconTheme: IconThemeData(color: Colors.white),
+                    ),
                     colorScheme: const ColorScheme.dark(
                       primary: Color(0xFF2563EB), // Royal Blue
                       onPrimary: Colors.white,
                       surface: Color(0xFF1A2744),
                       onSurface: Colors.white,
+                      secondary: Color(0xFF00B4D8),
                     ),
                     dialogBackgroundColor: const Color(0xFF0A1628),
+                    datePickerTheme: DatePickerThemeData(
+                      backgroundColor: const Color(0xFF0A1628),
+                      headerBackgroundColor: const Color(0xFF1E293B),
+                      headerForegroundColor: Colors.white,
+                      rangePickerHeaderBackgroundColor: const Color(0xFF1E293B),
+                      rangePickerHeaderForegroundColor: Colors.white,
+                      confirmButtonStyle: ButtonStyle(
+                        foregroundColor: WidgetStateProperty.all(const Color(0xFF60A5FA)),
+                        textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      cancelButtonStyle: ButtonStyle(
+                        foregroundColor: WidgetStateProperty.all(const Color(0xFF94A3B8)),
+                        textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF60A5FA), // Visible cyan/blue action text color
+                        textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                   child: child!,
                 );

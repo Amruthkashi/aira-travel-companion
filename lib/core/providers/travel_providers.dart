@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:math';
 import '../models/travel_models.dart';
 import '../services/ai_service.dart';
+import '../utils/timeline_validator.dart';
 
 
 // 1. User Profile State Notifier
@@ -338,9 +341,7 @@ class ItineraryNotifier extends StateNotifier<List<ItineraryDay>> {
     if (dayIndex >= 0 && dayIndex < state.length) {
       final updatedDays = state.map((day) {
         if (day.day == dayIndex + 1) {
-          return ItineraryDay(
-            day: day.day,
-            theme: day.theme,
+          return day.copyWith(
             activities: [...day.activities, item],
           );
         }
@@ -378,9 +379,7 @@ class ItineraryNotifier extends StateNotifier<List<ItineraryDay>> {
               placeDetails: placeDetails,
             );
           }
-          return ItineraryDay(
-            day: day.day,
-            theme: day.theme,
+          return day.copyWith(
             activities: updatedActivities,
           );
         }
@@ -400,9 +399,45 @@ class ItineraryNotifier extends StateNotifier<List<ItineraryDay>> {
               checked: !updatedActivities[activityIndex].checked,
             );
           }
-          return ItineraryDay(
-            day: day.day,
-            theme: day.theme,
+          return day.copyWith(
+            activities: updatedActivities,
+          );
+        }
+        return day;
+      }).toList();
+      state = updatedDays;
+    }
+  }
+
+  void deleteActivity(int dayIndex, int activityIndex) {
+    if (dayIndex >= 0 && dayIndex < state.length) {
+      final updatedDays = state.map((day) {
+        if (day.day == dayIndex + 1) {
+          final updatedActivities = List<ActivityItem>.from(day.activities);
+          if (activityIndex >= 0 && activityIndex < updatedActivities.length) {
+            updatedActivities.removeAt(activityIndex);
+          }
+          return day.copyWith(
+            activities: updatedActivities,
+          );
+        }
+        return day;
+      }).toList();
+      state = updatedDays;
+    }
+  }
+
+  void reorderActivity(int dayIndex, int oldIndex, int newIndex) {
+    if (dayIndex >= 0 && dayIndex < state.length) {
+      final updatedDays = state.map((day) {
+        if (day.day == dayIndex + 1) {
+          final updatedActivities = List<ActivityItem>.from(day.activities);
+          if (oldIndex >= 0 && oldIndex < updatedActivities.length &&
+              newIndex >= 0 && newIndex < updatedActivities.length) {
+            final item = updatedActivities.removeAt(oldIndex);
+            updatedActivities.insert(newIndex, item);
+          }
+          return day.copyWith(
             activities: updatedActivities,
           );
         }
@@ -419,7 +454,6 @@ class ItineraryNotifier extends StateNotifier<List<ItineraryDay>> {
 
     final oldAct = day.activities[activityIndex];
     
-    // Simulate AI swap for now with a slight variation
     final newAct = oldAct.copyWith(
       activity: "AI SUGGESTED: ${oldAct.activity} (Optimized)",
       description: "${oldAct.description}\n\n[AI Optimization]: Recommended alternative route via local express to save 15 mins.",
@@ -431,7 +465,7 @@ class ItineraryNotifier extends StateNotifier<List<ItineraryDay>> {
 
     state = state.map((d) {
       if (d.day == dayIndex + 1) {
-        return ItineraryDay(day: d.day, theme: d.theme, activities: updatedActivities);
+        return d.copyWith(activities: updatedActivities);
       }
       return d;
     }).toList();
@@ -441,11 +475,21 @@ class ItineraryNotifier extends StateNotifier<List<ItineraryDay>> {
     if (dayIndex >= 0 && dayIndex < state.length) {
       state = state.map((day) {
         if (day.day == dayIndex + 1) {
-          return ItineraryDay(
-            day: day.day,
+          return day.copyWith(
             theme: newTheme,
             activities: newActivities,
           );
+        }
+        return day;
+      }).toList();
+    }
+  }
+
+  void updateNotes(int dayIndex, String newNotes) {
+    if (dayIndex >= 0 && dayIndex < state.length) {
+      state = state.map((day) {
+        if (day.day == dayIndex + 1) {
+          return day.copyWith(notes: newNotes);
         }
         return day;
       }).toList();
@@ -703,3 +747,814 @@ final serverConnectionProvider = StateNotifierProvider<ServerConnectionNotifier,
 final serverUrlProvider = StateProvider<String>((ref) {
   return AiService.baseUrl;
 });
+
+// ==========================================
+// ITINERARY WIZARD PROVIDERS
+// ==========================================
+
+// 13. Trip Bookings State
+class TripBookingsNotifier extends StateNotifier<TripBookings> {
+  TripBookingsNotifier() : super(TripBookings());
+
+  void setTripDates(String start, String end) {
+    state = state.copyWith(startDate: start, endDate: end, isManualDates: true);
+  }
+
+  void setStartDate(String start) {
+    state = state.copyWith(startDate: start, isManualDates: true);
+  }
+
+  void setEndDate(String end) {
+    state = state.copyWith(endDate: end, isManualDates: true);
+  }
+
+  void addFlight(FlightBooking flight) {
+    final updatedFlights = [...state.flights, flight];
+    String? newStart = state.startDate;
+    String? newEnd = state.endDate;
+    String newDestination = state.destination;
+
+    if (updatedFlights.isNotEmpty) {
+      final sorted = List<FlightBooking>.from(updatedFlights)
+        ..sort((a, b) {
+          final dtA = DateTime.tryParse(a.departureDate) ?? DateTime(1970);
+          final dtB = DateTime.tryParse(b.departureDate) ?? DateTime(1970);
+          return dtA.compareTo(dtB);
+        });
+      final flightStart = sorted.first.departureDate;
+      final flightEnd = sorted.last.arrivalDate.isNotEmpty ? sorted.last.arrivalDate : sorted.last.departureDate;
+
+      if (!state.isManualDates) {
+        newStart = flightStart;
+        newEnd = flightEnd;
+      } else {
+        final parsedItineraryStart = DateTime.tryParse(state.startDate ?? '');
+        final parsedItineraryEnd = DateTime.tryParse(state.endDate ?? '');
+        final parsedFlightStart = DateTime.tryParse(flightStart);
+        final parsedFlightEnd = DateTime.tryParse(flightEnd);
+
+        if (parsedItineraryStart != null && parsedFlightStart != null) {
+          if (parsedFlightStart.isBefore(parsedItineraryStart)) {
+            newStart = flightStart;
+          }
+        }
+        if (parsedItineraryEnd != null && parsedFlightEnd != null) {
+          if (parsedFlightEnd.isAfter(parsedItineraryEnd)) {
+            newEnd = flightEnd;
+          }
+        }
+      }
+
+      // Auto-calculate destination city from flights
+      FlightBooking? targetFlight;
+      for (final f in updatedFlights) {
+        if (f.flightType == 'going') {
+          targetFlight = f;
+          break;
+        }
+      }
+      if (targetFlight == null) {
+        for (final f in updatedFlights) {
+          if (f.flightType == 'other') {
+            targetFlight = f;
+            break;
+          }
+        }
+      }
+      if (targetFlight == null) {
+        for (final f in updatedFlights) {
+          if (f.flightType != 'return') {
+            targetFlight = f;
+            break;
+          }
+        }
+      }
+      if (targetFlight == null) {
+        targetFlight = updatedFlights.first;
+      }
+
+      if (targetFlight.flightType == 'return') {
+        newDestination = targetFlight.departureCity;
+      } else {
+        newDestination = targetFlight.arrivalCity;
+      }
+    }
+
+    state = state.copyWith(
+      flights: updatedFlights,
+      startDate: newStart,
+      endDate: newEnd,
+      destination: newDestination,
+    );
+  }
+
+  void removeFlight(String id) {
+    final updatedFlights = state.flights.where((f) => f.id != id).toList();
+    String? newStart = state.startDate;
+    String? newEnd = state.endDate;
+    String newDestination = state.destination;
+
+    if (!state.isManualDates) {
+      if (updatedFlights.isNotEmpty) {
+        final sorted = List<FlightBooking>.from(updatedFlights)
+          ..sort((a, b) {
+            final dtA = DateTime.tryParse(a.departureDate) ?? DateTime(1970);
+            final dtB = DateTime.tryParse(b.departureDate) ?? DateTime(1970);
+            return dtA.compareTo(dtB);
+          });
+        newStart = sorted.first.departureDate;
+        newEnd = sorted.last.arrivalDate.isNotEmpty ? sorted.last.arrivalDate : sorted.last.departureDate;
+      } else {
+        newStart = '';
+        newEnd = '';
+      }
+    }
+
+    if (updatedFlights.isNotEmpty) {
+      // Auto-calculate destination city from flights
+      FlightBooking? targetFlight;
+      for (final f in updatedFlights) {
+        if (f.flightType == 'going') {
+          targetFlight = f;
+          break;
+        }
+      }
+      if (targetFlight == null) {
+        for (final f in updatedFlights) {
+          if (f.flightType == 'other') {
+            targetFlight = f;
+            break;
+          }
+        }
+      }
+      if (targetFlight == null) {
+        for (final f in updatedFlights) {
+          if (f.flightType != 'return') {
+            targetFlight = f;
+            break;
+          }
+        }
+      }
+      if (targetFlight == null) {
+        targetFlight = updatedFlights.first;
+      }
+
+      if (targetFlight.flightType == 'return') {
+        newDestination = targetFlight.departureCity;
+      } else {
+        newDestination = targetFlight.arrivalCity;
+      }
+    }
+
+    state = state.copyWith(
+      flights: updatedFlights,
+      startDate: newStart,
+      endDate: newEnd,
+      destination: newDestination,
+    );
+  }
+
+  void addHotel(HotelBooking hotel) {
+    state = state.copyWith(hotels: [...state.hotels, hotel]);
+  }
+
+  void removeHotel(String id) {
+    state = state.copyWith(hotels: state.hotels.where((h) => h.id != id).toList());
+  }
+
+  void addOther(OtherBooking other) {
+    state = state.copyWith(others: [...state.others, other]);
+  }
+
+  void removeOther(String id) {
+    state = state.copyWith(others: state.others.where((o) => o.id != id).toList());
+  }
+
+  void setDestination(String dest) {
+    state = state.copyWith(destination: dest);
+  }
+
+  void reset() {
+    state = TripBookings();
+  }
+}
+
+final tripBookingsProvider = StateNotifierProvider<TripBookingsNotifier, TripBookings>((ref) {
+  return TripBookingsNotifier();
+});
+
+// 14. Selected Places from Explore Screen
+final selectedPlacesProvider = StateProvider<List<ExplorePlaceItem>>((ref) => []);
+
+// 15. Day Schedule State — with time-blocking engine
+class DayScheduleNotifier extends StateNotifier<List<List<DayScheduleItem>>> {
+  DayScheduleNotifier() : super([]);
+
+  void initDays(int numDays) {
+    if (state.isEmpty) {
+      state = List.generate(numDays, (_) => []);
+    } else if (state.length < numDays) {
+      state = [...state, ...List.generate(numDays - state.length, (_) => [])];
+    } else if (state.length > numDays) {
+      state = state.sublist(0, numDays);
+    }
+  }
+
+  /// Check if a time slot is free on a given day
+  /// Returns true if no existing activity overlaps [startMin, startMin + duration)
+  bool isTimeSlotFree(int dayIndex, int startMin, int durationMin, {String? excludePlaceId}) {
+    if (dayIndex < 0 || dayIndex >= state.length) return true;
+    final endMin = startMin + durationMin;
+    for (final item in state[dayIndex]) {
+      if (excludePlaceId != null && item.place.id == excludePlaceId) continue;
+      final itemStart = item.startMinutes;
+      final itemEnd = item.endMinutes;
+      // Overlap check: two intervals overlap if one starts before the other ends
+      if (startMin < itemEnd && endMin > itemStart) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Find the first free slot of a day for a place.
+  /// Checks open hours first, falls back to closed hours if none are available.
+  int findFreeSlotForPlace(int dayIndex, ExplorePlaceItem place, TripBookings bookings, {String? excludePlaceId}) {
+    if (dayIndex < 0 || dayIndex >= state.length) return 540; // 9:00 AM default
+
+    final duration = place.durationMinutes;
+    final openMin = place.openMinutes;
+    final closeMin = place.closeMinutes;
+
+    // Build occupancy grid (1500 minutes to support nightlife crossing midnight)
+    final grid = List<int>.filled(1500, 0);
+
+    // Block time before earliest start
+    final earliestStart = getDayEarliestStart(dayIndex, bookings);
+    for (int i = 0; i < earliestStart; i++) {
+      grid[i] = 1;
+    }
+
+    // Block time after latest departure (if return day)
+    final baseStart = getBaseStartDate(bookings);
+    final dayDate = baseStart.add(Duration(days: dayIndex));
+    final dateStr = '${dayDate.year}-${dayDate.month.toString().padLeft(2, '0')}-${dayDate.day.toString().padLeft(2, '0')}';
+
+    final returnFlight = getReturnFlight(bookings);
+    final returnDeparture = returnFlight != null
+        ? parseFlightDateTime(returnFlight.departureDate, returnFlight.departureTime.isNotEmpty ? returnFlight.departureTime : '06:00 PM')
+        : null;
+
+    final isReturnDepartureDay = returnDeparture != null &&
+        dayDate.year == returnDeparture.year &&
+        dayDate.month == returnDeparture.month &&
+        dayDate.day == returnDeparture.day;
+
+    if (isReturnDepartureDay && returnFlight != null) {
+      final depMin = parseTimeToMinutes(returnFlight.departureTime.isNotEmpty ? returnFlight.departureTime : '06:00 PM');
+      final latestDepartureStartMin = depMin - 165;
+      for (int i = latestDepartureStartMin; i < 1500; i++) {
+        grid[i] = 1;
+      }
+    }
+
+    // Block hotel checkout periods
+    final checkingInHotels = bookings.hotels.where((h) => h.checkInDate == dateStr).toList();
+    final checkingOutHotels = bookings.hotels.where((h) => h.checkOutDate == dateStr).toList();
+    for (final hotel in checkingOutHotels) {
+      final coMin = parseTimeToMinutes(hotel.checkOutTime.isNotEmpty ? hotel.checkOutTime : '11:00 AM');
+      final isHotelChange = checkingInHotels.isNotEmpty;
+      final endBlock = isHotelChange ? coMin + 120 : coMin + 30;
+      for (int i = coMin; i < endBlock; i++) {
+        if (i < 1500) grid[i] = 1;
+      }
+    }
+
+    // Block existing scheduled items (excluding the current one)
+    for (final item in state[dayIndex]) {
+      if (excludePlaceId != null && item.place.id == excludePlaceId) continue;
+      final s = item.startMinutes - 30; // 30 min travel buffer before
+      final e = item.endMinutes;
+      for (int i = max(0, s); i < e; i++) {
+        if (i < 1500) grid[i] = 1;
+      }
+    }
+
+    // Helper to check if a candidate interval is free
+    bool isIntervalFree(int start, int end) {
+      for (int i = start; i < end; i++) {
+        if (i >= 1500 || grid[i] != 0) return false;
+      }
+      return true;
+    }
+
+    // Pass 1: Try to find first free slot respecting open/close hours
+    int searchStart = openMin;
+    if (searchStart < earliestStart) {
+      searchStart = earliestStart;
+    }
+    
+    for (int candidate = searchStart; candidate + duration <= closeMin; candidate += 15) {
+      if (isIntervalFree(candidate - 30, candidate + duration)) {
+        return candidate;
+      }
+    }
+
+    // Pass 2: Fallback (any slot, even if closed)
+    int absoluteLimit = (place.genre == 'Nightlife') ? 1500 : 1380;
+    for (int candidate = earliestStart; candidate + duration <= absoluteLimit; candidate += 15) {
+      if (isIntervalFree(candidate - 30, candidate + duration)) {
+        return candidate;
+      }
+    }
+
+    return earliestStart; // absolute fallback
+  }
+
+  /// Find the next free slot on a day that can fit [durationMin] minutes
+  /// Searches from [afterMinutes] onwards (default 9:00 AM = 540)
+  /// Returns start time in minutes, or -1 if no slot found before 10 PM
+  int findNextFreeSlot(int dayIndex, int durationMin, {int afterMinutes = 540}) {
+    if (dayIndex < 0 || dayIndex >= state.length) return afterMinutes;
+    
+    // Get all occupied intervals on this day, sorted by start
+    final occupied = state[dayIndex]
+        .map((item) => [item.startMinutes, item.endMinutes])
+        .toList()
+      ..sort((a, b) => a[0].compareTo(b[0]));
+
+    int candidate = afterMinutes;
+    const int dayEnd = 22 * 60; // 10:00 PM limit
+
+    for (final interval in occupied) {
+      if (candidate + durationMin <= interval[0]) {
+        // Found a gap before this occupied interval
+        return candidate;
+      }
+      // Move candidate past this occupied interval (+ 30 min travel buffer)
+      if (interval[1] + 30 > candidate) {
+        candidate = interval[1] + 30;
+      }
+    }
+
+    // Check if there's room after all occupied slots
+    if (candidate + durationMin <= dayEnd) {
+      return candidate;
+    }
+    return -1; // No slot available
+  }
+
+  void addToDay(int dayIndex, DayScheduleItem item, TripBookings bookings) {
+    if (dayIndex >= 0 && dayIndex < state.length) {
+      final updated = List<List<DayScheduleItem>>.from(state.map((d) => List<DayScheduleItem>.from(d)));
+      
+      // Auto-assign the first free slot
+      final freeSlot = findFreeSlotForPlace(dayIndex, item.place, bookings);
+      final timeStr = minutesToTimeString(freeSlot);
+      
+      final newItem = item.copyWith(
+        dayNumber: dayIndex + 1,
+        sortOrder: updated[dayIndex].length,
+        scheduledTime: timeStr,
+      );
+      updated[dayIndex] = [...updated[dayIndex], newItem];
+      // Sort by scheduled time
+      updated[dayIndex].sort((a, b) => a.startMinutes.compareTo(b.startMinutes));
+      // Re-index sort orders
+      for (int i = 0; i < updated[dayIndex].length; i++) {
+        updated[dayIndex][i] = updated[dayIndex][i].copyWith(sortOrder: i);
+      }
+      state = updated;
+    }
+  }
+
+  void removeFromDay(int dayIndex, String placeId) {
+    if (dayIndex >= 0 && dayIndex < state.length) {
+      final updated = List<List<DayScheduleItem>>.from(state.map((d) => List<DayScheduleItem>.from(d)));
+      updated[dayIndex] = updated[dayIndex].where((item) => item.place.id != placeId).toList();
+      // Re-index sort orders
+      for (int i = 0; i < updated[dayIndex].length; i++) {
+        updated[dayIndex][i] = updated[dayIndex][i].copyWith(sortOrder: i);
+      }
+      state = updated;
+    }
+  }
+
+  /// Move activity between days; checks for time availability on target day
+  /// Returns true if successful, false if no free slot
+  bool moveToDay(int fromDay, int toDay, String placeId, TripBookings bookings) {
+    if (fromDay >= 0 && fromDay < state.length && toDay >= 0 && toDay < state.length) {
+      final updated = List<List<DayScheduleItem>>.from(state.map((d) => List<DayScheduleItem>.from(d)));
+      final itemIndex = updated[fromDay].indexWhere((item) => item.place.id == placeId);
+      if (itemIndex >= 0) {
+        final item = updated[fromDay][itemIndex];
+        
+        // Check if the same time is free on the target day
+        final originalStart = item.startMinutes;
+        bool canKeepTime = true;
+        // Check against target day's existing items
+        final targetOccupied = updated[toDay];
+        for (final existing in targetOccupied) {
+          final eStart = existing.startMinutes;
+          final eEnd = existing.endMinutes;
+          if (originalStart < eEnd && (originalStart + item.place.durationMinutes) > eStart) {
+            canKeepTime = false;
+            break;
+          }
+        }
+
+        String newTime = item.scheduledTime;
+        if (!canKeepTime) {
+          // Find a free slot on the target day
+          final freeSlot = findFreeSlotForPlace(toDay, item.place, bookings, excludePlaceId: placeId);
+          if (freeSlot < 0) return false; // No free slot available
+          newTime = minutesToTimeString(freeSlot);
+        }
+
+        updated[fromDay].removeAt(itemIndex);
+        final movedItem = item.copyWith(
+          dayNumber: toDay + 1,
+          sortOrder: updated[toDay].length,
+          scheduledTime: newTime,
+        );
+        updated[toDay] = [...updated[toDay], movedItem];
+        // Sort target day by time
+        updated[toDay].sort((a, b) => a.startMinutes.compareTo(b.startMinutes));
+        for (int i = 0; i < updated[toDay].length; i++) {
+          updated[toDay][i] = updated[toDay][i].copyWith(sortOrder: i);
+        }
+        state = updated;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void reorderInDay(int dayIndex, int oldIndex, int newIndex) {
+    if (dayIndex >= 0 && dayIndex < state.length) {
+      final updated = List<List<DayScheduleItem>>.from(state.map((d) => List<DayScheduleItem>.from(d)));
+      final dayItems = List<DayScheduleItem>.from(updated[dayIndex]);
+      if (newIndex > oldIndex) newIndex -= 1;
+      final item = dayItems.removeAt(oldIndex);
+      dayItems.insert(newIndex, item);
+      
+      // Auto-suggest timings to re-stack them sequentially in the new order!
+      int currentTime = 540; // 9:00 AM
+      for (int i = 0; i < dayItems.length; i++) {
+        dayItems[i] = dayItems[i].copyWith(
+          scheduledTime: minutesToTimeString(currentTime),
+          sortOrder: i,
+        );
+        currentTime += dayItems[i].place.durationMinutes + 30; // 30 min buffer
+      }
+      
+      updated[dayIndex] = dayItems;
+      state = updated;
+    }
+  }
+
+  /// Swap two activities between days/times.
+  /// Checks if both slots are free (excluding the swapping items themselves).
+  /// Returns true if successful, false if there is a conflict.
+  bool swapActivities(int dayIndex1, String placeId1, int dayIndex2, String placeId2) {
+    if (dayIndex1 < 0 || dayIndex1 >= state.length || dayIndex2 < 0 || dayIndex2 >= state.length) return false;
+    
+    final updated = List<List<DayScheduleItem>>.from(state.map((d) => List<DayScheduleItem>.from(d)));
+    final idx1 = updated[dayIndex1].indexWhere((item) => item.place.id == placeId1);
+    final idx2 = updated[dayIndex2].indexWhere((item) => item.place.id == placeId2);
+    
+    if (idx1 < 0 || idx2 < 0) return false;
+    
+    final item1 = updated[dayIndex1][idx1];
+    final item2 = updated[dayIndex2][idx2];
+    
+    final time1 = item1.scheduledTime;
+    final time2 = item2.scheduledTime;
+    
+    final startMin1 = item1.startMinutes;
+    final startMin2 = item2.startMinutes;
+    
+    // Check if item1 fits on dayIndex2 at startMin2 (excluding item2)
+    final fits1 = isTimeSlotFree(dayIndex2, startMin2, item1.place.durationMinutes, excludePlaceId: placeId2);
+    // Check if item2 fits on dayIndex1 at startMin1 (excluding item1)
+    final fits2 = isTimeSlotFree(dayIndex1, startMin1, item2.place.durationMinutes, excludePlaceId: placeId1);
+    
+    if (fits1 && fits2) {
+      if (dayIndex1 == dayIndex2) {
+        // Same day: just swap times
+        final list = List<DayScheduleItem>.from(state[dayIndex1]);
+        final i1 = list.indexWhere((item) => item.place.id == placeId1);
+        final i2 = list.indexWhere((item) => item.place.id == placeId2);
+        
+        final temp = list[i1].copyWith(scheduledTime: time2);
+        list[i2] = list[i2].copyWith(scheduledTime: time1);
+        list[i1] = temp;
+        
+        list.sort((a, b) => a.startMinutes.compareTo(b.startMinutes));
+        for (int i = 0; i < list.length; i++) {
+          list[i] = list[i].copyWith(sortOrder: i);
+        }
+        updated[dayIndex1] = list;
+      } else {
+        // Different days: swap days and times
+        updated[dayIndex1].removeAt(idx1);
+        final newItem2 = item2.copyWith(
+          dayNumber: dayIndex1 + 1,
+          scheduledTime: time1,
+        );
+        updated[dayIndex1].add(newItem2);
+        updated[dayIndex1].sort((a, b) => a.startMinutes.compareTo(b.startMinutes));
+        for (int i = 0; i < updated[dayIndex1].length; i++) {
+          updated[dayIndex1][i] = updated[dayIndex1][i].copyWith(sortOrder: i);
+        }
+        
+        final idx2New = updated[dayIndex2].indexWhere((item) => item.place.id == placeId2);
+        updated[dayIndex2].removeAt(idx2New);
+        final newItem1 = item1.copyWith(
+          dayNumber: dayIndex2 + 1,
+          scheduledTime: time2,
+        );
+        updated[dayIndex2].add(newItem1);
+        updated[dayIndex2].sort((a, b) => a.startMinutes.compareTo(b.startMinutes));
+        for (int i = 0; i < updated[dayIndex2].length; i++) {
+          updated[dayIndex2][i] = updated[dayIndex2][i].copyWith(sortOrder: i);
+        }
+      }
+      
+      state = updated;
+      return true;
+    }
+    
+    return false;
+  }
+
+  /// Update time for an activity. Returns false if the new time conflicts.
+  bool updateTime(int dayIndex, String placeId, String newTime) {
+    if (dayIndex >= 0 && dayIndex < state.length) {
+      final item = state[dayIndex].firstWhere(
+        (i) => i.place.id == placeId,
+        orElse: () => state[dayIndex].first,
+      );
+      final newStartMin = parseTimeToMinutes(newTime);
+      
+      // Check collision (exclude self)
+      if (!isTimeSlotFree(dayIndex, newStartMin, item.place.durationMinutes, excludePlaceId: placeId)) {
+        return false; // Conflict!
+      }
+      
+      final updated = List<List<DayScheduleItem>>.from(state.map((d) => List<DayScheduleItem>.from(d)));
+      updated[dayIndex] = updated[dayIndex].map((i) {
+        if (i.place.id == placeId) {
+          return i.copyWith(scheduledTime: newTime);
+        }
+        return i;
+      }).toList();
+      // Re-sort by time
+      updated[dayIndex].sort((a, b) => a.startMinutes.compareTo(b.startMinutes));
+      for (int i = 0; i < updated[dayIndex].length; i++) {
+        updated[dayIndex][i] = updated[dayIndex][i].copyWith(sortOrder: i);
+      }
+      state = updated;
+      return true;
+    }
+    return false;
+  }
+
+  void addToDayAtTime(int dayIndex, ExplorePlaceItem place, String timeStr) {
+    if (dayIndex >= 0 && dayIndex < state.length) {
+      final updated = List<List<DayScheduleItem>>.from(state.map((d) => List<DayScheduleItem>.from(d)));
+      final newItem = DayScheduleItem(
+        place: place,
+        dayNumber: dayIndex + 1,
+        sortOrder: updated[dayIndex].length,
+        scheduledTime: timeStr,
+      );
+      updated[dayIndex] = [...updated[dayIndex], newItem];
+      updated[dayIndex].sort((a, b) => a.startMinutes.compareTo(b.startMinutes));
+      for (int i = 0; i < updated[dayIndex].length; i++) {
+        updated[dayIndex][i] = updated[dayIndex][i].copyWith(sortOrder: i);
+      }
+      state = updated;
+    }
+  }
+
+  Map<String, String> autoSuggestTimings(int dayIndex, TripBookings bookings) {
+    return resolveConflictsForDay(dayIndex, bookings);
+  }
+
+  void reorderAttractionsInDay(int dayIdx, int oldIndex, int newIndex, TripBookings bookings) {
+    if (dayIdx < 0 || dayIdx >= state.length) return;
+    final dayItems = List<DayScheduleItem>.from(state[dayIdx]);
+    if (dayItems.isEmpty) return;
+
+    if (newIndex > oldIndex) newIndex -= 1;
+    newIndex = newIndex.clamp(0, dayItems.length - 1);
+    final item = dayItems.removeAt(oldIndex);
+    dayItems.insert(newIndex, item);
+
+    final baseStart = getBaseStartDate(bookings);
+    final dayDate = baseStart.add(Duration(days: dayIdx));
+    final dateStr = '${dayDate.year}-${dayDate.month.toString().padLeft(2, '0')}-${dayDate.day.toString().padLeft(2, '0')}';
+
+    final checkingInHotels = bookings.hotels.where((h) => h.checkInDate == dateStr).toList();
+    final checkingOutHotels = bookings.hotels.where((h) => h.checkOutDate == dateStr).toList();
+
+    int currentPointerMin = getDayEarliestStart(dayIdx, bookings);
+
+    final returnFlight = getReturnFlight(bookings);
+    final returnDeparture = returnFlight != null
+        ? parseFlightDateTime(returnFlight.departureDate, returnFlight.departureTime.isNotEmpty ? returnFlight.departureTime : '06:00 PM')
+        : null;
+
+    final isReturnDepartureDay = returnDeparture != null &&
+        dayDate.year == returnDeparture.year &&
+        dayDate.month == returnDeparture.month &&
+        dayDate.day == returnDeparture.day;
+
+    final isAfterReturnFlight = returnDeparture != null &&
+        DateTime(dayDate.year, dayDate.month, dayDate.day).isAfter(DateTime(returnDeparture.year, returnDeparture.month, returnDeparture.day));
+
+    int latestDepartureStartMin = 1500;
+    if (isReturnDepartureDay && returnFlight != null) {
+      final depMin = parseTimeToMinutes(returnFlight.departureTime.isNotEmpty ? returnFlight.departureTime : '06:00 PM');
+      latestDepartureStartMin = depMin - 165;
+    } else if (isAfterReturnFlight) {
+      latestDepartureStartMin = 0;
+    }
+
+    final List<List<int>> avoidPeriods = [];
+    for (final hotel in checkingOutHotels) {
+      final coMin = parseTimeToMinutes(hotel.checkOutTime.isNotEmpty ? hotel.checkOutTime : '11:00 AM');
+      final isHotelChange = checkingInHotels.isNotEmpty;
+      avoidPeriods.add([coMin, isHotelChange ? coMin + 120 : coMin + 30]);
+    }
+
+    final List<DayScheduleItem> resolvedItems = [];
+    for (int i = 0; i < dayItems.length; i++) {
+      final currentItem = dayItems[i];
+      final duration = currentItem.place.durationMinutes;
+      final openMin = currentItem.place.openMinutes;
+      final closeMin = currentItem.place.closeMinutes;
+
+      int startMin = resolvedItems.isEmpty ? currentPointerMin : currentPointerMin + 30;
+      startMin = max(startMin, openMin);
+
+      bool slotFound = false;
+      final int dayLimit = (currentItem.place.genre == 'Nightlife') ? 1500 : 1380;
+      while (startMin + duration <= latestDepartureStartMin && startMin + duration <= dayLimit) {
+        bool overlapsAvoid = false;
+        for (final period in avoidPeriods) {
+          if (startMin < period[1] && (startMin + duration) > period[0]) {
+            overlapsAvoid = true;
+            break;
+          }
+        }
+
+        if (!overlapsAvoid && startMin >= openMin && (startMin + duration) <= closeMin) {
+          slotFound = true;
+          break;
+        }
+        startMin += 15;
+      }
+
+      if (slotFound) {
+        resolvedItems.add(currentItem.copyWith(
+          scheduledTime: minutesToTimeString(startMin),
+          sortOrder: i,
+        ));
+        currentPointerMin = startMin + duration;
+      } else {
+        resolvedItems.add(currentItem.copyWith(sortOrder: i));
+      }
+    }
+
+    resolvedItems.sort((a, b) => a.startMinutes.compareTo(b.startMinutes));
+    for (int i = 0; i < resolvedItems.length; i++) {
+      resolvedItems[i] = resolvedItems[i].copyWith(sortOrder: i);
+    }
+
+    final updated = List<List<DayScheduleItem>>.from(state.map((d) => List<DayScheduleItem>.from(d)));
+    updated[dayIdx] = resolvedItems;
+    state = updated;
+  }
+
+  Map<String, String> resolveConflictsForDay(int dayIdx, TripBookings bookings) {
+    final Map<String, String> changes = {};
+    if (dayIdx < 0 || dayIdx >= state.length) return changes;
+    final dayItems = state[dayIdx];
+    if (dayItems.isEmpty) return changes;
+
+    final sortedItems = List<DayScheduleItem>.from(dayItems)
+      ..sort((a, b) => a.startMinutes.compareTo(b.startMinutes));
+
+    final baseStart = getBaseStartDate(bookings);
+    final dayDate = baseStart.add(Duration(days: dayIdx));
+    final dateStr = '${dayDate.year}-${dayDate.month.toString().padLeft(2, '0')}-${dayDate.day.toString().padLeft(2, '0')}';
+    final checkingInHotels = bookings.hotels.where((h) => h.checkInDate == dateStr).toList();
+    final checkingOutHotels = bookings.hotels.where((h) => h.checkOutDate == dateStr).toList();
+
+    int currentPointerMin = getDayEarliestStart(dayIdx, bookings);
+
+    final returnFlight = getReturnFlight(bookings);
+    final returnDeparture = returnFlight != null
+        ? parseFlightDateTime(returnFlight.departureDate, returnFlight.departureTime.isNotEmpty ? returnFlight.departureTime : '06:00 PM')
+        : null;
+
+    final isReturnDepartureDay = returnDeparture != null &&
+        dayDate.year == returnDeparture.year &&
+        dayDate.month == returnDeparture.month &&
+        dayDate.day == returnDeparture.day;
+
+    final isAfterReturnFlight = returnDeparture != null &&
+        DateTime(dayDate.year, dayDate.month, dayDate.day).isAfter(DateTime(returnDeparture.year, returnDeparture.month, returnDeparture.day));
+
+    int latestDepartureStartMin = 1500;
+    if (isReturnDepartureDay && returnFlight != null) {
+      final depMin = parseTimeToMinutes(returnFlight.departureTime.isNotEmpty ? returnFlight.departureTime : '06:00 PM');
+      latestDepartureStartMin = depMin - 165;
+    } else if (isAfterReturnFlight) {
+      latestDepartureStartMin = 0;
+    }
+
+    final List<List<int>> avoidPeriods = [];
+    for (final hotel in checkingOutHotels) {
+      final coMin = parseTimeToMinutes(hotel.checkOutTime.isNotEmpty ? hotel.checkOutTime : '11:00 AM');
+      final isHotelChange = checkingInHotels.isNotEmpty;
+      avoidPeriods.add([coMin, isHotelChange ? coMin + 120 : coMin + 30]);
+    }
+
+    final List<DayScheduleItem> resolvedItems = [];
+    for (final item in sortedItems) {
+      final duration = item.place.durationMinutes;
+      final openMin = item.place.openMinutes;
+      final closeMin = item.place.closeMinutes;
+
+      int startMin = resolvedItems.isEmpty ? currentPointerMin : currentPointerMin + 30;
+      startMin = max(startMin, openMin);
+
+      bool slotFound = false;
+      final int dayLimit = (item.place.genre == 'Nightlife') ? 1500 : 1380;
+      while (startMin + duration <= latestDepartureStartMin && startMin + duration <= dayLimit) {
+        bool overlapsAvoid = false;
+        for (final period in avoidPeriods) {
+          if (startMin < period[1] && (startMin + duration) > period[0]) {
+            overlapsAvoid = true;
+            break;
+          }
+        }
+
+        if (!overlapsAvoid && startMin >= openMin && (startMin + duration) <= closeMin) {
+          slotFound = true;
+          break;
+        }
+        startMin += 15;
+      }
+
+      if (slotFound) {
+        final oldTime = item.scheduledTime;
+        final newTime = minutesToTimeString(startMin);
+        if (oldTime != newTime) {
+          changes[item.place.name] = "$oldTime → $newTime";
+        }
+        resolvedItems.add(item.copyWith(scheduledTime: newTime));
+        currentPointerMin = startMin + duration;
+      } else {
+        resolvedItems.add(item);
+      }
+    }
+
+    resolvedItems.sort((a, b) => a.startMinutes.compareTo(b.startMinutes));
+    for (int i = 0; i < resolvedItems.length; i++) {
+      resolvedItems[i] = resolvedItems[i].copyWith(sortOrder: i);
+    }
+
+    final updated = List<List<DayScheduleItem>>.from(state.map((d) => List<DayScheduleItem>.from(d)));
+    updated[dayIdx] = resolvedItems;
+    state = updated;
+
+    return changes;
+  }
+
+
+  /// Get all occupied time ranges for a day (for UI display)
+  List<Map<String, int>> getOccupiedSlots(int dayIndex) {
+    if (dayIndex < 0 || dayIndex >= state.length) return [];
+    return state[dayIndex].map((item) => {
+      'start': item.startMinutes,
+      'end': item.endMinutes,
+    }).toList();
+  }
+
+  void reset() {
+    state = [];
+  }
+}
+
+final dayScheduleProvider = StateNotifierProvider<DayScheduleNotifier, List<List<DayScheduleItem>>>((ref) {
+  return DayScheduleNotifier();
+});
+
+final draftItineraryProvider = StateProvider<DraftItinerary?>((ref) => null);
+
+// 17. App Theme Mode Provider
+final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.dark);

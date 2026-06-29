@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -90,10 +90,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final connectionStatus = ref.watch(serverConnectionProvider);
     final serverUrl = ref.watch(serverUrlProvider);
 
+    final themeMode = ref.watch(themeModeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final bgColor = isDark ? const Color(0xFF0A1628) : const Color(0xFFF8FAFC);
+    final cardColor = isDark ? const Color(0xFF1A2744) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final mutedTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A2744),
+        backgroundColor: isDark ? const Color(0xFF1A2744) : Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
         leadingWidth: 56,
@@ -103,13 +111,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: Container(
               width: 36,
               height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFF0A1628),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 18),
+                icon: Icon(Icons.arrow_back, color: textColor, size: 18),
                 onPressed: () {
                   if (Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
@@ -121,10 +129,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
         ),
-        title: const Text(
+        title: Text(
           'TRAVELER PASSPORT',
           style: TextStyle(
-            color: Colors.white,
+            color: textColor,
             fontWeight: FontWeight.w900,
             fontSize: 14,
             letterSpacing: 1.5,
@@ -138,13 +146,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: Container(
               width: 36,
               height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFF0A1628),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                icon: const Icon(Icons.settings, color: Colors.white, size: 18),
+                icon: Icon(Icons.settings, color: textColor, size: 18),
                 onPressed: () {
                   _showSettingsModal(context, connectionStatus, serverUrl);
                 },

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/providers/travel_providers.dart';
@@ -1307,17 +1307,20 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           const SizedBox(height: 8),
           
           // Tax Free Checkbox
-          CheckboxListTile(
-            title: const Text(
-              'Include JPY Tax-Free Shopping (10% discount)',
-              style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)),
+          Material(
+            color: Colors.transparent,
+            child: CheckboxListTile(
+              title: const Text(
+                'Include JPY Tax-Free Shopping (10% discount)',
+                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)),
+              ),
+              value: _taxFreeReduction,
+              activeColor: const Color(0xFF2563EB),
+              onChanged: (v) => setState(() => _taxFreeReduction = v!),
+              controlAffinity: ListTileControlAffinity.leading,
+              contentPadding: EdgeInsets.zero,
+              dense: true,
             ),
-            value: _taxFreeReduction,
-            activeColor: const Color(0xFF2563EB),
-            onChanged: (v) => setState(() => _taxFreeReduction = v!),
-            controlAffinity: ListTileControlAffinity.leading,
-            contentPadding: EdgeInsets.zero,
-            dense: true,
           ),
           const SizedBox(height: 6),
 

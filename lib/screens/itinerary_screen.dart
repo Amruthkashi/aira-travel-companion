@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:js' as js;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/providers/travel_providers.dart';
@@ -13,14 +17,630 @@ class ItineraryScreen extends ConsumerStatefulWidget {
 
 class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   int _activeDay = 0;
+  Timer? _reminderTimer;
+
+  bool _useMockTime = false;
+  DateTime? _mockTime;
+  bool _isShowingAlert = false;
+  final Set<String> _dismissedActivityAlerts = {};
+
+  DateTime get _nowTime {
+    if (_useMockTime && _mockTime != null) {
+      return _mockTime!;
+    }
+    return DateTime.now();
+  }
 
   @override
   void initState() {
     super.initState();
+    _reminderTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (mounted) {
+        setState(() {});
+        _checkExceededAlerts();
+      }
+    });
+  }
+
+  void _checkExceededAlerts() {
+    if (_isShowingAlert) return;
+    
+    final itinerary = ref.read(itineraryProvider);
+    if (itinerary.isEmpty) return;
+    
+    final bookings = ref.read(tripBookingsProvider);
+    final startDate = bookings.startDate;
+
+    final now = _nowTime;
+    final nowMin = now.hour * 60 + now.minute;
+
+    int currentDayIdx = _activeDay;
+    if (startDate != null && startDate.isNotEmpty) {
+      try {
+        final start = DateTime.parse(startDate);
+        final diff = DateTime(now.year, now.month, now.day)
+            .difference(DateTime(start.year, start.month, start.day))
+            .inDays;
+        if (diff >= 0 && diff < itinerary.length) {
+          currentDayIdx = diff;
+        }
+      } catch (_) {}
+    }
+
+    final dayObj = itinerary[currentDayIdx];
+
+    for (int i = 0; i < dayObj.activities.length; i++) {
+      final act = dayObj.activities[i];
+      if (act.activity.contains('Awaiting Departure') || act.activity.contains('Trip Completed')) {
+        continue;
+      }
+      
+      final startMin = parseTimeToMinutes(act.time);
+      final regExp = RegExp(r'(\d+)\s*min');
+      final match = regExp.firstMatch(act.placeDetails);
+      final duration = match != null ? (int.tryParse(match.group(1)!) ?? 60) : 60;
+      final endMin = startMin + duration;
+
+      if (nowMin > endMin && nowMin <= endMin + 30) {
+        final alertId = '${currentDayIdx}_${act.activity}_${act.time}';
+        if (!_dismissedActivityAlerts.contains(alertId)) {
+          _isShowingAlert = true;
+          _dismissedActivityAlerts.add(alertId);
+
+          ActivityItem? nextAct;
+          for (int j = i + 1; j < dayObj.activities.length; j++) {
+            final next = dayObj.activities[j];
+            if (!next.activity.contains('Transfer') && 
+                !next.activity.contains('Return to') && 
+                !next.activity.contains('Awaiting') && 
+                !next.activity.contains('Trip Completed')) {
+              nextAct = next;
+              break;
+            }
+          }
+
+          final nextStr = nextAct != null 
+              ? '\n\nNext Destination: "${nextAct.activity}" scheduled at ${nextAct.time}.'
+              : '';
+
+          Future.microtask(() {
+            if (!mounted) return;
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) {
+                return AlertDialog(
+                  backgroundColor: const Color(0xFF0A1628),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  title: const Row(
+                    children: [
+                      Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+                      SizedBox(width: 10),
+                      Text(
+                        'Time Limit Exceeded',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                  content: Text(
+                    'You have exceeded the time slot allotted for "${act.activity}". Please complete this activity. You have to leave now to visit your next destination.$nextStr',
+                    style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.4),
+                  ),
+                  actions: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2563EB),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _isShowingAlert = false;
+                      },
+                      child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                );
+              },
+            );
+          });
+          break;
+        }
+      }
+    }
+  }
+
+  void _showTimeSimulatorDialog() {
+    final now = DateTime.now();
+    final hourCtrl = TextEditingController(text: _mockTime != null ? _mockTime!.hour.toString() : now.hour.toString());
+    final minCtrl = TextEditingController(text: _mockTime != null ? _mockTime!.minute.toString() : now.minute.toString());
+    bool tempSimulate = _useMockTime;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF0A1628),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: const Text('Simulate Active Time', style: TextStyle(color: Colors.white)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CheckboxListTile(
+                    title: const Text('Enable Time Simulation', style: TextStyle(color: Colors.white, fontSize: 14)),
+                    value: tempSimulate,
+                    activeColor: const Color(0xFF2563EB),
+                    onChanged: (val) {
+                      setStateDialog(() {
+                        tempSimulate = val ?? false;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: hourCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            labelText: 'Hour (0-23)',
+                            labelStyle: TextStyle(color: Colors.white54),
+                            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextField(
+                          controller: minCtrl,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            labelText: 'Minute (0-59)',
+                            labelStyle: TextStyle(color: Colors.white54),
+                            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB)),
+                  onPressed: () {
+                    final h = int.tryParse(hourCtrl.text) ?? now.hour;
+                    final m = int.tryParse(minCtrl.text) ?? now.minute;
+                    setState(() {
+                      _useMockTime = tempSimulate;
+                      if (_useMockTime) {
+                        _mockTime = DateTime(now.year, now.month, now.day, h, m);
+                      } else {
+                        _mockTime = null;
+                      }
+                    });
+                    Navigator.pop(context);
+                    _checkExceededAlerts();
+                  },
+                  child: const Text('Apply', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showShareItineraryDialog() {
+    final itinerary = ref.read(itineraryProvider);
+    if (itinerary.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No itinerary available to share.')),
+      );
+      return;
+    }
+
+    final htmlContent = _generateHtmlItinerary(itinerary);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF0A1628),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Export & Share Itinerary', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.share_rounded, size: 48, color: Color(0xFF00B4D8)),
+              const SizedBox(height: 16),
+              const Text(
+                'Download your beautifully styled itinerary as an HTML file or open it to print/save as a PDF.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                constraints: const BoxConstraints(maxHeight: 100),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A2744),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const SingleChildScrollView(
+                  child: Text(
+                    'Your exported plan includes detailed timings, maps, attire recommendations, transport details, and budget allocations wrapped in a premium design.',
+                    style: TextStyle(color: Colors.white54, fontSize: 11, height: 1.35),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+            ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0E7C86),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () {
+                if (kIsWeb) {
+                  try {
+                    js.context.callMethod('eval', [
+                      '''
+                      (function(content, filename) {
+                        const blob = new Blob([content], { type: 'text/html' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                      })(${js.context['JSON'].callMethod('stringify', [htmlContent])}, 'aira_itinerary.html');
+                      '''
+                    ]);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('HTML file download started!')),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error downloading: $e')),
+                    );
+                  }
+                } else {
+                  Clipboard.setData(ClipboardData(text: htmlContent));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Itinerary HTML copied to clipboard (Downloads are web-only).')),
+                  );
+                }
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.download_rounded, size: 16, color: Colors.white),
+              label: const Text('Download HTML', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFEF4444),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () {
+                if (kIsWeb) {
+                  try {
+                    js.context.callMethod('eval', [
+                      '''
+                      (function(content) {
+                        const win = window.open('', '_blank');
+                        if (win) {
+                          win.document.write(content);
+                          win.document.close();
+                        } else {
+                          alert('Please allow popups to open print version.');
+                        }
+                      })(${js.context['JSON'].callMethod('stringify', [htmlContent])});
+                      '''
+                    ]);
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error opening print preview: $e')),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Print preview is only supported in web mode.')),
+                  );
+                }
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.picture_as_pdf_rounded, size: 16, color: Colors.white),
+              label: const Text('Save as PDF', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _generateHtmlItinerary(List<ItineraryDay> itinerary) {
+    final buffer = StringBuffer();
+    buffer.write('''
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Aira Travel Itinerary</title>
+  <style>
+    :root {
+      --bg-color: #0B132B;
+      --card-bg: #1C2541;
+      --accent-blue: #3A86C8;
+      --accent-cyan: #00B4D8;
+      --accent-purple: #818CF8;
+      --text-color: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border-color: #334155;
+    }
+    
+    body {
+      font-family: 'Outfit', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      background: linear-gradient(135deg, #1E293B, #0F172A);
+      padding: 30px;
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+    }
+    
+    header h1 {
+      margin: 0;
+      font-size: 2.2em;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #38BDF8, #818CF8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    header p {
+      color: var(--text-muted);
+      margin: 10px 0 0 0;
+      font-size: 1.1em;
+    }
+    
+    .day-card {
+      background-color: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    
+    .day-title {
+      font-size: 1.4em;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      margin-top: 0;
+      margin-bottom: 4px;
+      letter-spacing: -0.3px;
+    }
+    
+    .day-theme {
+      font-size: 1.05em;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    
+    .timeline {
+      position: relative;
+      border-left: 2px solid var(--border-color);
+      padding-left: 24px;
+      margin-left: 10px;
+    }
+    
+    .activity-item {
+      position: relative;
+      margin-bottom: 28px;
+    }
+    
+    .activity-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .timeline-dot {
+      position: absolute;
+      left: -33px;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: var(--accent-purple);
+      border: 4px solid var(--card-bg);
+    }
+    
+    .activity-time {
+      font-weight: 700;
+      font-size: 0.95em;
+      color: var(--accent-purple);
+      margin-bottom: 4px;
+    }
+    
+    .activity-name {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+    
+    .activity-desc {
+      color: #CBD5E1;
+      font-size: 0.95em;
+      margin-bottom: 8px;
+    }
+    
+    .meta-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    .tag {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .tag-location { color: var(--accent-cyan); border-color: rgba(0, 180, 216, 0.2); }
+    .tag-cost { color: #F59E0B; border-color: rgba(245, 158, 11, 0.2); }
+    .tag-attire { color: #EC4899; border-color: rgba(236, 72, 153, 0.2); }
+    .tag-transport { color: #10B981; border-color: rgba(16, 185, 129, 0.2); }
+    
+    @media print {
+      body {
+        background-color: #FFFFFF;
+        color: #0F172A;
+      }
+      .container {
+        margin: 0;
+        max-width: 100%;
+        padding: 0;
+      }
+      header {
+        background: #F1F5F9;
+        border: 1px solid #CBD5E1;
+      }
+      header h1 {
+        background: none;
+        -webkit-text-fill-color: #0F172A;
+        color: #0F172A;
+      }
+      .day-card {
+        background-color: #FFFFFF;
+        border: 1px solid #CBD5E1;
+        box-shadow: none;
+        page-break-inside: avoid;
+        margin-bottom: 30px;
+      }
+      .day-title {
+        color: #0284C7;
+      }
+      .activity-name {
+        color: #0F172A;
+      }
+      .activity-desc {
+        color: #334155;
+      }
+      .tag {
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        color: #475569;
+      }
+      .timeline-dot {
+        border-color: #FFFFFF;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>YOUR TRIP ITINERARY</h1>
+      <p>Custom travel plan powered by Aira Travel Companion</p>
+    </header>
+''');
+
+    for (final day in itinerary) {
+      buffer.write('    <div class="day-card">\n');
+      buffer.write('      <div class="day-title">Day ${day.day}</div>\n');
+      buffer.write('      <div class="day-theme">${day.theme}</div>\n');
+      buffer.write('      <div class="timeline">\n');
+      for (final act in day.activities) {
+        buffer.write('        <div class="activity-item">\n');
+        buffer.write('          <div class="timeline-dot"></div>\n');
+        buffer.write('          <div class="activity-time">${act.time}</div>\n');
+        buffer.write('          <div class="activity-name">${act.activity}</div>\n');
+        if (act.description.isNotEmpty) {
+          buffer.write('          <div class="activity-desc">${act.description}</div>\n');
+        }
+        
+        final metaTags = <String>[];
+        if (act.locationName.isNotEmpty) {
+          metaTags.add('<span class="tag tag-location">📍 ${act.locationName}</span>');
+        }
+        if (act.cost.isNotEmpty && act.cost != '-') {
+          metaTags.add('<span class="tag tag-cost">💰 ${act.cost}</span>');
+        }
+        if (act.suggestedAttire.isNotEmpty) {
+          metaTags.add('<span class="tag tag-attire">👚 ${act.suggestedAttire}</span>');
+        }
+        if (act.transport.isNotEmpty && act.transport != '-') {
+          metaTags.add('<span class="tag tag-transport">🚇 ${act.transport}</span>');
+        }
+        
+        if (metaTags.isNotEmpty) {
+          buffer.write('          <div class="meta-tags">\n');
+          for (final tag in metaTags) {
+            buffer.write('            $tag\n');
+          }
+          buffer.write('          </div>\n');
+        }
+        buffer.write('        </div>\n');
+      }
+      buffer.write('      </div>\n');
+      buffer.write('    </div>\n');
+    }
+
+    buffer.write('''
+  </div>
+</body>
+</html>
+''');
+    return buffer.toString();
   }
 
   @override
   void dispose() {
+    _reminderTimer?.cancel();
     super.dispose();
   }
 
@@ -270,67 +890,95 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   @override
   Widget build(BuildContext context) {
     final itinerary = ref.watch(itineraryProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+
+    final bgColor = isDark ? const Color(0xFF0A1628) : const Color(0xFFF8FAFC);
+    final cardColor = isDark ? const Color(0xFF1A2744) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final mutedTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final pillActive = isDark ? const Color(0xFF2563EB) : const Color(0xFF4F46E5);
+    final pillInactive = isDark ? const Color(0xFF1A2744) : Colors.white;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628), // Slate 900
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Column(
           children: [
-
-            // Custom high-fidelity Header
+            // Custom high-fidelity Header matching user request
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Row(
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E1E38) : const Color(0xFFEEF2FF),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'CHRONO WATCH',
+                      style: TextStyle(
+                        color: Color(0xFF4F46E5),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                  Row(
                     children: [
-                      Icon(Icons.schedule, color: Color(0xFF2563EB), size: 20),
-                      SizedBox(width: 8),
+                      IconButton(
+                        tooltip: 'Share Itinerary (HTML)',
+                        icon: Icon(Icons.share_rounded, color: textColor, size: 20),
+                        onPressed: _showShareItineraryDialog,
+                      ),
+                      IconButton(
+                        tooltip: 'Simulate Time',
+                        icon: Icon(
+                          Icons.more_time_rounded,
+                          color: _useMockTime ? Colors.amberAccent : textColor,
+                          size: 20,
+                        ),
+                        onPressed: _showTimeSimulatorDialog,
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        tooltip: isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme',
+                        icon: Icon(
+                          isDark ? Icons.light_mode : Icons.dark_mode,
+                          color: const Color(0xFF4F46E5),
+                          size: 20,
+                        ),
+                        onPressed: () {
+                          ref.read(themeModeProvider.notifier).state =
+                              isDark ? ThemeMode.light : ThemeMode.dark;
+                        },
+                      ),
+                      const SizedBox(width: 12),
                       Text(
-                        'HOURLY SCHEDULE',
+                        'XP Level Progress',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 15,
-                          letterSpacing: 0.5,
+                          color: mutedTextColor,
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
                         ),
                       ),
                     ],
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFDCFCE7),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFBBF7D0)),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.train, color: Color(0xFF15803D), size: 12),
-                        SizedBox(width: 4),
-                        Text(
-                          'TRANSIT INCLUDED',
-                          style: TextStyle(
-                            color: Color(0xFF15803D),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 9,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
             ),
 
-            // Horizontal Day Tabs (Day 1 - Day 5)
-            _buildHorizontalDayTabs(itinerary),
+            // Horizontal Day Tabs (Day 1 - Day 5) matching styling from reference image
+            _buildHorizontalDayTabs(itinerary, pillActive, pillInactive, borderColor, textColor, mutedTextColor),
 
             // The main body list
             Expanded(
-              child: _buildItineraryBody(itinerary),
+              child: _buildItineraryBody(itinerary, cardColor, textColor, mutedTextColor, borderColor),
             ),
           ],
         ),
@@ -338,12 +986,19 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     );
   }
 
-  Widget _buildHorizontalDayTabs(List<ItineraryDay> itinerary) {
+  Widget _buildHorizontalDayTabs(
+    List<ItineraryDay> itinerary,
+    Color activeBg,
+    Color inactiveBg,
+    Color borderCol,
+    Color activeTxt,
+    Color inactiveTxt,
+  ) {
     if (itinerary.isEmpty) return const SizedBox.shrink();
 
     return Container(
       height: 48,
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -361,16 +1016,16 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               padding: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
-                color: active ? const Color(0xFF2563EB) : const Color(0xFF1A2744),
-                borderRadius: BorderRadius.circular(24),
+                color: active ? activeBg : inactiveBg,
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: active ? const Color(0xFF2563EB) : const Color(0xFF334155),
-                  width: 1,
+                  color: active ? activeBg : borderCol,
+                  width: 1.2,
                 ),
                 boxShadow: active
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF2563EB).withOpacity(0.25),
+                          color: activeBg.withOpacity(0.2),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         )
@@ -380,7 +1035,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               child: Text(
                 'Day ${idx + 1}',
                 style: TextStyle(
-                  color: active ? Colors.white : const Color(0xFF94A3B8),
+                  color: active ? Colors.white : inactiveTxt,
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                 ),
@@ -392,7 +1047,386 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     );
   }
 
-  Widget _buildItineraryBody(List<ItineraryDay> itinerary) {
+  Widget _buildTransportSyncCard(ItineraryDay dayObj, Color textColor, Color mutedTextColor) {
+    final isDark = ref.read(themeModeProvider) == ThemeMode.dark;
+
+    // Detect primary event type of the day
+    String syncTitle = 'DAY ${_activeDay + 1} ACTIVITY SYNC';
+    String syncHeadline = 'Sightseeing Highlight';
+    String syncDetails = 'No bookings registered for today.';
+    IconData syncIcon = Icons.auto_awesome;
+    Color titleCol = isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8);
+    Color cardBg = isDark ? const Color(0xFF0F1E36) : const Color(0xFFEFF6FF);
+    Color borderCol = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFDBEAFE);
+
+    ActivityItem? transportAct;
+    ActivityItem? hotelAct;
+
+    for (final act in dayObj.activities) {
+      final actLower = act.activity.toLowerCase();
+      if (actLower.contains('flight') || 
+          actLower.contains('airport') || 
+          actLower.contains('transit') || 
+          actLower.contains('train') || 
+          actLower.contains('shinkansen') || 
+          actLower.contains('shuttle') || 
+          actLower.contains('transport')) {
+        transportAct = act;
+        break;
+      }
+    }
+
+    for (final act in dayObj.activities) {
+      final actLower = act.activity.toLowerCase();
+      if (actLower.contains('hotel') || 
+          actLower.contains('check-in') || 
+          actLower.contains('stay') || 
+          actLower.contains('checkout') || 
+          actLower.contains('lodging')) {
+        hotelAct = act;
+        break;
+      }
+    }
+
+    if (transportAct != null) {
+      // Transport Sync Card (Green theme)
+      cardBg = isDark ? const Color(0xFF132A1C) : const Color(0xFFECFDF5);
+      borderCol = isDark ? const Color(0xFF0F5132) : const Color(0xFFD1FAE5);
+      titleCol = isDark ? const Color(0xFF75F8A9) : const Color(0xFF065F46);
+      syncTitle = 'DAY ${_activeDay + 1} TRANSPORT SYNC';
+      syncIcon = Icons.flight_takeoff;
+      syncHeadline = transportAct.activity;
+      syncDetails = 'Scheduled at ${transportAct.time} • Location: ${transportAct.locationName.isNotEmpty ? transportAct.locationName : 'Transit Station'}';
+    } else if (hotelAct != null) {
+      // Hotel Sync Card (Orange/Amber theme)
+      cardBg = isDark ? const Color(0xFF2D1F10) : const Color(0xFFFFFBEB);
+      borderCol = isDark ? const Color(0xFF6B470F) : const Color(0xFFFEF3C7);
+      titleCol = isDark ? const Color(0xFFFBBF24) : const Color(0xFFB45309);
+      syncTitle = 'DAY ${_activeDay + 1} STAY SYNC';
+      syncIcon = Icons.hotel_rounded;
+      syncHeadline = hotelAct.activity;
+      syncDetails = 'Scheduled at ${hotelAct.time} • Destination: ${hotelAct.locationName.isNotEmpty ? hotelAct.locationName : 'Hotel Lodge'}';
+    } else if (dayObj.activities.isNotEmpty) {
+      // General Activity Sync Card (Blue/Purple theme)
+      final primaryAct = dayObj.activities.first;
+      cardBg = isDark ? const Color(0xFF1E1E38) : const Color(0xFFF5F3FF);
+      borderCol = isDark ? const Color(0xFF3B0764) : const Color(0xFFEDE9FE);
+      titleCol = isDark ? const Color(0xFFC084FC) : const Color(0xFF6D28D9);
+      syncTitle = 'DAY ${_activeDay + 1} ITINERARY SYNC';
+      syncIcon = Icons.auto_awesome_rounded;
+      syncHeadline = primaryAct.activity;
+      syncDetails = 'Highlight at ${primaryAct.time} • Location: ${primaryAct.locationName.isNotEmpty ? primaryAct.locationName : 'Sightseeing Area'}';
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderCol, width: 1.2),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.black.withOpacity(0.2) : Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(syncIcon, color: titleCol, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  syncTitle,
+                  style: TextStyle(
+                    color: titleCol,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 10,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  syncHeadline,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  syncDetails,
+                  style: TextStyle(
+                    color: mutedTextColor,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPrivateDayNotesCard(int dayIdx, String notesText, Color cardColor, Color textColor, Color mutedTextColor, Color borderColor) {
+    return Container(
+      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 1.2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Text('📝', style: TextStyle(fontSize: 14)),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Private Day Notes',
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+              GestureDetector(
+                onTap: () => _showEditNotesDialog(dayIdx, notesText),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4F46E5).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Edit',
+                    style: TextStyle(
+                      color: Color(0xFF4F46E5),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            notesText.isEmpty ? 'Tap Edit to add private notes for this day...' : notesText,
+            style: TextStyle(
+              color: notesText.isEmpty ? mutedTextColor : textColor.withOpacity(0.85),
+              fontSize: 12.5,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditNotesDialog(int dayIdx, String currentNotes) {
+    final notesCtrl = TextEditingController(text: currentNotes);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF0A1628),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Edit Day Notes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          content: TextField(
+            controller: notesCtrl,
+            maxLines: 4,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              hintText: 'Enter notes for this day...',
+              hintStyle: TextStyle(color: Colors.white54),
+              enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB)),
+              onPressed: () {
+                ref.read(itineraryProvider.notifier).updateNotes(dayIdx, notesCtrl.text);
+                Navigator.pop(context);
+                setState(() {});
+              },
+              child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget? _buildLiveReminder(List<ItineraryDay> itinerary) {
+    if (itinerary.isEmpty) return null;
+
+    final bookings = ref.read(tripBookingsProvider);
+    final startDate = bookings.startDate;
+
+    int currentDayIdx = _activeDay;
+    if (startDate != null && startDate.isNotEmpty) {
+      try {
+        final start = DateTime.parse(startDate);
+        final today = _nowTime;
+        final diff = DateTime(today.year, today.month, today.day)
+            .difference(DateTime(start.year, start.month, start.day))
+            .inDays;
+        if (diff >= 0 && diff < itinerary.length) {
+          currentDayIdx = diff;
+        }
+      } catch (_) {}
+    }
+
+    final dayObj = itinerary[currentDayIdx];
+    final now = _nowTime;
+    final nowMin = now.hour * 60 + now.minute;
+
+    ActivityItem? currentAct;
+    ActivityItem? nextAct;
+    int currentActDuration = 60;
+
+    for (int i = 0; i < dayObj.activities.length; i++) {
+      final act = dayObj.activities[i];
+      if (act.activity.contains('Awaiting Departure') || act.activity.contains('Trip Completed')) {
+        continue;
+      }
+      
+      final startMin = parseTimeToMinutes(act.time);
+      final regExp = RegExp(r'(\d+)\s*min');
+      final match = regExp.firstMatch(act.placeDetails);
+      final duration = match != null ? (int.tryParse(match.group(1)!) ?? 60) : 60;
+      final endMin = startMin + duration;
+
+      if (nowMin >= startMin && nowMin < endMin) {
+        currentAct = act;
+        currentActDuration = duration;
+        for (int j = i + 1; j < dayObj.activities.length; j++) {
+          final next = dayObj.activities[j];
+          if (!next.activity.contains('Transfer') && 
+              !next.activity.contains('Return to') && 
+              !next.activity.contains('Awaiting') && 
+              !next.activity.contains('Trip Completed')) {
+            nextAct = next;
+            break;
+          }
+        }
+        break;
+      }
+    }
+
+    if (currentAct != null && nextAct != null) {
+      final startMin = parseTimeToMinutes(currentAct.time);
+      final endMin = startMin + currentActDuration;
+      
+      if (nowMin >= endMin - 15) {
+        return Container(
+          margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF7F1D1D), Color(0xFF991B1B)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFEF4444), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFEF4444).withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.alarm_on, color: Color(0xFFFCA5A5), size: 20),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'TIME IS UP! LEAVE NOW',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 11,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'ALERT',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'According to your plan, you should leave "${currentAct.activity}" now. It is time to travel to your next destination: "${nextAct.activity}" (scheduled at ${nextAct.time}).',
+                style: const TextStyle(color: Colors.white, fontSize: 12, height: 1.4),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF7F1D1D),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    ),
+                    onPressed: () {
+                      context.push('/navigation');
+                    },
+                    icon: const Icon(Icons.near_me, size: 14),
+                    label: const Text('Start Transit / Launch Map', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      }
+    }
+    
+    return null;
+  }
+
+  Widget _buildItineraryBody(List<ItineraryDay> itinerary, Color cardColor, Color textColor, Color mutedTextColor, Color borderColor) {
+    final isDark = ref.read(themeModeProvider) == ThemeMode.dark;
     if (itinerary.isEmpty) {
       return Center(
         child: SingleChildScrollView(
@@ -421,7 +1455,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 ),
                 onPressed: () {
                   ref.read(currentScreenProvider.notifier).state = '/home';
-                  ref.read(currentTabProvider.notifier).state = 0; // go home tab
+                  ref.read(currentTabProvider.notifier).state = 0;
                 },
                 icon: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 16),
                 label: const Text('Go Plan with Aira', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -437,384 +1471,364 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     }
     final dayObj = itinerary[_activeDay];
 
-    // Calculate progression metrics
-    final totalActs = dayObj.activities.length;
-    final checkedActs = dayObj.activities.where((a) => a.checked).length;
-    final progress = totalActs > 0 ? (checkedActs / totalActs) : 0.0;
+    final reminderWidget = _buildLiveReminder(itinerary);
+    final hasReminder = reminderWidget != null;
+    final int headerOffset = (hasReminder ? 1 : 0) + 3;
 
-    return Column(
-      children: [
-        // Day Theme Card with custom purple gradient and progress bar
-        Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2563EB), Color(0xFF2563EB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF2563EB).withOpacity(0.3),
-                  blurRadius: 16,
-                  offset: const Offset(0, 8),
-                )
-              ],
-            ),
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: dayObj.activities.length + headerOffset + 1,
+      itemBuilder: (context, idx) {
+        int currentIdx = idx;
+        
+        if (hasReminder) {
+          if (currentIdx == 0) return reminderWidget!;
+          currentIdx--;
+        }
+        
+        if (currentIdx == 0) {
+          return _buildTransportSyncCard(dayObj, textColor, mutedTextColor);
+        }
+        
+        if (currentIdx == 1) {
+          // General daily theme header
+          return Padding(
+            padding: const EdgeInsets.only(left: 4, right: 4, bottom: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'DAY ${_activeDay + 1} THEME',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 9,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                    Text(
-                      '$totalActs ACTIVITIES   /   $checkedActs DONE',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.85),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 9,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
                 Text(
-                  dayObj.theme,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  'THEME: ${dayObj.theme.toUpperCase()}',
+                  style: TextStyle(
+                    color: textColor,
                     fontWeight: FontWeight.w900,
-                    fontSize: 16,
+                    fontSize: 15.5,
+                    letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 16),
-                // Custom Progress Bar
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Stack(
-                    children: [
-                      Container(
-                        height: 6,
-                        color: Colors.white.withOpacity(0.15),
-                      ),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        height: 6,
-                        width: MediaQuery.of(context).size.width * 0.8 * progress,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 6),
+                Text(
+                  'Toggle checklist to track your walk. Rearrange with arrow tags, add new spots, or delete unwanted slots live.',
+                  style: TextStyle(
+                    color: mutedTextColor,
+                    fontSize: 12,
+                    height: 1.4,
                   ),
                 ),
               ],
             ),
-          ),
-        ),        // Activities Timeline
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: dayObj.activities.length + 1,
-            itemBuilder: (context, idx) {
-              if (idx == dayObj.activities.length) {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 8.0, bottom: 32.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF334155)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        foregroundColor: const Color(0xFF00B4D8),
-                        backgroundColor: const Color(0xFF1A2744),
-                      ),
-                      onPressed: () => _showActivityAddModal(_activeDay),
-                      icon: const Icon(Icons.add, size: 18),
-                      label: const Text('Add Custom Itinerary Item', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                    ),
+          );
+        }
+        
+        if (currentIdx == 2) {
+          return _buildPrivateDayNotesCard(_activeDay, dayObj.notes, cardColor, textColor, mutedTextColor, borderColor);
+        }
+        
+        final activityIdx = currentIdx - 3;
+        
+        if (activityIdx == dayObj.activities.length) {
+          // Add custom itinerary item button
+          return Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 32.0),
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: borderColor),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  foregroundColor: const Color(0xFF00B4D8),
+                  backgroundColor: cardColor,
+                ),
+                onPressed: () => _showActivityAddModal(_activeDay),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Add Custom Itinerary Item', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              ),
+            ),
+          );
+        }
+        
+        final act = dayObj.activities[activityIdx];
+        
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 250),
+            opacity: act.checked ? 0.65 : 1.0,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Activity Details Card matching the style of reference image
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: borderColor, width: 1.2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      )
+                    ],
                   ),
-                );
-              }
-
-              final act = dayObj.activities[idx];
-
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 250),
-                  opacity: act.checked ? 0.65 : 1.0,
-                  child: Stack(
-                    clipBehavior: Clip.none,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Activity Details Card
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A2744),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF334155)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            )
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Card Header Row
-                            Row(
-                              children: [
-                                // Inline Checkbox
-                                GestureDetector(
-                                  onTap: () {
-                                    ref.read(itineraryProvider.notifier).toggleActivityCheck(_activeDay, idx);
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    width: 20,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      color: act.checked ? const Color(0xFF2563EB) : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(
-                                        color: act.checked ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                    child: act.checked
-                                        ? const Icon(Icons.check, size: 14, color: Colors.white)
-                                        : null,
-                                  ),
+                      // Card Header Row with custom checkbox, carets and delete button
+                      Row(
+                        children: [
+                          // Styled Checkbox from reference image
+                          GestureDetector(
+                            onTap: () {
+                              ref.read(itineraryProvider.notifier).toggleActivityCheck(_activeDay, activityIdx);
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                color: act.checked ? const Color(0xFF4F46E5) : Colors.transparent,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: act.checked ? const Color(0xFF4F46E5) : mutedTextColor,
+                                  width: 1.8,
                                 ),
-                                const SizedBox(width: 10),
-                                
-                                // Time
-                                Text(
-                                  act.time,
-                                  style: const TextStyle(
-                                    color: Color(0xFF818CF8),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                const Spacer(),
-                                
-                                // Status
-                                Text(
-                                  act.cost.isEmpty ? 'Free' : act.cost,
-                                  style: const TextStyle(
-                                    color: Color(0xFF94A3B8),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                
-                                // Edit button
-                                GestureDetector(
-                                  onTap: () => _showActivityEditModal(_activeDay, idx, act),
-                                  child: const Icon(Icons.edit, size: 16, color: Color(0xFFF97316)), // Orange
-                                ),
-                              ],
+                              ),
+                              child: act.checked
+                                  ? const Icon(Icons.check, size: 16, color: Colors.white)
+                                  : null,
                             ),
-                            const SizedBox(height: 12),
-                            
-                            // Activity Title
-                            Text(
-                              act.activity,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                decoration: act.checked ? TextDecoration.lineThrough : null,
-                              ),
+                          ),
+                          const SizedBox(width: 10),
+                          
+                          // Time & Booking state label (Free/Booked)
+                          Text(
+                            '${act.time}  (${act.cost.contains('\$') || act.cost.contains('¥') || act.cost.contains('Booked') ? 'Booked' : 'Free'})',
+                            style: const TextStyle(
+                              color: Color(0xFF818CF8),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
                             ),
-                            const SizedBox(height: 6),
-                            
-                            // Activity Description
-                            if (act.description.isNotEmpty) ...[
-                              Text(
-                                act.description,
-                                style: const TextStyle(
-                                  fontSize: 12.5,
-                                  color: Colors.white70,
-                                  height: 1.4,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                            ],
-                            
-                            // Location chip
-                            if (act.locationName.isNotEmpty) ...[
-                              GestureDetector(
-                                onTap: () => context.push('/navigation'),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF0A1628),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: const Color(0xFF334155)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(Icons.location_on, size: 13, color: Color(0xFF00B4D8)),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        act.locationName,
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          color: Color(0xFF00B4D8),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-                            
-                            // Detail rows
-                            if (act.suggestedAttire.isNotEmpty) ...[
-                              _buildDetailRow(
-                                emoji: '👚',
-                                label: 'Outfit:',
-                                labelColor: const Color(0xFFEC4899),
-                                text: act.suggestedAttire,
-                              ),
-                              const SizedBox(height: 8),
-                            ],
-                            
-                            if (act.placeDetails.isNotEmpty) ...[
-                              _buildDetailRow(
-                                emoji: '🍜',
-                                label: 'Food:',
-                                labelColor: const Color(0xFFF97316),
-                                text: act.placeDetails,
-                              ),
-                              const SizedBox(height: 8),
-                            ],
-                            
-                            if (act.ticketInfo.isNotEmpty) ...[
-                              _buildDetailRow(
-                                emoji: '💡',
-                                label: 'Tip:',
-                                labelColor: const Color(0xFF10B981),
-                                text: act.ticketInfo,
-                              ),
-                              const SizedBox(height: 8),
-                            ],
-                            
-                            if (act.transport.isNotEmpty) ...[
-                              _buildDetailRow(
-                                emoji: '🚇',
-                                label: 'Transport:',
-                                labelColor: const Color(0xFF06B6D4),
-                                text: act.transport,
-                              ),
-                              const SizedBox(height: 8),
-                            ],
-                            
-                            const SizedBox(height: 4),
-                            const Divider(color: Color(0xFF334155), height: 1),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => ref.read(itineraryProvider.notifier).swapActivityWithAi(_activeDay, idx),
-                                    child: const Row(
-                                      children: [
-                                        Icon(Icons.auto_awesome, size: 14, color: Color(0xFF00B4D8)),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          'Swap with AI',
-                                          style: TextStyle(
-                                            fontSize: 10.5,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF00B4D8),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => context.push('/navigation'),
-                                    child: const Row(
-                                      children: [
-                                        Icon(Icons.near_me, size: 14, color: Colors.tealAccent),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          'Launch Map',
-                                          style: TextStyle(
-                                            fontSize: 10.5,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.tealAccent,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                          ),
+                          const Spacer(),
+                          
+                          // Caret up button for reordering
+                          if (activityIdx > 0)
+                            IconButton(
+                              visualDensity: VisualDensity.compact,
+                              icon: Icon(Icons.keyboard_arrow_up, size: 20, color: mutedTextColor),
+                              onPressed: () {
+                                ref.read(itineraryProvider.notifier).reorderActivity(_activeDay, activityIdx, activityIdx - 1);
+                                setState(() {});
+                              },
                             ),
-                          ],
+                          
+                          // Caret down button for reordering
+                          if (activityIdx < dayObj.activities.length - 1)
+                            IconButton(
+                              visualDensity: VisualDensity.compact,
+                              icon: Icon(Icons.keyboard_arrow_down, size: 20, color: mutedTextColor),
+                              onPressed: () {
+                                ref.read(itineraryProvider.notifier).reorderActivity(_activeDay, activityIdx, activityIdx + 1);
+                                setState(() {});
+                              },
+                            ),
+
+                          const SizedBox(width: 4),
+
+                          // Trash/Delete action button
+                          IconButton(
+                            visualDensity: VisualDensity.compact,
+                            icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Colors.redAccent),
+                            onPressed: () {
+                              ref.read(itineraryProvider.notifier).deleteActivity(_activeDay, activityIdx);
+                              setState(() {});
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      
+                      // Activity Title
+                      Text(
+                        act.activity,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                          decoration: act.checked ? TextDecoration.lineThrough : null,
                         ),
                       ),
-
-                      // Floating Siren Alert Badge (only on specific items)
-                      if (idx == 0 && _activeDay == 3)
-                        Positioned(
-                          bottom: 24,
-                          right: -10,
+                      const SizedBox(height: 6),
+                      
+                      // Activity Description
+                      if (act.description.isNotEmpty) ...[
+                        Text(
+                          act.description,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            color: textColor.withOpacity(0.75),
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                      
+                      // Location chip
+                      if (act.locationName.isNotEmpty) ...[
+                        GestureDetector(
+                          onTap: () => context.push('/navigation'),
                           child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFEF4444),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xFFEF4444),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
-                                )
-                              ],
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: borderColor),
                             ),
-                            child: const Center(
-                              child: Icon(Icons.notifications_active, color: Colors.white, size: 15),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.location_on, size: 13, color: Color(0xFF00B4D8)),
+                                const SizedBox(width: 4),
+                                Text(
+                                  act.locationName,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFF00B4D8),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
+                        const SizedBox(height: 12),
+                      ],
+                      
+                      // Detail rows matching formatting in the reference image (pink, orange, green tags)
+                      if (act.suggestedAttire.isNotEmpty) ...[
+                        _buildDetailRow(
+                          emoji: '👚',
+                          label: 'Outfit:',
+                          labelColor: const Color(0xFFEC4899),
+                          text: act.suggestedAttire,
+                          textColor: textColor,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      
+                      if (act.placeDetails.isNotEmpty) ...[
+                        _buildDetailRow(
+                          emoji: '🍜',
+                          label: 'Food:',
+                          labelColor: const Color(0xFFF97316),
+                          text: act.placeDetails,
+                          textColor: textColor,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      
+                      if (act.ticketInfo.isNotEmpty) ...[
+                        _buildDetailRow(
+                          emoji: '💡',
+                          label: 'Tip:',
+                          labelColor: const Color(0xFF10B981),
+                          text: act.ticketInfo,
+                          textColor: textColor,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      
+                      if (act.transport.isNotEmpty) ...[
+                        _buildDetailRow(
+                          emoji: '🚇',
+                          label: 'Transport:',
+                          labelColor: const Color(0xFF06B6D4),
+                          text: act.transport,
+                          textColor: textColor,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      
+                      const SizedBox(height: 4),
+                      Divider(color: borderColor, height: 1),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => ref.read(itineraryProvider.notifier).swapActivityWithAi(_activeDay, activityIdx),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.auto_awesome, size: 14, color: Color(0xFF00B4D8)),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Swap with AI',
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF00B4D8),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => context.push('/navigation'),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.near_me, size: 14, color: Colors.tealAccent),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Launch Map',
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.tealAccent,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-              );
-            },
+
+                if (activityIdx == 0 && _activeDay == 3)
+                  Positioned(
+                    bottom: 24,
+                    right: -10,
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFEF4444),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFFEF4444),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                          )
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.notifications_active, color: Colors.white, size: 15),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -823,6 +1837,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     required String label,
     required Color labelColor,
     required String text,
+    required Color textColor,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -841,9 +1856,9 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: Colors.white70,
+              color: textColor.withOpacity(0.75),
               height: 1.35,
             ),
           ),

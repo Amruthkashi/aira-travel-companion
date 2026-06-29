@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/utils/sound_synthesizer.dart';
 import '../core/utils/tts_helper.dart';
@@ -23,6 +24,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
       'seconds': 225,
       'description': 'Discover the design principles and history behind the worlds busiest pedestrian crossing, and the Hachiko statue memorial.',
       'frequency': 440.0,
+      'ambientUrl': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav',
     },
     {
       'id': 'aud-2',
@@ -32,6 +34,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
       'seconds': 320,
       'description': 'Learn about the purification ceremonies, fortune omikuji papers, and centuries-old wooden shrines of Tokyos oldest temple.',
       'frequency': 520.0,
+      'ambientUrl': 'https://assets.mixkit.co/active_storage/sfx/1659/1659-200.wav',
     },
     {
       'id': 'aud-3',
@@ -41,6 +44,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
       'seconds': 252,
       'description': 'Step through the transition of Geek Town from a post-war black market radio parts hub into the global capital of electronic gaming and anime subculture.',
       'frequency': 600.0,
+      'ambientUrl': 'https://assets.mixkit.co/active_storage/sfx/2018/2018-200.wav',
     }
   ];
 
@@ -48,6 +52,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
   Timer? _progressTimer;
   double _playbackSpeed = 1.0;
   bool _beaconScanning = false;
+  final AudioPlayer _ambientPlayer = AudioPlayer();
 
   // Translation & Audio Guide State
   String _selectedLang = 'English';
@@ -70,6 +75,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
     _pulseController.dispose();
     _progressTimer?.cancel();
     TtsHelper.stop();
+    _ambientPlayer.dispose();
     super.dispose();
   }
 
@@ -83,11 +89,13 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
       _pulseController.stop();
       ref.read(audioGuideProvider.notifier).playAudioTrack(track['id']);
       await TtsHelper.stop();
+      await _ambientPlayer.stop();
       SoundSynthesizer.playTone(frequency: 440, durationSeconds: 0.15, name: 'audio_pause.wav');
     } else {
       // Play
       _progressTimer?.cancel();
       await TtsHelper.stop();
+      await _ambientPlayer.stop();
       
       String speakText = track['description'];
       String targetLang = _selectedLang;
@@ -141,6 +149,17 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
       ref.read(audioGuideProvider.notifier).playAudioTrack(track['id']);
       _pulseController.repeat();
       
+      // Play background ambient loop
+      if (track['ambientUrl'] != null) {
+        try {
+          await _ambientPlayer.setReleaseMode(ReleaseMode.loop);
+          await _ambientPlayer.play(UrlSource(track['ambientUrl']));
+          await _ambientPlayer.setVolume(0.15);
+        } catch (e) {
+          print('Ambient player error: $e');
+        }
+      }
+
       // Play real audio read-aloud via phone speaker
       await TtsHelper.speak(speakText, targetLang);
 
@@ -155,6 +174,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
           _pulseController.stop();
           ref.read(audioGuideProvider.notifier).playAudioTrack(track['id']); // Reset play state
           TtsHelper.stop();
+          _ambientPlayer.stop();
           SoundSynthesizer.playUnlockChime(); // Play complete chime
         } else {
           ref.read(audioGuideProvider.notifier).updateAudioProgress(currentProgress);

@@ -616,6 +616,11 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
   const [audioActiveTrackId, setAudioActiveTrackId] = useState<string | null>(null);
   const [audioIsPlaying, setAudioIsPlaying] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
+  const [audioSelectedLang, setAudioSelectedLang] = useState('English');
+  const [audioTranslating, setAudioTranslating] = useState(false);
+  const [audioActiveTranslation, setAudioActiveTranslation] = useState<string | null>(null);
+  const [audioActiveRomaji, setAudioActiveRomaji] = useState<string | null>(null);
+  const [audioTranslationCache, setAudioTranslationCache] = useState<Record<string, { translation: string, romaji: string }>>({});
 
   // Translator states
   const [transSourceLang, setTransSourceLang] = useState('English');
@@ -1325,6 +1330,112 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
       if (timer) clearTimeout(timer);
     };
   }, [cabBookingState]);
+
+  // Ambient Audio Player and Text-To-Speech for Audio Guides
+  const ambientAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (ambientAudioRef.current) {
+      ambientAudioRef.current.pause();
+      ambientAudioRef.current = null;
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    if (!audioIsPlaying || !audioActiveTrackId) {
+      return;
+    }
+
+    const tracks = [
+      { id: 'shibuya', desc: 'Step-by-step stroll through Famous Scramble Crossing crossing while learning Hachiko\'s history.', url: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav' },
+      { id: 'sensoji', desc: 'Tranquil walk down Nakamise-dori towards the main hall with monk chant simulation.', url: 'https://assets.mixkit.co/active_storage/sfx/1659/1659-200.wav' },
+      { id: 'shinjuku', desc: 'Unravel the post-war history of Cozy Micro-Bars and Nostalgic Food Alley\'s food alley.', url: 'https://assets.mixkit.co/active_storage/sfx/2018/2018-200.wav' },
+      { id: 'godzilla', desc: 'Stand underneath the 1:1 scale Godzilla head and listen to local kaiju origin lore.', url: 'https://assets.mixkit.co/active_storage/sfx/2747/2747-200.wav' }
+    ];
+
+    const track = tracks.find(t => t.id === audioActiveTrackId);
+    if (!track) return;
+
+    // Play ambient loop
+    const audio = new Audio(track.url);
+    audio.loop = true;
+    audio.volume = 0.15;
+    audio.play().catch(err => console.log('Ambient audio playback blocked:', err));
+    ambientAudioRef.current = audio;
+
+    // Speak and dynamically translate if needed
+    const speakAndTranslate = async () => {
+      let speakText = track.desc;
+
+      if (audioSelectedLang !== 'English') {
+        const cacheKey = `${audioActiveTrackId}_${audioSelectedLang}`;
+        if (audioTranslationCache[cacheKey]) {
+          const cached = audioTranslationCache[cacheKey];
+          setAudioActiveTranslation(cached.translation);
+          setAudioActiveRomaji(cached.romaji);
+          speakText = cached.translation;
+        } else {
+          setAudioTranslating(true);
+          try {
+            const response = await fetch('/api/translate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                text: track.desc,
+                sourceLang: 'English',
+                targetLang: audioSelectedLang
+              })
+            });
+            if (response.ok) {
+              const data = await response.json();
+              const tr = data.translation || '';
+              const rom = data.romaji || '';
+              setAudioTranslationCache(prev => ({
+                ...prev,
+                [cacheKey]: { translation: tr, romaji: rom }
+              }));
+              setAudioActiveTranslation(tr);
+              setAudioActiveRomaji(rom);
+              speakText = tr;
+            }
+          } catch (e) {
+            console.error('Translation error in simulator:', e);
+          } finally {
+            setAudioTranslating(false);
+          }
+        }
+      } else {
+        setAudioActiveTranslation(null);
+        setAudioActiveRomaji(null);
+      }
+
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(speakText);
+        let localeCode = 'en-US';
+        if (audioSelectedLang === 'Japanese') localeCode = 'ja-JP';
+        else if (audioSelectedLang === 'French') localeCode = 'fr-FR';
+        else if (audioSelectedLang === 'Spanish') localeCode = 'es-ES';
+        else if (audioSelectedLang === 'German') localeCode = 'de-DE';
+        else if (audioSelectedLang === 'Italian') localeCode = 'it-IT';
+        else if (audioSelectedLang === 'Chinese') localeCode = 'zh-CN';
+        else if (audioSelectedLang === 'Korean') localeCode = 'ko-KR';
+        utterance.lang = localeCode;
+        window.speechSynthesis.speak(utterance);
+      }
+    };
+
+    speakAndTranslate();
+
+    return () => {
+      if (ambientAudioRef.current) {
+        ambientAudioRef.current.pause();
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [audioActiveTrackId, audioIsPlaying, audioSelectedLang]);
 
   // Sync scroll to chat bottom
   const chatBottomRef = useRef<HTMLDivElement>(null);
@@ -4877,8 +4988,24 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
                     <span className="text-[9px] font-mono font-bold text-rose-600 block uppercase">Immersive Sights Walkthrough</span>
                   </div>
                 </div>
-                <div className="px-2 py-0.5 bg-rose-50 border border-rose-100 text-rose-700 rounded-lg text-[8.5px] font-mono font-bold uppercase">
-                  4 Tracks
+                <div className="flex items-center gap-1.5 font-sans">
+                  <select
+                    value={audioSelectedLang}
+                    onChange={(e) => setAudioSelectedLang(e.target.value)}
+                    className="bg-slate-100 border border-slate-200 text-rose-600 rounded-lg text-[9px] font-bold py-1 px-1.5 outline-none cursor-pointer"
+                  >
+                    <option value="English">English</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="French">French</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="German">German</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Korean">Korean</option>
+                  </select>
+                  <div className="px-2 py-1 bg-rose-50 border border-rose-100 text-rose-700 rounded-lg text-[8.5px] font-mono font-bold uppercase">
+                    4 Tracks
+                  </div>
                 </div>
               </div>
 
@@ -4968,7 +5095,25 @@ export default function MobileSimulator({ currentScreenId, onScreenChange }: Mob
                         ⏩
                       </button>
                     </div>
+
+                    {/* Translation Dynamic Widget Card */}
+                    {audioTranslating && (
+                      <div className="flex items-center justify-center gap-1.5 py-1 text-slate-400">
+                        <div className="w-3.5 h-3.5 border-2 border-rose-600 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-[10px] font-bold">Translating guide...</span>
+                      </div>
+                    )}
+                    {!audioTranslating && audioActiveTranslation && (
+                      <div className="bg-slate-55 border border-slate-200 rounded-2.5xl p-3 text-left space-y-1 mx-0.5 mt-2 shadow-3xs">
+                        <span className="text-[8px] font-mono font-black text-rose-650 block uppercase">Translation ({audioSelectedLang})</span>
+                        <p className="text-[11px] font-bold text-slate-800 leading-tight">{audioActiveTranslation}</p>
+                        {audioActiveRomaji && (
+                          <p className="text-[9.5px] font-mono text-slate-500 italic mt-0.5">{audioActiveRomaji}</p>
+                        )}
+                      </div>
+                    )}
                   </>
+
                 ) : (
                   <div className="py-6 flex flex-col items-center justify-center text-slate-400 space-y-2">
                     <span className="text-2xl">🎧</span>

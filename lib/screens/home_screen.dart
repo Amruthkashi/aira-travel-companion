@@ -3114,6 +3114,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     onSurface: Colors.white,
                   ),
                   dialogBackgroundColor: const Color(0xFF0A1628),
+                  datePickerTheme: DatePickerThemeData(
+                    backgroundColor: const Color(0xFF0A1628),
+                    headerBackgroundColor: const Color(0xFF1E293B),
+                    headerForegroundColor: Colors.white,
+                    rangePickerHeaderBackgroundColor: const Color(0xFF1E293B),
+                    rangePickerHeaderForegroundColor: Colors.white,
+                    confirmButtonStyle: ButtonStyle(
+                      foregroundColor: WidgetStateProperty.all(const Color(0xFF60A5FA)),
+                      textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    cancelButtonStyle: ButtonStyle(
+                      foregroundColor: WidgetStateProperty.all(const Color(0xFF94A3B8)),
+                      textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ),
                 ),
                 child: child!,
               );

@@ -15,6 +15,10 @@ import '../../screens/alerts_screen.dart';
 import '../../screens/memories_screen.dart';
 import '../../screens/audio_guide_screen.dart';
 import '../../screens/squad_hub_screen.dart';
+import '../../screens/booking_upload_screen.dart';
+import '../../screens/explore_places_screen.dart';
+import '../../screens/day_schedule_screen.dart';
+import '../../screens/draft_preview_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
@@ -78,6 +82,23 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/squad/:squadId',
       builder: (context, state) => SquadHubScreen(squadId: state.pathParameters['squadId']!),
+    ),
+    // Itinerary Wizard Routes
+    GoRoute(
+      path: '/itinerary-wizard/bookings',
+      builder: (context, state) => const BookingUploadScreen(),
+    ),
+    GoRoute(
+      path: '/itinerary-wizard/explore',
+      builder: (context, state) => const ExplorePlacesScreen(),
+    ),
+    GoRoute(
+      path: '/itinerary-wizard/schedule',
+      builder: (context, state) => const DayScheduleScreen(),
+    ),
+    GoRoute(
+      path: '/itinerary-wizard/preview',
+      builder: (context, state) => const DraftPreviewScreen(),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(
