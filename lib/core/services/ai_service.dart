@@ -372,7 +372,7 @@ class AiService {
           "country": "Japan",
           "countryCode": "JPN",
           "rating": 4.9,
-          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=400",
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=800&q=80",
           "desc": "Bustling neon streets, capsule hotels, retro arcades, and solo-friendly sushi counters.",
           "tags": ["Neon", "Tech", "Solo-Friendly"]
         },
@@ -381,7 +381,7 @@ class AiService {
           "country": "Iceland",
           "countryCode": "ISL",
           "rating": 4.8,
-          "image": "https://images.unsplash.com/photo-1504829857797-ddff28127792?w=400",
+          "image": "https://images.unsplash.com/photo-1504829857797-ddff28127792?auto=format&fit=crop&w=800&q=80",
           "desc": "The safest country for solo explorers, featuring hot springs, waterfalls, and northern lights.",
           "tags": ["Nature", "Safety", "Adventure"]
         }
@@ -393,7 +393,7 @@ class AiService {
           "country": "Greece",
           "countryCode": "GRC",
           "rating": 4.9,
-          "image": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=400",
+          "image": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80",
           "desc": "Iconic whitewashed houses with blue domes perched high on volcanic cliffs overlooking the sunset.",
           "tags": ["Romantic", "Sunset", "Luxury"]
         }

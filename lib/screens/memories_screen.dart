@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/utils/sound_synthesizer.dart';
@@ -16,7 +16,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
       'id': 'mem-1',
       'title': 'Godzilla Roar at Skyline Godzilla Hotel',
       'date': 'June 4, 2026',
-      'image': 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400',
+      'image': 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
       'journal': 'Watched the massive Godzilla head roar on the 8th floor terrace exactly on the hour. The neon lights reflecting off the wet pavement felt straight out of a sci-fi set.',
       'tags': ['West Central Tokyo', 'Godzilla', 'Cyberpunk'],
       'voiceSeconds': 12,
@@ -26,7 +26,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
       'id': 'mem-2',
       'title': 'Quiet Zen Walk through Asakusa',
       'date': 'June 3, 2026',
-      'image': 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400',
+      'image': 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80',
       'journal': 'Woke up at 6:00 AM to visit Senso-ji Temple before the crowds arrived. Hearing the soft chime of the wind bells and smelling the incense in the cool morning air was therapeutic.',
       'tags': ['Asakusa', 'Zen', 'Morning'],
       'voiceSeconds': 24,
@@ -219,7 +219,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                             'id': 'mem-${DateTime.now().millisecondsSinceEpoch}',
                             'title': _journalTitleCtrl.text,
                             'date': 'Today',
-                            'image': 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400',
+                            'image': 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80',
                             'journal': _journalBodyCtrl.text,
                             'tags': ['Travels', 'Memories'],
                             'voiceSeconds': _recordSeconds > 0 ? _recordSeconds : 10,

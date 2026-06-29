@@ -1585,7 +1585,7 @@ class PastTripsNotifier extends StateNotifier<List<PastTrip>> {
       dates: 'May 12 - May 17, 2025',
       theme: 'Cyberpunk Neon & Ancient Shrines',
       activitiesCount: 15,
-      image: 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=400',
+      image: 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=800&q=80',
       highlight: 'Watched Godzilla roar at dusk in Shinjuku and walked Asakusa at dawn.',
     ),
     PastTrip(
@@ -1594,7 +1594,7 @@ class PastTripsNotifier extends StateNotifier<List<PastTrip>> {
       dates: 'Sept 04 - Sept 08, 2024',
       theme: 'Gourmet Pastries & Impressionist Art',
       activitiesCount: 9,
-      image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400',
+      image: 'https://images.unsplash.com/photo-1499856871958-5b9647a6409a?auto=format&fit=crop&w=800&q=80',
       highlight: 'Ate fresh croissants by the Seine and visited the Musee d’Orsay.',
     ),
   ]);
