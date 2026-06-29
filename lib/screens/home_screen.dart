@@ -1315,7 +1315,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           subtitle: 'Completed stays & travel memories',
           icon: Icons.history,
           iconColor: const Color(0xFF94A3B8),
-          onTap: () => context.push('/memories'),
+          onTap: () => context.push('/past-trips'),
         ),
         const SizedBox(height: 10),
         // Create new Itinerary (indigo highlight gradient)

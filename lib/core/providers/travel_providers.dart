@@ -1555,3 +1555,59 @@ final dayScheduleProvider = StateNotifierProvider<DayScheduleNotifier, List<List
 });
 
 final draftItineraryProvider = StateProvider<DraftItinerary?>((ref) => null);
+
+// 18. Past Trips Provider
+class PastTrip {
+  final String id;
+  final String destination;
+  final String dates;
+  final String theme;
+  final int activitiesCount;
+  final String image;
+  final String highlight;
+
+  PastTrip({
+    required this.id,
+    required this.destination,
+    required this.dates,
+    required this.theme,
+    required this.activitiesCount,
+    required this.image,
+    required this.highlight,
+  });
+}
+
+class PastTripsNotifier extends StateNotifier<List<PastTrip>> {
+  PastTripsNotifier() : super([
+    PastTrip(
+      id: 'pt-1',
+      destination: 'Tokyo, Japan',
+      dates: 'May 12 - May 17, 2025',
+      theme: 'Cyberpunk Neon & Ancient Shrines',
+      activitiesCount: 15,
+      image: 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=400',
+      highlight: 'Watched Godzilla roar at dusk in Shinjuku and walked Asakusa at dawn.',
+    ),
+    PastTrip(
+      id: 'pt-2',
+      destination: 'Paris, France',
+      dates: 'Sept 04 - Sept 08, 2024',
+      theme: 'Gourmet Pastries & Impressionist Art',
+      activitiesCount: 9,
+      image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400',
+      highlight: 'Ate fresh croissants by the Seine and visited the Musee d’Orsay.',
+    ),
+  ]);
+
+  void removeTrip(String id) {
+    state = state.where((trip) => trip.id != id).toList();
+  }
+
+  void clearTrips() {
+    state = [];
+  }
+}
+
+final pastTripsProvider = StateNotifierProvider<PastTripsNotifier, List<PastTrip>>((ref) {
+  return PastTripsNotifier();
+});

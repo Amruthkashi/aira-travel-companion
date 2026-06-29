@@ -19,6 +19,7 @@ import '../../screens/booking_upload_screen.dart';
 import '../../screens/explore_places_screen.dart';
 import '../../screens/day_schedule_screen.dart';
 import '../../screens/draft_preview_screen.dart';
+import '../../screens/past_trips_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
@@ -74,6 +75,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/memories',
       builder: (context, state) => const MemoriesScreen(),
+    ),
+    GoRoute(
+      path: '/past-trips',
+      builder: (context, state) => const PastTripsScreen(),
     ),
     GoRoute(
       path: '/audio-guide',
