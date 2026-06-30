@@ -20,6 +20,7 @@ import '../../screens/explore_places_screen.dart';
 import '../../screens/day_schedule_screen.dart';
 import '../../screens/draft_preview_screen.dart';
 import '../../screens/past_trips_screen.dart';
+import '../../screens/map_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
@@ -104,6 +105,17 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/itinerary-wizard/preview',
       builder: (context, state) => const DraftPreviewScreen(),
+    ),
+    GoRoute(
+      path: '/flight-map',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>? ?? {};
+        return MapScreen(
+          fromCity: extra['fromCity'] as String? ?? 'Delhi',
+          destinationCity: extra['destinationCity'] as String? ?? 'London',
+          layovers: extra['layovers'] as List<String>?,
+        );
+      },
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

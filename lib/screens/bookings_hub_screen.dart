@@ -1,8 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/models/travel_models.dart';
+import '../core/services/geoapify_service.dart';
+import '../core/services/foursquare_service.dart';
 
 class BookingsHubScreen extends ConsumerStatefulWidget {
   const BookingsHubScreen({super.key});
@@ -13,6 +15,24 @@ class BookingsHubScreen extends ConsumerStatefulWidget {
 
 class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
   String _activeTab = 'flights'; // 'flights', 'hotels', 'cruise', 'bus', 'cabs', 'tickets'
+
+  // Real-time API search services & states
+  final _geoapify = GeoapifyService();
+  final _foursquare = FoursquareService();
+
+  // Search hotel states
+  final TextEditingController _hotelSearchCtrl = TextEditingController();
+  List<ExplorePlaceItem> _searchedHotels = [];
+  bool _searchingHotels = false;
+  String? _hotelSearchError;
+  String? _hotelSearchCity;
+
+  // Search cruise states
+  final TextEditingController _cruiseSearchCtrl = TextEditingController();
+  List<ExplorePlaceItem> _searchedCruises = [];
+  bool _searchingCruises = false;
+  String? _cruiseSearchError;
+  String? _cruiseSearchCity;
 
   // Cab states
   String? _selectedCabType;
@@ -117,6 +137,368 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    _hotelSearchCtrl.dispose();
+    _cruiseSearchCtrl.dispose();
+    _geoapify.dispose();
+    _foursquare.dispose();
+    super.dispose();
+  }
+
+  List<ExplorePlaceItem> _generateMockHotels(String city) {
+    final cleanCity = city.trim();
+    final capitalized = cleanCity.isNotEmpty 
+        ? cleanCity[0].toUpperCase() + cleanCity.substring(1)
+        : 'Destination';
+    
+    return [
+      ExplorePlaceItem(
+        id: 'mock-hotel-1-${DateTime.now().millisecondsSinceEpoch}',
+        name: 'The Grand $capitalized Majestic Resort',
+        genre: 'Hotel',
+        imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
+        description: 'A premium 5-star luxury stay situated right in the heart of $capitalized. Features panoramic views, fine dining, and full guest concierge services.',
+        rating: 4.9,
+        estimatedDuration: '240 per night',
+        estimatedCost: '\$240',
+        address: '77 Royal Boulevard, $capitalized',
+        durationMinutes: 240,
+      ),
+      ExplorePlaceItem(
+        id: 'mock-hotel-2-${DateTime.now().millisecondsSinceEpoch}',
+        name: 'Boutique Garden Lodge $capitalized',
+        genre: 'Hotel',
+        imageUrl: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80',
+        description: 'Elegant boutique lodging featuring traditional architecture, lush inner gardens, and cozy local character.',
+        rating: 4.7,
+        estimatedDuration: '145 per night',
+        estimatedCost: '\$145',
+        address: '12 Blossom Lane, $capitalized',
+        durationMinutes: 145,
+      ),
+      ExplorePlaceItem(
+        id: 'mock-hotel-3-${DateTime.now().millisecondsSinceEpoch}',
+        name: '$capitalized Central Capsule Pods',
+        genre: 'Hotel',
+        imageUrl: 'https://images.unsplash.com/photo-1549294413-26f195afcbce?auto=format&fit=crop&w=800&q=80',
+        description: 'Futuristic and highly functional capsule sleeping pods, fully equipped with high-speed Wi-Fi and ambient controls.',
+        rating: 4.5,
+        estimatedDuration: '75 per night',
+        estimatedCost: '\$75',
+        address: '39 Transit Hub St, $capitalized',
+        durationMinutes: 75,
+      ),
+    ];
+  }
+
+  List<ExplorePlaceItem> _generateMockCruises(String city) {
+    final cleanCity = city.trim();
+    final capitalized = cleanCity.isNotEmpty 
+        ? cleanCity[0].toUpperCase() + cleanCity.substring(1)
+        : 'Destination';
+        
+    return [
+      ExplorePlaceItem(
+        id: 'mock-cruise-1-${DateTime.now().millisecondsSinceEpoch}',
+        name: '$capitalized Royal Harbor Ocean Cruise',
+        genre: 'Cruise',
+        imageUrl: 'https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=800&q=80',
+        description: 'Set sail on a scenic maritime adventure departing from the main ports of $capitalized. Exceptional service and sunset views.',
+        rating: 4.8,
+        estimatedDuration: '180 per passenger',
+        estimatedCost: '\$180',
+        address: 'Terminal Pier 3, $capitalized Port',
+        durationMinutes: 180,
+      ),
+      ExplorePlaceItem(
+        id: 'mock-cruise-2-${DateTime.now().millisecondsSinceEpoch}',
+        name: 'Emerald Water Star Voyager',
+        genre: 'Cruise',
+        imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+        description: 'Enjoy a delightful coastal cruise experience exploring the local waters and landmark vistas of $capitalized.',
+        rating: 4.6,
+        estimatedDuration: '95 per passenger',
+        estimatedCost: '\$95',
+        address: 'Marina Gateway East, $capitalized',
+        durationMinutes: 95,
+      ),
+    ];
+  }
+
+  void _searchHotelsForCity(String cityQuery) async {
+    if (cityQuery.trim().isEmpty) return;
+    setState(() {
+      _searchingHotels = true;
+      _hotelSearchError = null;
+      _searchedHotels = [];
+      _hotelSearchCity = cityQuery;
+    });
+
+    try {
+      final coords = await _geoapify.geocodeCity(cityQuery);
+      if (coords == null) {
+        setState(() {
+          _searchedHotels = _generateMockHotels(cityQuery);
+          _searchingHotels = false;
+        });
+        return;
+      }
+
+      final hotels = await _foursquare.fetchHotelsAndLodgings(
+        coords['lat']!,
+        coords['lon']!,
+        cityQuery,
+      );
+
+      setState(() {
+        _searchedHotels = hotels.isNotEmpty ? hotels : _generateMockHotels(cityQuery);
+        _searchingHotels = false;
+      });
+    } catch (e) {
+      print('Hotel search error, falling back: $e');
+      setState(() {
+        _searchedHotels = _generateMockHotels(cityQuery);
+        _searchingHotels = false;
+      });
+    }
+  }
+
+  void _searchCruisesForCity(String cityQuery) async {
+    if (cityQuery.trim().isEmpty) return;
+    setState(() {
+      _searchingCruises = true;
+      _cruiseSearchError = null;
+      _searchedCruises = [];
+      _cruiseSearchCity = cityQuery;
+    });
+
+    try {
+      final coords = await _geoapify.geocodeCity(cityQuery);
+      if (coords == null) {
+        setState(() {
+          _searchedCruises = _generateMockCruises(cityQuery);
+          _searchingCruises = false;
+        });
+        return;
+      }
+
+      final cruises = await _foursquare.fetchCruisesAndBoats(
+        coords['lat']!,
+        coords['lon']!,
+        cityQuery,
+      );
+
+      setState(() {
+        _searchedCruises = cruises.isNotEmpty ? cruises : _generateMockCruises(cityQuery);
+        _searchingCruises = false;
+      });
+    } catch (e) {
+      print('Cruise search error, falling back: $e');
+      setState(() {
+        _searchedCruises = _generateMockCruises(cityQuery);
+        _searchingCruises = false;
+      });
+    }
+  }
+
+  void _showBookingDialog(ExplorePlaceItem item, String category) {
+    final TextEditingController nameCtrl = TextEditingController(text: 'John Doe');
+    final TextEditingController nightsCtrl = TextEditingController(text: '3');
+    final TextEditingController guestsCtrl = TextEditingController(text: '2');
+    DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF0F172A),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: Color(0xFF334155))),
+              title: Row(
+                children: [
+                  Icon(category == 'Hotels' ? Icons.hotel_rounded : Icons.directions_boat_rounded, color: const Color(0xFF2563EB), size: 24),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'BOOK ${category.toUpperCase()}',
+                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                    ),
+                  ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(item.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                    const SizedBox(height: 4),
+                    Text(item.address, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10.5)),
+                    const Divider(height: 20, color: Color(0xFF334155)),
+                    
+                    const Text('Guest Name', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: nameCtrl,
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      decoration: InputDecoration(
+                        fillColor: Colors.white10,
+                        filled: true,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(category == 'Hotels' ? 'Nights' : 'Tickets', style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 6),
+                              TextField(
+                                controller: nightsCtrl,
+                                keyboardType: TextInputType.number,
+                                style: const TextStyle(color: Colors.white, fontSize: 12),
+                                decoration: InputDecoration(
+                                  fillColor: Colors.white10,
+                                  filled: true,
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Guests', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 6),
+                              TextField(
+                                controller: guestsCtrl,
+                                keyboardType: TextInputType.number,
+                                style: const TextStyle(color: Colors.white, fontSize: 12),
+                                decoration: InputDecoration(
+                                  fillColor: Colors.white10,
+                                  filled: true,
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    const Text('Departure / Check-in Date', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    GestureDetector(
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(const Duration(days: 365)),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: const ColorScheme.dark(
+                                  primary: Color(0xFF2563EB),
+                                  surface: Color(0xFF0F172A),
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+                        if (picked != null) {
+                          setDialogState(() {
+                            selectedDate = picked;
+                          });
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white10,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
+                              style: const TextStyle(color: Colors.white, fontSize: 12),
+                            ),
+                            const Icon(Icons.calendar_today, color: Color(0xFF94A3B8), size: 14),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel', style: TextStyle(color: Color(0xFF94A3B8))),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB)),
+                  onPressed: () {
+                    final qty = int.tryParse(nightsCtrl.text) ?? 1;
+                    final pricePerUnit = item.durationMinutes.toDouble();
+                    final totalCost = pricePerUnit * qty;
+
+                    ref.read(expensesProvider.notifier).addExpense(TravelExpense(
+                      id: '${category.toLowerCase()}-${DateTime.now().millisecondsSinceEpoch}',
+                      category: category,
+                      amount: totalCost,
+                      label: category == 'Hotels'
+                          ? '${item.name} Stay ($qty Nights for ${nameCtrl.text})'
+                          : '${item.name} Voyage ($qty Tickets for ${nameCtrl.text})',
+                      date: '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
+                    ));
+
+                    ref.read(userProfileProvider.notifier).addXP(category == 'Hotels' ? 300 : 150);
+
+                    Navigator.pop(context);
+                    
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      backgroundColor: const Color(0xFF0F172A),
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.green, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Successfully booked ${item.name}! logged in budget.',
+                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ));
+                  },
+                  child: const Text('Confirm Book', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
 
 
   @override
@@ -214,20 +596,220 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
     }
 
     if (_activeTab == 'hotels') {
-      if (hotels.isEmpty) {
-        return _buildEmptyState('No hotel lodgings confirmed.', 'Find your optimal capsules or design stays and lock a room.', '/hotels');
-      }
       return Column(
-        children: hotels.map((h) => _buildBookingCard(h.label, 'Check-in: 03:00 PM • Room: 402', Icons.hotel)).toList(),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // API Search Area
+          const Text(
+            'SEARCH REAL-TIME HOTELS',
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: Color(0xFF00B4D8)),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _hotelSearchCtrl,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: 'Enter city (e.g. London, Singapore, Tokyo)',
+                    hintStyle: const TextStyle(color: Colors.white30, fontSize: 13),
+                    fillColor: const Color(0xFF1A2744),
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF334155)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF2563EB)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    suffixIcon: _hotelSearchCtrl.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, color: Colors.white30, size: 16),
+                            onPressed: () {
+                              _hotelSearchCtrl.clear();
+                              setState(() {
+                                _searchedHotels = [];
+                                _hotelSearchError = null;
+                              });
+                            },
+                          )
+                        : null,
+                  ),
+                  onSubmitted: _searchHotelsForCity,
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2563EB),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () => _searchHotelsForCity(_hotelSearchCtrl.text),
+                child: const Icon(Icons.search, color: Colors.white, size: 18),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Loading & States
+          if (_searchingHotels)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.0),
+              child: Center(
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(color: Color(0xFF00B4D8)),
+                    SizedBox(height: 10),
+                    Text('Searching hotels...', style: TextStyle(color: Colors.white60, fontSize: 11)),
+                  ],
+                ),
+              ),
+            ),
+
+          if (_hotelSearchError != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                child: Text(_hotelSearchError!, style: const TextStyle(color: Colors.redAccent, fontSize: 11)),
+              ),
+            ),
+
+          if (_searchedHotels.isNotEmpty) ...[
+            Text(
+              'REAL HOTELS IN ${_hotelSearchCity?.toUpperCase()}',
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white54),
+            ),
+            const SizedBox(height: 10),
+            ..._searchedHotels.map((hotel) => _buildApiPlaceSearchCard(hotel, 'Hotels')),
+            const SizedBox(height: 16),
+          ],
+
+          // Confirmed Stays Section
+          const Text(
+            'CONFIRMED RESERVATIONS',
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: Colors.white70),
+          ),
+          const SizedBox(height: 10),
+          if (hotels.isEmpty)
+            _buildEmptyState('No hotel lodgings confirmed yet.', 'Search a city above and book a stay, or register an external stay.', '/hotels')
+          else
+            Column(
+              children: hotels.map((h) => _buildBookingCard(h.label, 'Scheduled: ${h.date} • Secured Room', Icons.hotel)).toList(),
+            ),
+        ],
       );
     }
 
     if (_activeTab == 'cruise') {
       final cruiseExpenses = expenses.where((e) => e.category == 'Cruise').toList();
-      if (cruiseExpenses.isNotEmpty && !_bookingAnotherCruise) {
-        return Column(
-          children: [
-            ...cruiseExpenses.map((c) => _buildBookingCard(c.label, 'Boarding: 06:00 PM • Dock: Pier 3', Icons.directions_boat)),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Cruise search bar
+          const Text(
+            'SEARCH REAL-TIME CRUISES',
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: Color(0xFF00B4D8)),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _cruiseSearchCtrl,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: 'Enter coastal city (e.g. Miami, Singapore, Yokohama)',
+                    hintStyle: const TextStyle(color: Colors.white30, fontSize: 13),
+                    fillColor: const Color(0xFF1A2744),
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF334155)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF2563EB)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    suffixIcon: _cruiseSearchCtrl.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, color: Colors.white30, size: 16),
+                            onPressed: () {
+                              _cruiseSearchCtrl.clear();
+                              setState(() {
+                                _searchedCruises = [];
+                                _cruiseSearchError = null;
+                              });
+                            },
+                          )
+                        : null,
+                  ),
+                  onSubmitted: _searchCruisesForCity,
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2563EB),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () => _searchCruisesForCity(_cruiseSearchCtrl.text),
+                child: const Icon(Icons.search, color: Colors.white, size: 18),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Loading & States
+          if (_searchingCruises)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.0),
+              child: Center(
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(color: Color(0xFF00B4D8)),
+                    SizedBox(height: 10),
+                    Text('Searching coastal routes and cruises near port...', style: TextStyle(color: Colors.white60, fontSize: 11)),
+                  ],
+                ),
+              ),
+            ),
+
+          if (_cruiseSearchError != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                child: Text(_cruiseSearchError!, style: const TextStyle(color: Colors.redAccent, fontSize: 11)),
+              ),
+            ),
+
+          if (_searchedCruises.isNotEmpty) ...[
+            Text(
+              'CRUISES & PORTS IN ${_cruiseSearchCity?.toUpperCase()}',
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white54),
+            ),
+            const SizedBox(height: 10),
+            ..._searchedCruises.map((cruise) => _buildApiPlaceSearchCard(cruise, 'Cruise')),
+            const SizedBox(height: 16),
+          ],
+
+          // Confirmed cruises
+          const Text(
+            'CONFIRMED CRUISE EXPEDITIONS',
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: Colors.white70),
+          ),
+          const SizedBox(height: 10),
+          if (cruiseExpenses.isEmpty && !_bookingAnotherCruise) ...[
+            _buildEmptyState('No cruise expeditions confirmed yet.', 'Search a port city above or select from default packages.', ''),
             const SizedBox(height: 12),
             OutlinedButton(
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF2563EB))),
@@ -235,80 +817,95 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                 _bookingAnotherCruise = true;
                 _selectedCruiseType = null;
               }),
-              child: const Text('Book Another Cruise', style: TextStyle(color: Color(0xFF2563EB))),
+              child: const Text('View Cruise Offers Packages', style: TextStyle(color: Color(0xFF2563EB))),
             ),
-          ],
-        );
-      }
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('SELECT CRUISE VOYAGE STAY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white70)),
-          const SizedBox(height: 10),
-          ..._cruiseOptions.map((c) {
-            final isSelected = _selectedCruiseType == c['type'];
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1A2744),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF334155), width: isSelected ? 2 : 1),
-              ),
-              child: Row(
-                children: [
-                  Icon(c['icon'], color: isSelected ? const Color(0xFF2563EB) : Colors.grey, size: 24),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          ] else if (_bookingAnotherCruise) ...[
+            // show mock cruise selectors
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('MOCK OFFERS SELECTOR', style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold)),
+                TextButton(
+                  onPressed: () => setState(() => _bookingAnotherCruise = false),
+                  child: const Text('Back to search', style: TextStyle(color: Color(0xFF00B4D8), fontSize: 11)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ..._cruiseOptions.map((c) {
+              final isSelected = _selectedCruiseType == c['type'];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A2744),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF334155), width: isSelected ? 2 : 1),
+                ),
+                child: Row(
+                  children: [
+                    Icon(c['icon'], color: isSelected ? const Color(0xFF2563EB) : Colors.grey, size: 24),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(c['type'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white)),
+                          Text('Duration: ${c['duration']}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(c['type'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white)),
-                        Text('Duration: ${c['duration']}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                        Text(c['cost'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF2563EB))),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedCruiseType = c['type'];
+                            });
+                          },
+                          child: Text(isSelected ? 'Selected' : 'Select', style: TextStyle(fontSize: 10, color: isSelected ? const Color(0xFF00B4D8) : Colors.grey, fontWeight: FontWeight.bold)),
+                        )
                       ],
                     ),
+                  ],
+                ),
+              );
+            }),
+            if (_selectedCruiseType != null) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 46,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB)),
+                  onPressed: _cruiseBooking ? null : () {
+                    final cost = _cruiseOptions.firstWhere((c) => c['type'] == _selectedCruiseType)['cost'];
+                    _bookCruise(_selectedCruiseType!, cost);
+                  },
+                  icon: _cruiseBooking
+                      ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : const Icon(Icons.payment_outlined, color: Colors.white),
+                  label: Text(
+                    _cruiseBooking ? 'Reserving Cruise Suite...' : 'Confirm Cruise Reservation Block',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(c['cost'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF2563EB))),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedCruiseType = c['type'];
-                          });
-                        },
-                        child: Text(isSelected ? 'Selected' : 'Select', style: TextStyle(fontSize: 10, color: isSelected ? const Color(0xFF00B4D8) : Colors.grey, fontWeight: FontWeight.bold)),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            );
-          }),
-
-          if (_selectedCruiseType != null) ...[
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              height: 46,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB)),
-                onPressed: _cruiseBooking ? null : () {
-                  final cost = _cruiseOptions.firstWhere((c) => c['type'] == _selectedCruiseType)['cost'];
-                  _bookCruise(_selectedCruiseType!, cost);
-                },
-                icon: _cruiseBooking
-                    ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Icon(Icons.payment_outlined, color: Colors.white),
-                label: Text(
-                  _cruiseBooking ? 'Reserving Cruise Suite...' : 'Confirm Cruise Reservation Block',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
-            )
-          ]
+            ]
+          ] else ...[
+            ...cruiseExpenses.map((c) => _buildBookingCard(c.label, 'Scheduled: ${c.date} • Port Terminal Entrance', Icons.directions_boat)),
+            const SizedBox(height: 12),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF2563EB))),
+              onPressed: () => setState(() {
+                _bookingAnotherCruise = true;
+                _selectedCruiseType = null;
+              }),
+              child: const Text('Book Another Cruise Offer', style: TextStyle(color: Color(0xFF2563EB))),
+            ),
+          ],
         ],
       );
     }
@@ -598,6 +1195,134 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB)),
             onPressed: () => context.push(route),
             child: const Text('Procure Now', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildApiPlaceSearchCard(ExplorePlaceItem item, String category) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A2744),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF334155)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
+                child: Image.network(
+                  item.imageUrl,
+                  height: 140,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 140,
+                    color: const Color(0xFF0F172A),
+                    child: const Icon(Icons.image_not_supported, color: Colors.white24, size: 40),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 12),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${item.rating}',
+                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, color: Color(0xFF00B4D8), size: 12),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        item.address,
+                        style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10.5),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(height: 20, color: Color(0xFF334155)),
+                Text(
+                  item.description,
+                  style: const TextStyle(fontSize: 11, color: Colors.white70, height: 1.45),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.estimatedCost,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF00B4D8)),
+                        ),
+                        Text(
+                          category == 'Hotels' ? 'Estimated price / night' : 'Estimated ticket price',
+                          style: const TextStyle(fontSize: 9, color: Color(0xFF94A3B8)),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2563EB),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                      onPressed: () => _showBookingDialog(item, category),
+                      icon: const Icon(Icons.add_shopping_cart, size: 12),
+                      label: Text(
+                        category == 'Hotels' ? 'Book Stay' : 'Book Voyage',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

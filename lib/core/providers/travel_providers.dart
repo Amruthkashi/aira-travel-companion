@@ -990,9 +990,16 @@ class DayScheduleNotifier extends StateNotifier<List<List<DayScheduleItem>>> {
     final grid = List<int>.filled(1500, 0);
 
     // Block time before earliest start
-    final earliestStart = getDayEarliestStart(dayIndex, bookings);
+    int earliestStart = getDayEarliestStart(dayIndex, bookings);
+    if (earliestStart >= 1320) { // 10:00 PM or blocked
+      earliestStart = 540; // Default to 9:00 AM
+    } else {
+      earliestStart = max(540, earliestStart);
+    }
     for (int i = 0; i < earliestStart; i++) {
-      grid[i] = 1;
+      if (i < 1500) {
+        grid[i] = 1;
+      }
     }
 
     // Block time after latest departure (if return day)
@@ -1359,7 +1366,8 @@ class DayScheduleNotifier extends StateNotifier<List<List<DayScheduleItem>>> {
     final checkingInHotels = bookings.hotels.where((h) => h.checkInDate == dateStr).toList();
     final checkingOutHotels = bookings.hotels.where((h) => h.checkOutDate == dateStr).toList();
 
-    int currentPointerMin = getDayEarliestStart(dayIdx, bookings);
+    int earliestStart = getDayEarliestStart(dayIdx, bookings);
+    int currentPointerMin = (earliestStart >= 1320) ? 540 : max(540, earliestStart);
 
     final returnFlight = getReturnFlight(bookings);
     final returnDeparture = returnFlight != null
@@ -1424,7 +1432,12 @@ class DayScheduleNotifier extends StateNotifier<List<List<DayScheduleItem>>> {
         ));
         currentPointerMin = startMin + duration;
       } else {
-        resolvedItems.add(currentItem.copyWith(sortOrder: i));
+        final fallbackStart = resolvedItems.isEmpty ? currentPointerMin : currentPointerMin + 30;
+        resolvedItems.add(currentItem.copyWith(
+          scheduledTime: minutesToTimeString(fallbackStart),
+          sortOrder: i,
+        ));
+        currentPointerMin = fallbackStart + duration;
       }
     }
 
@@ -1453,7 +1466,8 @@ class DayScheduleNotifier extends StateNotifier<List<List<DayScheduleItem>>> {
     final checkingInHotels = bookings.hotels.where((h) => h.checkInDate == dateStr).toList();
     final checkingOutHotels = bookings.hotels.where((h) => h.checkOutDate == dateStr).toList();
 
-    int currentPointerMin = getDayEarliestStart(dayIdx, bookings);
+    int earliestStart = getDayEarliestStart(dayIdx, bookings);
+    int currentPointerMin = (earliestStart >= 1320) ? 540 : max(540, earliestStart);
 
     final returnFlight = getReturnFlight(bookings);
     final returnDeparture = returnFlight != null
@@ -1519,7 +1533,14 @@ class DayScheduleNotifier extends StateNotifier<List<List<DayScheduleItem>>> {
         resolvedItems.add(item.copyWith(scheduledTime: newTime));
         currentPointerMin = startMin + duration;
       } else {
-        resolvedItems.add(item);
+        final fallbackStart = resolvedItems.isEmpty ? currentPointerMin : currentPointerMin + 30;
+        final oldTime = item.scheduledTime;
+        final newTime = minutesToTimeString(fallbackStart);
+        if (oldTime != newTime) {
+          changes[item.place.name] = "$oldTime → $newTime (Forced)";
+        }
+        resolvedItems.add(item.copyWith(scheduledTime: newTime));
+        currentPointerMin = fallbackStart + duration;
       }
     }
 

@@ -3931,85 +3931,6 @@
       "timestamp": 1781599983778
     },
     {
-      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_48.3766233766234_85_78_40",
-      "category": "Personalized",
-      "places": [
-        {
-          "name": "Crossing District Neon Night Stroll",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.8,
-          "desc": "Wander through the world's busiest pedestrian crossing, followed by hidden izakaya lanes.",
-          "tags": [
-            "Street Food",
-            "Japanese",
-            "Tokyo",
-            "Local Street Food"
-          ],
-          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Geek Town Otaku Pilgrimage",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.9,
-          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
-          "tags": [
-            "Anime",
-            "Tokyo",
-            "Street Food",
-            "Japanese"
-          ],
-          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Kyoto Classic Zen Gardens",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.8,
-          "desc": "Breathe in the ancient tranquility of rock gardens, golden pavilions, and traditional green tea houses.",
-          "tags": [
-            "Historical Tours",
-            "Japanese",
-            "Zen",
-            "Kyoto"
-          ],
-          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Eiffel Tower Sunset Picnic",
-          "country": "France",
-          "countryCode": "FRA",
-          "rating": 4.9,
-          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
-          "tags": [
-            "Paris",
-            "French",
-            "Historical Tours",
-            "Cozy Cafes",
-            "Fine Dining"
-          ],
-          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Burj Khalifa Sky Lounge Dinner",
-          "country": "United Arab Emirates",
-          "countryCode": "ARE",
-          "rating": 4.8,
-          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
-          "tags": [
-            "Dubai",
-            "Luxury Shopping",
-            "Fine Dining",
-            "Modern",
-            "Rooftop Dining"
-          ],
-          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
-        }
-      ],
-      "timestamp": 1781599983861
-    },
-    {
       "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_55.735957158076324_85_78_40",
       "category": "ðŸ‘¤ Solo Traveler",
       "places": [
@@ -4227,14 +4148,14 @@
     },
     {
       "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Tokyo_Anime Shopping,Local Food Stalls,Temples,Tech Gadgets_48.3766233766234_85_78_40",
-      "category": "Personalized",
+      "category": "👤 Solo Traveler",
       "places": [
         {
           "name": "Akihabara District",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.7,
-          "desc": "Anime, tech, and local food stalls in Tokyo's electronic hub",
+          "rating": 4.9,
+          "desc": "Tokyo's electronic and anime hub",
           "tags": [
             "Tech",
             "Anime"
@@ -4245,8 +4166,8 @@
           "name": "Fushimi Inari Shrine",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.9,
-          "desc": "Historic temple with thousands of vermilion gates",
+          "rating": 4.8,
+          "desc": "Kyoto's thousand red gates and local food",
           "tags": [
             "Heritage",
             "Culture"
@@ -4257,11 +4178,78 @@
           "name": "Shibuya Crossing",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.8,
-          "desc": "Tokyo's busiest intersection with neon lights and local food",
+          "rating": 4.7,
+          "desc": "Tokyo's busiest tech and food spot",
           "tags": [
             "Tech",
             "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Nara Park",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Historic temples and friendly deer",
+          "tags": [
+            "Heritage",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Asakusa Kannon Temple",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "Ancient temple with local food stalls",
+          "tags": [
+            "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1782732247921
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Tokyo_Anime Shopping,Local Food Stalls,Temples,Tech Gadgets_48.3766233766234_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Tokyo's electronic and anime hub",
+          "tags": [
+            "Tech",
+            "Anime"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Kyoto's famous orange torii gates",
+          "tags": [
+            "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Shibuya Crossing",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Tokyo's busiest and most colorful intersection",
+          "tags": [
+            "Tech",
+            "Local Food"
           ],
           "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
         },
@@ -4270,27 +4258,171 @@
           "country": "Japan",
           "countryCode": "JPN",
           "rating": 4.6,
-          "desc": "Ancient Buddhist temple with anime and local food nearby",
+          "desc": "Ancient Buddhist temple in Tokyo",
           "tags": [
             "Heritage",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Dotonbori Neighborhood",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Osaka's popular entertainment district",
+          "tags": [
+            "Local Food",
+            "Tech"
+          ],
+          "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1782732248089
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_48.3766233766234_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Tokyo Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Vibrant anime and tech hub with rich street food",
+          "tags": [
+            "Anime",
+            "Tech",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Historical site with thousands of vermilion gates",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Zen"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Dotonbori",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Colorful street food and entertainment district",
+          "tags": [
+            "Food",
+            "Culture",
+            "Nightlife"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Hiroshima Peace Memorial Park",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Historical site and museum with somber heritage",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "History"
+          ],
+          "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Nikko Toshogu Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.5,
+          "desc": "UNESCO World Heritage site with ornate temples",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1782732610762
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Crossing District_Tokyo,Japanese,Anime,Street Food,Historical Sites_48.3766233766234_85_78_40",
+      "category": "☀️ Summer",
+      "places": [
+        {
+          "name": "Tokyo Akihabara District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Neon-lit anime and tech hub with street food",
+          "tags": [
+            "Anime",
+            "Tech",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Fushimi Inari Shrine",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Historical site with thousand red gates and food",
+          "tags": [
+            "Heritage",
+            "Culture",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Singapore Gardens by the Bay",
+          "country": "Singapore",
+          "countryCode": "SGP",
+          "rating": 4.7,
+          "desc": "Futuristic gardens with anime-inspired structures",
+          "tags": [
+            "Tech",
+            "Nature",
             "Culture"
           ],
           "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Ikebukuro Otome Road",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.5,
-          "desc": "Shopping district for anime and manga fans with local eateries",
+          "name": "Bangkok Street Food Night Market",
+          "country": "Thailand",
+          "countryCode": "THA",
+          "rating": 4.6,
+          "desc": "Vibrant night market with street food and anime",
           "tags": [
-            "Anime",
-            "Shopping"
+            "Food",
+            "Culture",
+            "Street"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Seoul Myeong-dong Shopping District",
+          "country": "South Korea",
+          "countryCode": "KOR",
+          "rating": 4.5,
+          "desc": "K-pop and anime-inspired fashion and food hub",
+          "tags": [
+            "Culture",
+            "Tech",
+            "Fashion"
           ],
           "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
         }
       ],
-      "timestamp": 1781612424575
+      "timestamp": 1782732611244
     }
   ],
   "squads": []

@@ -54,7 +54,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     final now = _nowTime;
     final nowMin = now.hour * 60 + now.minute;
 
-    int currentDayIdx = _activeDay;
+    int currentDayIdx = -1;
     if (startDate != null && startDate.isNotEmpty) {
       try {
         final start = DateTime.parse(startDate);
@@ -65,6 +65,10 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
           currentDayIdx = diff;
         }
       } catch (_) {}
+    }
+
+    if (currentDayIdx == -1) {
+      return; // Today is not a trip day, do not check alerts
     }
 
     final dayObj = itinerary[currentDayIdx];
@@ -1259,7 +1263,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     final bookings = ref.read(tripBookingsProvider);
     final startDate = bookings.startDate;
 
-    int currentDayIdx = _activeDay;
+    int currentDayIdx = -1;
     if (startDate != null && startDate.isNotEmpty) {
       try {
         final start = DateTime.parse(startDate);
@@ -1271,6 +1275,10 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
           currentDayIdx = diff;
         }
       } catch (_) {}
+    }
+
+    if (currentDayIdx == -1) {
+      return null; // Today is not a trip day, do not show live reminder
     }
 
     final dayObj = itinerary[currentDayIdx];

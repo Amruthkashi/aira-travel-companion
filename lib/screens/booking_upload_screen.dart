@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,7 @@ import '../core/models/hotel_place.dart';
 import '../core/models/aviation_flight.dart';
 import '../core/services/aviationstack_service.dart';
 import '../core/widgets/hotel_search_field.dart';
+
 
 const List<String> _popularAirlines = [
   'ANA (All Nippon Airways)',
@@ -562,6 +565,375 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
       },
     );
   }
+
+  void _showPnrImportModal() {
+    final pnrCtrl = TextEditingController();
+    bool isPnrLoading = false;
+    String? pnrError;
+    Map<String, dynamic>? foundFlight;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF0A1628),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 24, right: 24, top: 24,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _modalHandle(),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.cloud_download, color: Color(0xFF34D399), size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        const Text('IMPORT FLIGHT VIA PNR',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: _modalField('Enter PNR Code', pnrCtrl, 'e.g. XX24X4 or HHE333'),
+                        ),
+                        const SizedBox(width: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: SizedBox(
+                            height: 40,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF10B981),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                              onPressed: isPnrLoading
+                                  ? null
+                                  : () async {
+                                      final code = pnrCtrl.text.trim().toUpperCase();
+                                      if (code.isEmpty) return;
+                                      setModalState(() {
+                                        isPnrLoading = true;
+                                        pnrError = null;
+                                        foundFlight = null;
+                                      });
+                                      try {
+                                        final response = await http.get(Uri.parse('https://6a4236f27602860e652113bd.mockapi.io/api/v1/Flights'))
+                                            .timeout(const Duration(seconds: 8));
+                                        if (response.statusCode >= 200 && response.statusCode < 300) {
+                                          final List<dynamic> data = jsonDecode(response.body);
+                                          final match = data.firstWhere(
+                                            (item) => item['pnr']?.toString().toUpperCase() == code,
+                                            orElse: () => null,
+                                          );
+                                          if (match != null) {
+                                            setModalState(() {
+                                              foundFlight = match;
+                                            });
+                                          } else {
+                                            setModalState(() {
+                                              pnrError = 'No booking found matching PNR "$code".';
+                                            });
+                                          }
+                                        } else {
+                                          setModalState(() {
+                                            pnrError = 'Failed to fetch flight list (${response.statusCode}).';
+                                          });
+                                        }
+                                      } catch (err) {
+                                        setModalState(() {
+                                          pnrError = 'Network error or timeout. Please check connection.';
+                                        });
+                                      } finally {
+                                        setModalState(() {
+                                          isPnrLoading = false;
+                                        });
+                                      }
+                                    },
+                              child: isPnrLoading
+                                  ? const SizedBox.square(
+                                      dimension: 18,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    )
+                                  : const Icon(Icons.search, color: Colors.white, size: 18),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    if (pnrError != null) ...[
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444).withOpacity(0.1),
+                          border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.3)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: Color(0xFFFCA5A5), size: 16),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                pnrError!,
+                                style: const TextStyle(color: Color(0xFFFCA5A5), fontSize: 11),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+
+                    if (foundFlight != null) ...[
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E293B),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFF334155)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${foundFlight!['airline']} • ${foundFlight!['flight_number']}',
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: (foundFlight!['status'] == 'Confirmed')
+                                        ? const Color(0xFF10B981).withOpacity(0.15)
+                                        : const Color(0xFFEF4444).withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    foundFlight!['status'] ?? 'Unknown',
+                                    style: TextStyle(
+                                      color: (foundFlight!['status'] == 'Confirmed')
+                                          ? const Color(0xFF34D399)
+                                          : const Color(0xFFF87171),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            _buildInfoRow('Passenger', foundFlight!['passenger_name'] ?? 'N/A'),
+                            _buildInfoRow('PNR Code', foundFlight!['pnr'] ?? 'N/A'),
+                            _buildInfoRow('Cabin Class', foundFlight!['class'] ?? 'N/A'),
+                            _buildInfoRow('Seat Number', foundFlight!['seat'] ?? 'N/A'),
+                            _buildInfoRow('Duration', foundFlight!['duration'] ?? 'N/A'),
+                            _buildInfoRow('Meal Pref.', foundFlight!['meal_preference'] ?? 'N/A'),
+                            _buildInfoRow('Baggage', foundFlight!['baggage_allowance'] ?? 'N/A'),
+                            const Divider(color: Color(0xFF334155), height: 24),
+                            const Text(
+                              'ITINERARY LEGS',
+                              style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
+                            ),
+                            const SizedBox(height: 8),
+                            ...((foundFlight!['itinerary'] as List? ?? []).map((leg) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.circle, size: 6, color: Color(0xFF60A5FA)),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        'Leg ${leg['leg']}: ${leg['flight']} (${leg['from']} → ${leg['to']}) at ${leg['dep']} - ${leg['arr']}',
+                                        style: const TextStyle(color: Colors.white70, fontSize: 11),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList()),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xFF334155)),
+                                foregroundColor: Colors.white70,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Cancel'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF10B981),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              onPressed: () {
+                                final flight = foundFlight!;
+                                final itineraryLegs = flight['itinerary'] as List? ?? [];
+                                if (itineraryLegs.isNotEmpty) {
+                                  // Parse main flight date
+                                  String flightDate = '';
+                                  try {
+                                    final depRaw = flight['departure']?.toString() ?? '';
+                                    if (depRaw.contains(' ')) {
+                                      flightDate = depRaw.split(' ')[0];
+                                    } else {
+                                      flightDate = depRaw;
+                                    }
+                                    DateTime.parse(flightDate);
+                                  } catch (_) {
+                                    flightDate = DateTime.now().toString().split(' ')[0];
+                                  }
+
+                                  // Determine if the entire PNR is a going or return journey
+                                  String determinedType = 'going';
+                                  bool isRoundTrip = false;
+                                  if (itineraryLegs.isNotEmpty) {
+                                    final firstLeg = itineraryLegs.first;
+                                    final lastLeg = itineraryLegs.last;
+                                    final pnrStartCity = firstLeg['from']?.toString().trim().toLowerCase() ?? '';
+                                    final pnrEndCity = lastLeg['to']?.toString().trim().toLowerCase() ?? '';
+                                    final currentDest = ref.read(tripBookingsProvider).destination.trim().toLowerCase();
+                                    
+                                    if (pnrStartCity.isNotEmpty && pnrEndCity.isNotEmpty && pnrStartCity == pnrEndCity) {
+                                      isRoundTrip = true;
+                                    } else {
+                                      if (currentDest.isNotEmpty) {
+                                        if (pnrEndCity.contains(currentDest) || currentDest.contains(pnrEndCity)) {
+                                          determinedType = 'going';
+                                        } else if (pnrStartCity.contains(currentDest) || currentDest.contains(pnrStartCity)) {
+                                          determinedType = 'return';
+                                        } else {
+                                          final hasGoing = ref.read(tripBookingsProvider).flights.any((f) => f.flightType == 'going');
+                                          determinedType = hasGoing ? 'return' : 'going';
+                                        }
+                                      } else {
+                                        final hasGoing = ref.read(tripBookingsProvider).flights.any((f) => f.flightType == 'going');
+                                        determinedType = hasGoing ? 'return' : 'going';
+                                      }
+                                    }
+                                  }
+
+                                  for (int i = 0; i < itineraryLegs.length; i++) {
+                                    final leg = itineraryLegs[i];
+                                    final legNo = leg['leg']?.toString() ?? (i + 1).toString();
+                                    
+                                    // Map direction
+                                    String directionType = determinedType;
+                                    if (isRoundTrip) {
+                                      if (i == 0) {
+                                        directionType = 'going';
+                                      } else if (i == itineraryLegs.length - 1) {
+                                        directionType = 'return';
+                                      } else {
+                                        directionType = 'other';
+                                      }
+                                    }
+
+                                    ref.read(tripBookingsProvider.notifier).addFlight(FlightBooking(
+                                      id: 'flt-pnr-$legNo-${flight['pnr']}-${DateTime.now().millisecondsSinceEpoch}',
+                                      airline: flight['airline'] ?? 'Unknown Airline',
+                                      flightNumber: leg['flight'] ?? flight['flight_number'] ?? '',
+                                      pnr: flight['pnr'] ?? '',
+                                      departureCity: leg['from'] ?? '',
+                                      arrivalCity: leg['to'] ?? '',
+                                      departureDate: flightDate,
+                                      arrivalDate: flightDate,
+                                      departureTime: leg['dep'] ?? '',
+                                      arrivalTime: leg['arr'] ?? '',
+                                      seatClass: flight['class'] ?? 'Economy',
+                                      passengers: 1,
+                                      flightType: directionType,
+                                    ));
+                                  }
+
+                                  // Set destination city to final arrival city of the flight
+                                  final lastLeg = itineraryLegs.last;
+                                  final finalCity = lastLeg['to']?.toString() ?? '';
+                                  if (finalCity.isNotEmpty) {
+                                    ref.read(tripBookingsProvider.notifier).setDestination(finalCity);
+                                  }
+
+                                  // Update trip dates
+                                  ref.read(tripBookingsProvider.notifier).setTripDates(flightDate, flightDate);
+
+                                  Navigator.pop(ctx);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Successfully imported flight for ${flight['passenger_name']}!'),
+                                      backgroundColor: const Color(0xFF10B981),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: const Text('Confirm & Import', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      const SizedBox(height: 8),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
+        ],
+      ),
+    );
+  }
+
 
   void _showHotelModal() {
     final nameCtrl = TextEditingController();
@@ -1584,7 +1956,17 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                   _sectionHeader('Flights', Icons.flight, const Color(0xFF2563EB), bookings.flights.length),
                   const SizedBox(height: 12),
                   ...bookings.flights.map((f) => _flightCard(f)),
-                  _addButton('Add Flight Booking', const Color(0xFF2563EB), Icons.flight, _showFlightModal),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _addButton('Add Flight Booking', const Color(0xFF2563EB), Icons.add, _showFlightModal),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _addButton('Import via PNR', const Color(0xFF10B981), Icons.cloud_download, _showPnrImportModal),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 24),
 
                   // HOTELS SECTION
@@ -1729,6 +2111,53 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
     );
   }
 
+  Map<String, dynamic> _getRouteDetailsForFlight(FlightBooking target, List<FlightBooking> allFlights) {
+    if (target.pnr.isEmpty) {
+      return {
+        'fromCity': target.departureCity,
+        'destinationCity': target.arrivalCity,
+        'layovers': <String>[],
+      };
+    }
+    final samePnrFlights = allFlights.where((flight) => 
+      flight.pnr.toLowerCase() == target.pnr.toLowerCase() && 
+      flight.flightType == target.flightType
+    ).toList();
+    
+    if (samePnrFlights.length <= 1) {
+      return {
+        'fromCity': target.departureCity,
+        'destinationCity': target.arrivalCity,
+        'layovers': <String>[],
+      };
+    }
+
+    // Sort samePnrFlights by departure date & time
+    samePnrFlights.sort((a, b) {
+      final cmp = a.departureDate.compareTo(b.departureDate);
+      if (cmp != 0) return cmp;
+      return a.departureTime.compareTo(b.departureTime);
+    });
+
+    final origin = samePnrFlights.first.departureCity;
+    final destination = samePnrFlights.last.arrivalCity;
+    final List<String> layovers = [];
+    for (int i = 0; i < samePnrFlights.length - 1; i++) {
+      final arr = samePnrFlights[i].arrivalCity;
+      if (arr.isNotEmpty && 
+          arr.toLowerCase() != origin.toLowerCase() && 
+          arr.toLowerCase() != destination.toLowerCase()) {
+        layovers.add(arr);
+      }
+    }
+
+    return {
+      'fromCity': origin,
+      'destinationCity': destination,
+      'layovers': layovers,
+    };
+  }
+
   Widget _flightCard(FlightBooking f) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -1790,6 +2219,15 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                 ),
               ),
               const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  final bookings = ref.read(tripBookingsProvider);
+                  final routeDetails = _getRouteDetailsForFlight(f, bookings.flights);
+                  context.push('/flight-map', extra: routeDetails);
+                },
+                child: const Icon(Icons.map, color: Color(0xFF00B4D8), size: 16),
+              ),
+              const SizedBox(width: 12),
               GestureDetector(
                 onTap: () => ref.read(tripBookingsProvider.notifier).removeFlight(f.id),
                 child: const Icon(Icons.close, color: Color(0xFFEF4444), size: 16),
@@ -1928,7 +2366,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
             backgroundColor: color.withOpacity(0.05),
           ),
           onPressed: onTap,
-          icon: Icon(Icons.add, size: 16, color: color),
+          icon: Icon(icon, size: 16, color: color),
           label: Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: color)),
         ),
       ),

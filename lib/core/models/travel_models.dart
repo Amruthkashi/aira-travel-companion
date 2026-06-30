@@ -93,12 +93,28 @@ class ItineraryDay {
   final int day;
   final String theme;
   final List<ActivityItem> activities;
+  String notes;
 
   ItineraryDay({
     required this.day,
     required this.theme,
     required this.activities,
+    this.notes = '',
   });
+
+  ItineraryDay copyWith({
+    int? day,
+    String? theme,
+    List<ActivityItem>? activities,
+    String? notes,
+  }) {
+    return ItineraryDay(
+      day: day ?? this.day,
+      theme: theme ?? this.theme,
+      activities: activities ?? this.activities,
+      notes: notes ?? this.notes,
+    );
+  }
 }
 
 class ChecklistItem {

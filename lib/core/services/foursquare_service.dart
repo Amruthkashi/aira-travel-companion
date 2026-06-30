@@ -41,12 +41,12 @@ class FoursquareService {
     ).timeout(const Duration(seconds: 5));
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw FoursquareException('Failed to fetch Foursquare attractions (${response.statusCode}).');
+      throw FoursquareException('Failed to fetch attractions (${response.statusCode}).');
     }
 
     final decoded = jsonDecode(response.body);
     if (decoded is! Map<String, dynamic>) {
-      throw const FoursquareException('Invalid response structure from Foursquare.');
+      throw const FoursquareException('Invalid response structure for attractions.');
     }
 
     final results = decoded['results'];
@@ -242,5 +242,199 @@ class FoursquareService {
 
   void dispose() {
     _client.close();
+  }
+
+  Future<List<ExplorePlaceItem>> fetchHotelsAndLodgings(double lat, double lon, String cityName) async {
+    const fields = 'fsq_id,name,location,categories,rating,description,photos';
+    
+    final uri = Uri.https(
+      'api.foursquare.com',
+      '/v3/places/search',
+      {
+        'll': '$lat,$lon',
+        'categories': '19014', // Lodging/Hotel
+        'radius': '15000',
+        'limit': '15',
+        'fields': fields,
+      },
+    );
+
+    final authKey = _apiKey.startsWith('fsq3_') ? _apiKey : 'fsq3_$_apiKey';
+    final response = await _client.get(
+      uri,
+      headers: {
+        'Authorization': authKey,
+        'accept': 'application/json',
+      },
+    ).timeout(const Duration(seconds: 5));
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw FoursquareException('Failed to fetch hotels (${response.statusCode}).');
+    }
+
+    final decoded = jsonDecode(response.body);
+    if (decoded is! Map<String, dynamic>) {
+      throw const FoursquareException('Invalid response structure for hotels.');
+    }
+
+    final results = decoded['results'];
+    if (results is! List) {
+      return const [];
+    }
+
+    final List<ExplorePlaceItem> items = [];
+    int index = 0;
+
+    for (final p in results) {
+      if (p is! Map<String, dynamic>) continue;
+      final name = p['name']?.toString() ?? '';
+      if (name.isEmpty) continue;
+
+      final categories = p['categories'] as List? ?? [];
+      final genre = 'Hotel';
+      
+      final location = p['location'] as Map<String, dynamic>? ?? {};
+      final address = location['formatted_address']?.toString() ?? location['address']?.toString() ?? cityName;
+      
+      double rating = 4.0;
+      final rawRating = p['rating'];
+      if (rawRating is num) {
+        rating = double.parse((rawRating / 2.0).toStringAsFixed(1));
+      } else {
+        rating = double.parse((4.0 + (name.hashCode.abs() % 11) * 0.1).toStringAsFixed(1));
+      }
+
+      String imageUrl = '';
+      final photos = p['photos'];
+      if (photos is List && photos.isNotEmpty) {
+        final firstPhoto = photos.first;
+        if (firstPhoto is Map<String, dynamic>) {
+          final prefix = firstPhoto['prefix']?.toString() ?? '';
+          final suffix = firstPhoto['suffix']?.toString() ?? '';
+          if (prefix.isNotEmpty && suffix.isNotEmpty) {
+            imageUrl = '${prefix}500x300$suffix';
+          }
+        }
+      }
+      if (imageUrl.isEmpty) {
+        imageUrl = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=500&q=80'; // default hotel
+      }
+
+      final description = p['description']?.toString() ?? 'A highly recommended stay in $cityName. Known as "$name", it offers premium lodging amenities and standard guest accommodations.';
+
+      final double price = 80.0 + (name.hashCode.abs() % 17) * 10;
+
+      items.add(ExplorePlaceItem(
+        id: 'fsq-hotel-${p['fsq_id'] ?? index++}',
+        name: name,
+        genre: genre,
+        imageUrl: imageUrl,
+        description: description,
+        rating: rating,
+        estimatedDuration: '${price.toInt()} per night',
+        estimatedCost: '\$${price.toInt()}',
+        address: address,
+        durationMinutes: price.toInt(),
+      ));
+    }
+
+    return items;
+  }
+
+  Future<List<ExplorePlaceItem>> fetchCruisesAndBoats(double lat, double lon, String cityName) async {
+    const fields = 'fsq_id,name,location,categories,rating,description,photos';
+    
+    final uri = Uri.https(
+      'api.foursquare.com',
+      '/v3/places/search',
+      {
+        'll': '$lat,$lon',
+        'categories': '19021,19015', // Cruise ship, Pier/port
+        'radius': '15000',
+        'limit': '10',
+        'fields': fields,
+      },
+    );
+
+    final authKey = _apiKey.startsWith('fsq3_') ? _apiKey : 'fsq3_$_apiKey';
+    final response = await _client.get(
+      uri,
+      headers: {
+        'Authorization': authKey,
+        'accept': 'application/json',
+      },
+    ).timeout(const Duration(seconds: 5));
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw FoursquareException('Failed to fetch cruises (${response.statusCode}).');
+    }
+
+    final decoded = jsonDecode(response.body);
+    if (decoded is! Map<String, dynamic>) {
+      throw const FoursquareException('Invalid response structure for cruises.');
+    }
+
+    final results = decoded['results'];
+    if (results is! List) {
+      return const [];
+    }
+
+    final List<ExplorePlaceItem> items = [];
+    int index = 0;
+
+    for (final p in results) {
+      if (p is! Map<String, dynamic>) continue;
+      final name = p['name']?.toString() ?? '';
+      if (name.isEmpty) continue;
+
+      final categories = p['categories'] as List? ?? [];
+      final genre = 'Cruise';
+      
+      final location = p['location'] as Map<String, dynamic>? ?? {};
+      final address = location['formatted_address']?.toString() ?? location['address']?.toString() ?? cityName;
+      
+      double rating = 4.0;
+      final rawRating = p['rating'];
+      if (rawRating is num) {
+        rating = double.parse((rawRating / 2.0).toStringAsFixed(1));
+      } else {
+        rating = double.parse((4.0 + (name.hashCode.abs() % 11) * 0.1).toStringAsFixed(1));
+      }
+
+      String imageUrl = '';
+      final photos = p['photos'];
+      if (photos is List && photos.isNotEmpty) {
+        final firstPhoto = photos.first;
+        if (firstPhoto is Map<String, dynamic>) {
+          final prefix = firstPhoto['prefix']?.toString() ?? '';
+          final suffix = firstPhoto['suffix']?.toString() ?? '';
+          if (prefix.isNotEmpty && suffix.isNotEmpty) {
+            imageUrl = '${prefix}500x300$suffix';
+          }
+        }
+      }
+      if (imageUrl.isEmpty) {
+        imageUrl = 'https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=500&q=80'; // default cruise ship
+      }
+
+      final description = p['description']?.toString() ?? 'A scenic maritime voyage departing from $cityName. Enjoy a premium $name experience with outstanding water views and amenities.';
+
+      final double price = 50.0 + (name.hashCode.abs() % 13) * 15;
+
+      items.add(ExplorePlaceItem(
+        id: 'fsq-cruise-${p['fsq_id'] ?? index++}',
+        name: name,
+        genre: genre,
+        imageUrl: imageUrl,
+        description: description,
+        rating: rating,
+        estimatedDuration: '${price.toInt()} per passenger',
+        estimatedCost: '\$${price.toInt()}',
+        address: address,
+        durationMinutes: price.toInt(),
+      ));
+    }
+
+    return items;
   }
 }

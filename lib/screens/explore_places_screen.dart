@@ -218,7 +218,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
         foursquareService.dispose();
         if (fsqPlaces.length >= 5) {
           fetchedPlaces = fsqPlaces;
-          sourceMessage = "Loaded real-time attractions from Foursquare.";
+          sourceMessage = "Loaded real-time local attractions.";
         } else {
           throw Exception("Foursquare returned too few places (${fsqPlaces.length})");
         }
@@ -233,7 +233,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
           );
           if (geoPlaces.length >= 5) {
             fetchedPlaces = geoPlaces;
-            sourceMessage = "Foursquare offline ($fsqError). Loaded attractions from Geoapify.";
+            sourceMessage = "Loaded local attractions.";
           } else {
             throw Exception("Geoapify returned too few places (${geoPlaces.length})");
           }

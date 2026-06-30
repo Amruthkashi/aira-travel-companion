@@ -55,7 +55,7 @@ class GeoapifyService {
 
     final decoded = jsonDecode(response.body);
     if (decoded is! Map<String, dynamic>) {
-      throw const GeoapifyException('Geoapify returned an invalid response.');
+      throw const GeoapifyException('Hotel search returned an invalid response.');
     }
 
     final features = decoded['features'];
@@ -142,7 +142,7 @@ class GeoapifyService {
 
     final decoded = jsonDecode(response.body);
     if (decoded is! Map<String, dynamic>) {
-      throw const GeoapifyException('Invalid places response from Geoapify.');
+      throw const GeoapifyException('Invalid response structure for places.');
     }
 
     final features = decoded['features'];

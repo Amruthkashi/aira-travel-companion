@@ -525,6 +525,11 @@ ResolvedItineraryResult validateAndResolveItinerary(DraftItinerary draft) {
     }
 
     // Now, schedule the attractions sequentially in the free slots of the day
+    if (timelineStartMin >= 1320) {
+      timelineStartMin = 540;
+    } else {
+      timelineStartMin = max(540, timelineStartMin);
+    }
     int currentPointerMin = timelineStartMin;
     String lastLocationName = activeHotelsForPrevNight.isNotEmpty 
         ? activeHotelsForPrevNight.first.hotelName 

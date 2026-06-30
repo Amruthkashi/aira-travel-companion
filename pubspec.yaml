@@ -49,6 +49,8 @@ dependencies:
   fl_chart: ^0.68.0
   cached_network_image: ^3.3.1
   google_maps_flutter: ^2.6.0
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
   
   # Firebase Core & Stubs (mocked globally)
   firebase_core: ^4.10.0

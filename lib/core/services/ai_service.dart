@@ -162,54 +162,89 @@ class AiService {
     } catch (e) {
       print('Error generating itinerary from backend: $e');
       final destination = profile['city'] ?? 'Tokyo';
-      // Return a basic fallback itinerary
-      return [
-        ItineraryDay(
-          day: 1,
-          theme: 'Highlights of $destination',
+      final cleanDest = destination.toString().trim();
+      final capitalized = cleanDest.isNotEmpty 
+          ? cleanDest[0].toUpperCase() + cleanDest.substring(1)
+          : 'Destination';
+      
+      final numDays = days ?? 2;
+      final List<ItineraryDay> fallbackList = [];
+      
+      for (int d = 1; d <= numDays; d++) {
+        fallbackList.add(ItineraryDay(
+          day: d,
+          theme: 'Culture & Local Flavors of $capitalized - Day $d',
           activities: [
             ActivityItem(
-              time: '09:00 AM', 
-              activity: 'Local Landmark Exploration', 
-              description: 'Stroll around the iconic central landmarks.', 
-              cost: 'Free', 
-              locationName: destination, 
-              suggestedAttire: 'Comfortable walking shoes',
-              transport: 'Metro Line 4',
-              ticketInfo: 'Public Access',
-              placeDetails: 'Established in 1870, this landmark represents the heart of the city.',
+              time: '08:30 AM',
+              activity: 'Healthy Local Breakfast',
+              description: 'Start your morning with freshly brewed artisanal coffee and a selection of freshly baked local pastries or a traditional breakfast set at a highly-rated neighborhood cafe.',
+              cost: '\$8',
+              locationName: '$capitalized Morning Bistro',
+              suggestedAttire: 'Casual day wear',
+              transport: 'Short 5-minute walk from hotel',
+              ticketInfo: 'No reservation required',
+              placeDetails: 'A cozy local spot loved by residents for its warm hospitality and freshly ground coffee beans.',
             ),
             ActivityItem(
-              time: '01:00 PM', 
-              activity: 'Local Food Tour', 
-              description: 'Sample signature local street foods.', 
-              cost: '\$20', 
-              locationName: 'Central Market', 
-              suggestedAttire: 'Casual',
-              transport: 'Walking (5 mins)',
-              ticketInfo: 'Pay at stall',
-              placeDetails: 'The oldest market in the region with over 200 vendors.',
+              time: '10:00 AM',
+              activity: 'Iconic Central Landmark Tour',
+              description: 'Stroll around the central historic plazas, view majestic architectural monuments, and capture beautiful morning photos of the city\'s most defining civic landmarks.',
+              cost: 'Free',
+              locationName: '$capitalized Heritage Plaza',
+              suggestedAttire: 'Comfortable walking shoes & light layers',
+              transport: 'Board local commuter rail to Central Station, walk 3 mins',
+              ticketInfo: 'Open public area access',
+              placeDetails: 'Established in the early historical era, this prominent plaza represents the rich cultural heart of the city.',
             ),
-          ],
-        ),
-        ItineraryDay(
-          day: 2,
-          theme: 'Culture & Modern Vibe',
-          activities: [
             ActivityItem(
-              time: '10:00 AM', 
-              activity: 'Art & Heritage Museum', 
-              description: 'Learn about local history and artistic expressions.', 
-              cost: '\$15', 
-              locationName: 'National Gallery', 
+              time: '01:00 PM',
+              activity: 'Gastronomy & Local Food Tour',
+              description: 'Explore a vibrant open-air market filled with diverse food stalls. Sample unique regional street food delicacies, local specialties, and freshly prepared bites.',
+              cost: '\$25',
+              locationName: '$capitalized City Market Hall',
+              suggestedAttire: 'Casual streetwear',
+              transport: 'Short taxi ride or walk (10 mins)',
+              ticketInfo: 'Cash highly recommended at individual stalls',
+              placeDetails: 'A bustling commercial market featuring family-owned food stalls passing down authentic recipes for generations.',
+            ),
+            ActivityItem(
+              time: '03:30 PM',
+              activity: 'Art & History Museum Visit',
+              description: 'Immerse yourself in history and artistic expression. View collections of historical artifacts, fine art, and contemporary exhibitions depicting local history.',
+              cost: '\$15',
+              locationName: '$capitalized Museum of Art & History',
+              suggestedAttire: 'Smart casual / Modest for indoor exhibits',
+              transport: 'Walk 5 minutes north from City Market Hall',
+              ticketInfo: 'Purchase entry ticket at the reception desk',
+              placeDetails: 'A world-class civic institution housing important national treasures and temporary modern art galleries.',
+            ),
+            ActivityItem(
+              time: '06:30 PM',
+              activity: 'Sunset Scenic Viewpoint',
+              description: 'Climb to an elevated observation deck or scenic hilltop park just in time to watch the setting sun paint the city skyline. Perfect for panoramic photography.',
+              cost: '\$18',
+              locationName: '$capitalized Skyline Observation Tower',
+              suggestedAttire: 'Light jacket (it gets breezy at high elevations)',
+              transport: 'Take local subway Line 4 to Heights Station, follow exit signs',
+              ticketInfo: 'Online pre-booked ticket voucher recommended for sunset slots',
+              placeDetails: 'Standing tall over the cityscape, this observation deck offers breathtaking 360-degree views of the horizon.',
+            ),
+            ActivityItem(
+              time: '08:00 PM',
+              activity: 'Signature Local Dinner',
+              description: 'Dine in a highly-rated traditional restaurant situated in an atmospheric neighborhood. Enjoy a multi-course dinner of classic regional recipes and local specialties.',
+              cost: '\$35',
+              locationName: 'Traditional Dining District',
               suggestedAttire: 'Smart casual',
-              transport: 'Taxi / Rideshare',
-              ticketInfo: 'QR Attached',
-              placeDetails: 'Houses the largest collection of contemporary art in the country.',
+              transport: 'Short taxi ride or walk',
+              ticketInfo: 'Reservation confirmed under travel profile',
+              placeDetails: 'A highly praised dining spot famous for its authentic cooking techniques and welcoming, cozy atmosphere.',
             ),
           ],
-        ),
-      ];
+        ));
+      }
+      return fallbackList;
     }
   }
 
