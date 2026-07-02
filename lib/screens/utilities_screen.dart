@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/utils/sound_synthesizer.dart';
 
@@ -70,15 +72,23 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
   @override
   Widget build(BuildContext context) {
     final userProfileState = ref.watch(userProfileProvider);
+    final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A2744),
+        backgroundColor: AiraColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('Smart Utilities', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        title: Text(
+          'Smart Utilities',
+          style: TextStyle(
+            color: AiraColors.textPrimary(isDark),
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -86,22 +96,30 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Customs guide section
-            const Text('CUSTOMS & DUTY-FREE LAWS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white70)),
+            Text(
+              'CUSTOMS & DUTY-FREE LAWS',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.0,
+                color: isDark ? Colors.white70 : const Color(0xFF475569),
+              ),
+            ),
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A2744),
+                color: AiraColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF334155)),
+                border: Border.all(color: AiraColors.border(isDark)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _customsRow(Icons.payments_outlined, 'Cash Caps', 'Declare if carrying > ¥1,000,000 equivalent cash value.'),
-                  _customsRow(Icons.liquor_outlined, 'Alcohol Limit', 'Tax-free allowance limits to 3 bottles (760ml each).'),
-                  _customsRow(Icons.filter_vintage_outlined, 'Prohibited Items', 'Strictly forbidden: fresh fruits, meats, narcotics, and firearms.'),
-                  _customsRow(Icons.shopping_bag_outlined, 'Tax-Free Purchases', 'Keep receipts attached to passport details for customs review at airport.'),
+                  _customsRow(Icons.payments_outlined, 'Cash Caps', 'Declare if carrying > ¥1,000,000 equivalent cash value.', isDark),
+                  _customsRow(Icons.liquor_outlined, 'Alcohol Limit', 'Tax-free allowance limits to 3 bottles (760ml each).', isDark),
+                  _customsRow(Icons.filter_vintage_outlined, 'Prohibited Items', 'Strictly forbidden: fresh fruits, meats, narcotics, and firearms.', isDark),
+                  _customsRow(Icons.shopping_bag_outlined, 'Tax-Free Purchases', 'Keep receipts attached to passport details for customs review at airport.', isDark),
                 ],
               ),
             ),
@@ -111,7 +129,15 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('VOCABULARY TRAINER GAME', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white70)),
+                Text(
+                  'VOCABULARY TRAINER GAME',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.0,
+                    color: isDark ? Colors.white70 : const Color(0xFF475569),
+                  ),
+                ),
                 Text('Score Rewards: ${userProfileState.xpPoints} XP', style: const TextStyle(fontSize: 11, color: Color(0xFF00B4D8), fontWeight: FontWeight.bold)),
               ],
             ),
@@ -119,15 +145,19 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A2744),
+                color: AiraColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF334155)),
+                border: Border.all(color: AiraColors.border(isDark)),
               ),
               child: Column(
                 children: [
-                  const Text(
+                  Text(
                     'Match word pairs below to claim 100 XP points rewards.',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8), fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AiraColors.textSecondary(isDark),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   
@@ -152,10 +182,10 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                                   decoration: BoxDecoration(
                                     color: matched
                                         ? Colors.green.withValues(alpha: 0.15)
-                                        : (selected ? const Color(0xFF2563EB) : const Color(0xFF0A1628)),
+                                        : (selected ? const Color(0xFF2563EB) : AiraColors.scaffoldBg(isDark)),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: matched ? Colors.green : (selected ? const Color(0xFF2563EB) : const Color(0xFF334155)),
+                                      color: matched ? Colors.green : (selected ? const Color(0xFF2563EB) : AiraColors.border(isDark)),
                                     ),
                                   ),
                                   child: Text(
@@ -165,7 +195,7 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                                       fontWeight: FontWeight.bold,
                                       color: matched
                                           ? Colors.greenAccent
-                                          : Colors.white,
+                                          : AiraColors.textPrimary(isDark),
                                     ),
                                   ),
                                 ),
@@ -193,10 +223,10 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                                   decoration: BoxDecoration(
                                     color: matched
                                         ? Colors.green.withValues(alpha: 0.15)
-                                        : (selected ? const Color(0xFF2563EB) : const Color(0xFF0A1628)),
+                                        : (selected ? const Color(0xFF2563EB) : AiraColors.scaffoldBg(isDark)),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: matched ? Colors.green : (selected ? const Color(0xFF2563EB) : const Color(0xFF334155)),
+                                      color: matched ? Colors.green : (selected ? const Color(0xFF2563EB) : AiraColors.border(isDark)),
                                     ),
                                   ),
                                   child: Text(
@@ -206,7 +236,7 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                                       fontWeight: FontWeight.bold,
                                       color: matched
                                           ? Colors.greenAccent
-                                          : Colors.white,
+                                          : AiraColors.textPrimary(isDark),
                                     ),
                                   ),
                                 ),
@@ -218,13 +248,17 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                     ],
                   ),
                   
-                  const Divider(height: 24, color: Color(0xFF334155)),
+                  Divider(height: 24, color: AiraColors.border(isDark)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Matched: ${_matchedWords.length ~/ 2} / ${_englishWords.length}',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AiraColors.textPrimary(isDark),
+                        ),
                       ),
                       TextButton.icon(
                         onPressed: () => _resetGame(),
@@ -242,7 +276,7 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
     );
   }
 
-  Widget _customsRow(IconData icon, String title, String val) {
+  Widget _customsRow(IconData icon, String title, String val, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14.0),
       child: Row(
@@ -256,7 +290,7 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
               children: [
                 Text(title, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF00B4D8))),
                 const SizedBox(height: 2),
-                Text(val, style: const TextStyle(fontSize: 12, color: Colors.white70, height: 1.3)),
+                Text(val, style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : const Color(0xFF475569), height: 1.3)),
               ],
             ),
           )
@@ -265,3 +299,4 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
     );
   }
 }
+

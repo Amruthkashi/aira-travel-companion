@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:math';
@@ -80,7 +80,7 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       AiService.updateProfile(email, updated).then((serverProfile) {
         state = state.copyWith(profile: serverProfile);
       }).catchError((e) {
-        print('Error syncing profile update to server: $e');
+        debugPrint('Error syncing profile update to server: $e');
       });
     }
   }
@@ -94,7 +94,7 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       AiService.updateProfile(email, {'selectedPreferences': vibes}).then((serverProfile) {
         state = state.copyWith(profile: serverProfile);
       }).catchError((e) {
-        print('Error syncing vibes update to server: $e');
+        debugPrint('Error syncing vibes update to server: $e');
       });
     }
   }
@@ -124,7 +124,7 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
         )).toList();
       }
     } catch (e) {
-      print('Background session sync failed: $e');
+      debugPrint('Background session sync failed: $e');
     }
   }
 
@@ -225,7 +225,7 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       }).then((serverProfile) {
         // Updated successfully
       }).catchError((e) {
-        print('Error syncing DNA update to server: $e');
+        debugPrint('Error syncing DNA update to server: $e');
       });
     }
   }
@@ -395,9 +395,16 @@ class ItineraryNotifier extends StateNotifier<List<ItineraryDay>> {
         if (day.day == dayIndex + 1) {
           final updatedActivities = List<ActivityItem>.from(day.activities);
           if (activityIndex >= 0 && activityIndex < updatedActivities.length) {
-            updatedActivities[activityIndex] = updatedActivities[activityIndex].copyWith(
-              checked: !updatedActivities[activityIndex].checked,
-            );
+            final isChecking = !updatedActivities[activityIndex].checked;
+            if (isChecking) {
+              // Check off all activities above/before this one
+              for (int i = 0; i <= activityIndex; i++) {
+                updatedActivities[i] = updatedActivities[i].copyWith(checked: true);
+              }
+            } else {
+              // Just uncheck this specific activity
+              updatedActivities[activityIndex] = updatedActivities[activityIndex].copyWith(checked: false);
+            }
           }
           return day.copyWith(
             activities: updatedActivities,
@@ -509,7 +516,7 @@ class ItineraryNotifier extends StateNotifier<List<ItineraryDay>> {
           days = end.difference(start).inDays + 1;
           if (days <= 0) days = 1;
         } catch (e) {
-          print('Error parsing upcoming trip dates: $e');
+          debugPrint('Error parsing upcoming trip dates: $e');
         }
       }
     }
@@ -576,7 +583,7 @@ class ChecklistNotifier extends StateNotifier<List<ChecklistItem>> {
       AiService.updateProfile(email, {'checklist': checklistData}).then((serverProfile) {
         ref.read(userProfileProvider.notifier).state = ref.read(userProfileProvider).copyWith(profile: serverProfile);
       }).catchError((e) {
-        print('Error syncing checklist to server: $e');
+        debugPrint('Error syncing checklist to server: $e');
       });
     }
   }
@@ -829,9 +836,7 @@ class TripBookingsNotifier extends StateNotifier<TripBookings> {
           }
         }
       }
-      if (targetFlight == null) {
-        targetFlight = updatedFlights.first;
-      }
+      targetFlight ??= updatedFlights.first;
 
       if (targetFlight.flightType == 'return') {
         newDestination = targetFlight.departureCity;
@@ -895,9 +900,7 @@ class TripBookingsNotifier extends StateNotifier<TripBookings> {
           }
         }
       }
-      if (targetFlight == null) {
-        targetFlight = updatedFlights.first;
-      }
+      targetFlight ??= updatedFlights.first;
 
       if (targetFlight.flightType == 'return') {
         newDestination = targetFlight.departureCity;

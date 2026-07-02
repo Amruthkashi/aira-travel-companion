@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/aviation_flight.dart';
 
@@ -108,7 +109,7 @@ class AviationstackService {
       
       // If unauthorized (401) or other HTTP errors, fallback to mock flights
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        print('Aviationstack HTTP Error ${response.statusCode}. Falling back to mock flights.');
+        debugPrint('Aviationstack HTTP Error ${response.statusCode}. Falling back to mock flights.');
         return _generateMockFlights(query);
       }
 
@@ -120,7 +121,7 @@ class AviationstackService {
       final error = decoded['error'];
       if (error != null) {
         final msg = error['message'] ?? 'Aviationstack API error';
-        print('Aviationstack API Error: $msg. Falling back to mock flights.');
+        debugPrint('Aviationstack API Error: $msg. Falling back to mock flights.');
         return _generateMockFlights(query);
       }
 
@@ -139,7 +140,7 @@ class AviationstackService {
       }
       return results;
     } catch (e) {
-      print('Aviationstack request failed: $e. Falling back to mock flights.');
+      debugPrint('Aviationstack request failed: $e. Falling back to mock flights.');
       return _generateMockFlights(query);
     }
   }

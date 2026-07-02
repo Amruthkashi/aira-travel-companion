@@ -3,9 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/models/travel_models.dart';
-import '../core/models/hotel_place.dart';
 import '../core/models/aviation_flight.dart';
 import '../core/services/aviationstack_service.dart';
 import '../core/widgets/hotel_search_field.dart';
@@ -135,6 +136,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   void _showFlightModal() {
+    final isDark = ref.read(isDarkProvider);
     final aviationService = AviationstackService();
     final flightSearchCtrl = TextEditingController();
     final flightSearchDateCtrl = TextEditingController(
@@ -163,7 +165,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -187,14 +189,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2563EB).withOpacity(0.2),
+                            color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.2 : 0.08),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(Icons.flight, color: Color(0xFF60A5FA), size: 20),
                         ),
                         const SizedBox(width: 12),
-                        const Text('ADD FLIGHT BOOKING',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5),
+                        Text('ADD FLIGHT BOOKING',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark), letterSpacing: 0.5),
                         ),
                       ],
                     ),
@@ -295,18 +297,18 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEF4444).withOpacity(0.1),
-                          border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.3)),
+                          color: const Color(0xFFEF4444).withValues(alpha: isDark ? 0.1 : 0.05),
+                          border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: isDark ? 0.3 : 0.15)),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.error_outline, color: Color(0xFFFCA5A5), size: 16),
+                            const Icon(Icons.error_outline, color: Color(0xFFEF4444), size: 16),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 flightError!,
-                                style: const TextStyle(color: Color(0xFFFCA5A5), fontSize: 11),
+                                style: const TextStyle(color: Color(0xFFEF4444), fontSize: 11),
                               ),
                             ),
                           ],
@@ -319,15 +321,15 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A2744),
-                          border: Border.all(color: const Color(0xFF334155)),
+                          color: AiraColors.cardBg(isDark),
+                          border: Border.all(color: AiraColors.border(isDark)),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(Icons.search_off, color: Color(0xFF94A3B8), size: 16),
-                            SizedBox(width: 8),
-                            Text('No active/scheduled flights found.', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+                            Icon(Icons.search_off, color: AiraColors.textSecondary(isDark), size: 16),
+                            const SizedBox(width: 8),
+                            Text('No active/scheduled flights found.', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11)),
                           ],
                         ),
                       ),
@@ -337,9 +339,9 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                       Container(
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
+                          color: AiraColors.cardBg(isDark),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0xFF334155)),
+                          border: Border.all(color: AiraColors.border(isDark)),
                         ),
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxHeight: 180),
@@ -347,7 +349,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                             padding: EdgeInsets.zero,
                             shrinkWrap: true,
                             itemCount: flightSuggestions.length,
-                            separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFF334155)),
+                            separatorBuilder: (context, index) => Divider(height: 1, color: AiraColors.border(isDark)),
                             itemBuilder: (context, index) {
                               final flt = flightSuggestions[index];
                               return Material(
@@ -357,11 +359,11 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                                   leading: const Icon(Icons.flight_takeoff, color: Color(0xFF60A5FA), size: 16),
                                   title: Text(
                                     '${flt.flightNumber} • ${flt.airlineName}',
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12),
                                   ),
                                   subtitle: Text(
                                     'Date: ${flt.departureDate}  |  ${flt.departureIata} → ${flt.arrivalIata}  |  ${flt.flightStatus.toUpperCase()}',
-                                    style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+                                    style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10),
                                   ),
                                   onTap: () {
                                     setModalState(() {
@@ -393,23 +395,23 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('AIRLINE NAME', style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
+                        Text('AIRLINE NAME', style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
                         const SizedBox(height: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1A2744),
+                            color: AiraColors.cardBg(isDark),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFF334155)),
+                            border: Border.all(color: AiraColors.border(isDark)),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               value: selectedAirline,
-                              dropdownColor: const Color(0xFF1A2744),
+                              dropdownColor: AiraColors.cardBg(isDark),
                               isExpanded: true,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+                              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
                               items: airlinesList
-                                  .map((a) => DropdownMenuItem(value: a, child: Text(a)))
+                                  .map((a) => DropdownMenuItem(value: a, child: Text(a, style: TextStyle(color: AiraColors.textPrimary(isDark)))))
                                   .toList(),
                               onChanged: (v) => setModalState(() => selectedAirline = v!),
                             ),
@@ -442,25 +444,25 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('FLIGHT DIRECTION / TYPE', style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
+                        Text('FLIGHT DIRECTION / TYPE', style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
                         const SizedBox(height: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1A2744),
+                            color: AiraColors.cardBg(isDark),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFF334155)),
+                            border: Border.all(color: AiraColors.border(isDark)),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               value: flightType,
-                              dropdownColor: const Color(0xFF1A2744),
+                              dropdownColor: AiraColors.cardBg(isDark),
                               isExpanded: true,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
-                              items: const [
-                                DropdownMenuItem(value: 'going', child: Text('🛫 Going Flight (Outbound)')),
-                                DropdownMenuItem(value: 'return', child: Text('🛬 Return Flight (Inbound)')),
-                                DropdownMenuItem(value: 'other', child: Text('✈️ Internal / Other Flight')),
+                              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
+                              items: [
+                                DropdownMenuItem(value: 'going', child: Text('🛫 Going Flight (Outbound)', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
+                                DropdownMenuItem(value: 'return', child: Text('🛬 Return Flight (Inbound)', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
+                                DropdownMenuItem(value: 'other', child: Text('✈️ Internal / Other Flight', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
                               ],
                               onChanged: (v) => setModalState(() => flightType = v!),
                             ),
@@ -474,23 +476,23 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('CLASS', style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
+                            Text('CLASS', style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
                             const SizedBox(height: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1A2744),
+                                color: AiraColors.cardBg(isDark),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: const Color(0xFF334155)),
+                                border: Border.all(color: AiraColors.border(isDark)),
                               ),
                               child: DropdownButtonHideUnderline(
                                 child: DropdownButton<String>(
                                   value: seatClass,
-                                  dropdownColor: const Color(0xFF1A2744),
+                                  dropdownColor: AiraColors.cardBg(isDark),
                                   isExpanded: true,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+                                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
                                   items: ['Economy', 'Premium Economy', 'Business', 'First']
-                                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                                      .map((c) => DropdownMenuItem(value: c, child: Text(c, style: TextStyle(color: AiraColors.textPrimary(isDark)))))
                                       .toList(),
                                   onChanged: (v) => setModalState(() => seatClass = v!),
                                 ),
@@ -508,8 +510,8 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                       Expanded(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFF334155)),
-                            foregroundColor: Colors.white70,
+                            side: BorderSide(color: AiraColors.border(isDark)),
+                            foregroundColor: AiraColors.textSecondary(isDark),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
@@ -567,6 +569,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   void _showPnrImportModal() {
+    final isDark = ref.read(isDarkProvider);
     final pnrCtrl = TextEditingController();
     bool isPnrLoading = false;
     String? pnrError;
@@ -575,7 +578,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -599,14 +602,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF10B981).withOpacity(0.2),
+                            color: const Color(0xFF10B981).withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(Icons.cloud_download, color: Color(0xFF34D399), size: 20),
                         ),
                         const SizedBox(width: 12),
-                        const Text('IMPORT FLIGHT VIA PNR',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5),
+                        Text('IMPORT FLIGHT VIA PNR',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark), letterSpacing: 0.5),
                         ),
                       ],
                     ),
@@ -688,18 +691,18 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEF4444).withOpacity(0.1),
-                          border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.3)),
+                          color: const Color(0xFFEF4444).withValues(alpha: isDark ? 0.1 : 0.05),
+                          border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: isDark ? 0.3 : 0.15)),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.error_outline, color: Color(0xFFFCA5A5), size: 16),
+                            const Icon(Icons.error_outline, color: Color(0xFFEF4444), size: 16),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 pnrError!,
-                                style: const TextStyle(color: Color(0xFFFCA5A5), fontSize: 11),
+                                style: const TextStyle(color: Color(0xFFEF4444), fontSize: 11),
                               ),
                             ),
                           ],
@@ -712,9 +715,9 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
+                          color: AiraColors.cardBg(isDark),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFF334155)),
+                          border: Border.all(color: AiraColors.border(isDark)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -724,14 +727,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                               children: [
                                 Text(
                                   '${foundFlight!['airline']} • ${foundFlight!['flight_number']}',
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14),
                                 ),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
                                     color: (foundFlight!['status'] == 'Confirmed')
-                                        ? const Color(0xFF10B981).withOpacity(0.15)
-                                        : const Color(0xFFEF4444).withOpacity(0.15),
+                                        ? const Color(0xFF10B981).withValues(alpha: 0.15)
+                                        : const Color(0xFFEF4444).withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
@@ -755,10 +758,10 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                             _buildInfoRow('Duration', foundFlight!['duration'] ?? 'N/A'),
                             _buildInfoRow('Meal Pref.', foundFlight!['meal_preference'] ?? 'N/A'),
                             _buildInfoRow('Baggage', foundFlight!['baggage_allowance'] ?? 'N/A'),
-                            const Divider(color: Color(0xFF334155), height: 24),
-                            const Text(
+                            Divider(color: AiraColors.border(isDark), height: 24),
+                            Text(
                               'ITINERARY LEGS',
-                              style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
+                              style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
                             ),
                             const SizedBox(height: 8),
                             ...((foundFlight!['itinerary'] as List? ?? []).map((leg) {
@@ -771,7 +774,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                                     Expanded(
                                       child: Text(
                                         'Leg ${leg['leg']}: ${leg['flight']} (${leg['from']} → ${leg['to']}) at ${leg['dep']} - ${leg['arr']}',
-                                        style: const TextStyle(color: Colors.white70, fontSize: 11),
+                                        style: TextStyle(color: AiraColors.textPrimary(isDark).withValues(alpha: 0.8), fontSize: 11),
                                       ),
                                     ),
                                   ],
@@ -787,8 +790,8 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                           Expanded(
                             child: OutlinedButton(
                               style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Color(0xFF334155)),
-                                foregroundColor: Colors.white70,
+                                side: BorderSide(color: AiraColors.border(isDark)),
+                                foregroundColor: AiraColors.textSecondary(isDark),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                               ),
@@ -922,13 +925,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _buildInfoRow(String label, String value) {
+    final isDark = ref.read(isDarkProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
+          Text(label, style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11)),
+          Text(value, style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 11)),
         ],
       ),
     );
@@ -936,6 +940,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
 
 
   void _showHotelModal() {
+    final isDark = ref.read(isDarkProvider);
     final nameCtrl = TextEditingController();
     final addressCtrl = TextEditingController();
     final checkInCtrl = TextEditingController();
@@ -949,7 +954,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -973,14 +978,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF7C3AED).withOpacity(0.2),
+                            color: const Color(0xFF7C3AED).withValues(alpha: isDark ? 0.2 : 0.08),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(Icons.hotel, color: Color(0xFFA78BFA), size: 20),
                         ),
                         const SizedBox(width: 12),
-                        const Text('ADD HOTEL BOOKING',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5),
+                        Text('ADD HOTEL BOOKING',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark), letterSpacing: 0.5),
                         ),
                       ],
                     ),
@@ -1015,8 +1020,8 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                       Expanded(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFF334155)),
-                            foregroundColor: Colors.white70,
+                            side: BorderSide(color: AiraColors.border(isDark)),
+                            foregroundColor: AiraColors.textSecondary(isDark),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
@@ -1064,6 +1069,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   void _showOtherBookingModal() {
+    final isDark = ref.read(isDarkProvider);
     final titleCtrl = TextEditingController();
     String bookingType = 'activity';
     final dateCtrl = TextEditingController();
@@ -1073,7 +1079,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1097,14 +1103,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF059669).withOpacity(0.2),
+                            color: const Color(0xFF059669).withValues(alpha: isDark ? 0.2 : 0.08),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(Icons.confirmation_number, color: Color(0xFF34D399), size: 20),
                         ),
                         const SizedBox(width: 12),
-                        const Text('ADD OTHER BOOKING',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5),
+                        Text('ADD OTHER BOOKING',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark), letterSpacing: 0.5),
                         ),
                       ],
                     ),
@@ -1113,25 +1119,25 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('BOOKING TYPE', style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
+                        Text('BOOKING TYPE', style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
                         const SizedBox(height: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1A2744),
+                            color: AiraColors.cardBg(isDark),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFF334155)),
+                            border: Border.all(color: AiraColors.border(isDark)),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               value: bookingType,
-                              dropdownColor: const Color(0xFF1A2744),
+                              dropdownColor: AiraColors.cardBg(isDark),
                               isExpanded: true,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+                              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
                               items: ['activity', 'tour', 'pass', 'transport']
                                   .map((t) => DropdownMenuItem(
                                     value: t,
-                                    child: Text(t[0].toUpperCase() + t.substring(1)),
+                                    child: Text(t[0].toUpperCase() + t.substring(1), style: TextStyle(color: AiraColors.textPrimary(isDark))),
                                   ))
                                   .toList(),
                               onChanged: (v) => setModalState(() => bookingType = v!),
@@ -1149,8 +1155,8 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                       Expanded(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFF334155)),
-                            foregroundColor: Colors.white70,
+                            side: BorderSide(color: AiraColors.border(isDark)),
+                            foregroundColor: AiraColors.textSecondary(isDark),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
@@ -1194,11 +1200,12 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _modalHandle() {
+    final isDark = ref.read(isDarkProvider);
     return Center(
       child: Container(
         width: 40, height: 5,
         decoration: BoxDecoration(
-          color: const Color(0xFF334155),
+          color: AiraColors.border(isDark),
           borderRadius: BorderRadius.circular(10),
         ),
       ),
@@ -1206,28 +1213,29 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _modalField(String label, TextEditingController ctrl, String hint, {int maxLines = 1, bool isNumeric = false}) {
+    final isDark = ref.read(isDarkProvider);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label.toUpperCase(), style: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
+          Text(label.toUpperCase(), style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
           const SizedBox(height: 6),
           TextField(
             controller: ctrl,
             maxLines: maxLines,
             keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+            style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
             decoration: InputDecoration(
               isDense: true,
               hintText: hint,
-              hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+              hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
               filled: true,
-              fillColor: const Color(0xFF1A2744),
+              fillColor: AiraColors.cardBg(isDark),
               contentPadding: const EdgeInsets.all(12),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFF334155)),
+                borderSide: BorderSide(color: AiraColors.border(isDark)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -1241,12 +1249,13 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _datePicker(String label, TextEditingController ctrl, BuildContext ctx) {
+    final isDark = ref.read(isDarkProvider);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label.toUpperCase(), style: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
+          Text(label.toUpperCase(), style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
           const SizedBox(height: 6),
           TextField(
             controller: ctrl,
@@ -1258,42 +1267,77 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                 firstDate: DateTime(2020),
                 lastDate: DateTime(2035),
                 builder: (c, child) => Theme(
-                  data: Theme.of(c).copyWith(
-                    appBarTheme: const AppBarTheme(
-                      backgroundColor: Color(0xFF1A2744),
-                      foregroundColor: Colors.white,
-                      iconTheme: IconThemeData(color: Colors.white),
-                    ),
-                    colorScheme: const ColorScheme.dark(
-                      primary: Color(0xFF2563EB),
-                      onPrimary: Colors.white,
-                      surface: Color(0xFF1A2744),
-                      onSurface: Colors.white,
-                      secondary: Color(0xFF00B4D8),
-                    ),
-                    dialogBackgroundColor: const Color(0xFF0A1628),
-                    datePickerTheme: DatePickerThemeData(
-                      backgroundColor: const Color(0xFF0A1628),
-                      headerBackgroundColor: const Color(0xFF1E293B),
-                      headerForegroundColor: Colors.white,
-                      rangePickerHeaderBackgroundColor: const Color(0xFF1E293B),
-                      rangePickerHeaderForegroundColor: Colors.white,
-                      confirmButtonStyle: ButtonStyle(
-                        foregroundColor: WidgetStateProperty.all(const Color(0xFF60A5FA)),
-                        textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      cancelButtonStyle: ButtonStyle(
-                        foregroundColor: WidgetStateProperty.all(const Color(0xFF94A3B8)),
-                        textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                    textButtonTheme: TextButtonThemeData(
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF60A5FA),
-                        textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
+                  data: isDark
+                      ? ThemeData.dark().copyWith(
+                          appBarTheme: const AppBarTheme(
+                            backgroundColor: Color(0xFF1A2744),
+                            foregroundColor: Colors.white,
+                            iconTheme: IconThemeData(color: Colors.white),
+                          ),
+                          colorScheme: const ColorScheme.dark(
+                            primary: Color(0xFF2563EB),
+                            onPrimary: Colors.white,
+                            surface: Color(0xFF1A2744),
+                            onSurface: Colors.white,
+                            secondary: Color(0xFF00B4D8),
+                          ),
+                          dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF0A1628),),
+                          datePickerTheme: DatePickerThemeData(
+                            backgroundColor: const Color(0xFF0A1628),
+                            headerBackgroundColor: const Color(0xFF1A2744),
+                            headerForegroundColor: Colors.white,
+                            rangePickerHeaderBackgroundColor: const Color(0xFF1A2744),
+                            rangePickerHeaderForegroundColor: Colors.white,
+                            confirmButtonStyle: ButtonStyle(
+                              foregroundColor: WidgetStateProperty.all(const Color(0xFF60A5FA)),
+                              textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                            cancelButtonStyle: ButtonStyle(
+                              foregroundColor: WidgetStateProperty.all(const Color(0xFF94A3B8)),
+                              textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF60A5FA),
+                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        )
+                      : ThemeData.light().copyWith(
+                          appBarTheme: const AppBarTheme(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Color(0xFF0A1628),
+                            iconTheme: IconThemeData(color: Color(0xFF0A1628)),
+                          ),
+                          colorScheme: const ColorScheme.light(
+                            primary: Color(0xFF2563EB),
+                            onPrimary: Colors.white,
+                            surface: Colors.white,
+                            onSurface: Color(0xFF0A1628),
+                            secondary: Color(0xFF2563EB),
+                          ),
+                          dialogTheme: DialogThemeData(backgroundColor: Colors.white,),
+                          datePickerTheme: DatePickerThemeData(
+                            backgroundColor: Colors.white,
+                            headerBackgroundColor: const Color(0xFF2563EB),
+                            headerForegroundColor: Colors.white,
+                            confirmButtonStyle: ButtonStyle(
+                              foregroundColor: WidgetStateProperty.all(const Color(0xFF2563EB)),
+                              textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                            cancelButtonStyle: ButtonStyle(
+                              foregroundColor: WidgetStateProperty.all(const Color(0xFF64748B)),
+                              textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF2563EB),
+                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                   child: child!,
                 ),
               );
@@ -1301,18 +1345,18 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                 ctrl.text = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
               }
             },
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+            style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
             decoration: InputDecoration(
               isDense: true,
               hintText: 'Select date',
-              hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+              hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
               suffixIcon: const Icon(Icons.calendar_month, color: Color(0xFF2563EB), size: 16),
               filled: true,
-              fillColor: const Color(0xFF1A2744),
+              fillColor: AiraColors.cardBg(isDark),
               contentPadding: const EdgeInsets.all(12),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFF334155)),
+                borderSide: BorderSide(color: AiraColors.border(isDark)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -1326,12 +1370,13 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _timePicker(String label, TextEditingController ctrl, BuildContext ctx) {
+    final isDark = ref.read(isDarkProvider);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label.toUpperCase(), style: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
+          Text(label.toUpperCase(), style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
           const SizedBox(height: 6),
           TextField(
             controller: ctrl,
@@ -1348,27 +1393,49 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                 context: ctx,
                 initialTime: initialTime,
                 builder: (c, child) => Theme(
-                  data: Theme.of(c).copyWith(
-                    appBarTheme: const AppBarTheme(
-                      backgroundColor: Color(0xFF1A2744),
-                      foregroundColor: Colors.white,
-                      iconTheme: IconThemeData(color: Colors.white),
-                    ),
-                    colorScheme: const ColorScheme.dark(
-                      primary: Color(0xFF2563EB),
-                      onPrimary: Colors.white,
-                      surface: Color(0xFF1A2744),
-                      onSurface: Colors.white,
-                      secondary: Color(0xFF00B4D8),
-                    ),
-                    dialogBackgroundColor: const Color(0xFF0A1628),
-                    textButtonTheme: TextButtonThemeData(
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF60A5FA),
-                        textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
+                  data: isDark
+                      ? ThemeData.dark().copyWith(
+                          appBarTheme: const AppBarTheme(
+                            backgroundColor: Color(0xFF1A2744),
+                            foregroundColor: Colors.white,
+                            iconTheme: IconThemeData(color: Colors.white),
+                          ),
+                          colorScheme: const ColorScheme.dark(
+                            primary: Color(0xFF2563EB),
+                            onPrimary: Colors.white,
+                            surface: Color(0xFF1A2744),
+                            onSurface: Colors.white,
+                            secondary: Color(0xFF00B4D8),
+                          ),
+                          dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF0A1628),),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF60A5FA),
+                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        )
+                      : ThemeData.light().copyWith(
+                          appBarTheme: const AppBarTheme(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Color(0xFF0A1628),
+                            iconTheme: IconThemeData(color: Color(0xFF0A1628)),
+                          ),
+                          colorScheme: const ColorScheme.light(
+                            primary: Color(0xFF2563EB),
+                            onPrimary: Colors.white,
+                            surface: Colors.white,
+                            onSurface: Color(0xFF0A1628),
+                            secondary: Color(0xFF2563EB),
+                          ),
+                          dialogTheme: DialogThemeData(backgroundColor: Colors.white,),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF2563EB),
+                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                   child: child!,
                 ),
               );
@@ -1377,18 +1444,18 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                 ctrl.text = minutesToTimeString(totalMinutes);
               }
             },
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+            style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
             decoration: InputDecoration(
               isDense: true,
               hintText: 'Select time',
-              hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+              hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
               suffixIcon: const Icon(Icons.access_time, color: Color(0xFF2563EB), size: 16),
               filled: true,
-              fillColor: const Color(0xFF1A2744),
+              fillColor: AiraColors.cardBg(isDark),
               contentPadding: const EdgeInsets.all(12),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFF334155)),
+                borderSide: BorderSide(color: AiraColors.border(isDark)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -1402,6 +1469,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _buildDateSelectorCard(TripBookings bookings) {
+    final isDark = ref.read(isDarkProvider);
     final hasDates = bookings.startDate != null &&
         bookings.endDate != null &&
         bookings.startDate!.isNotEmpty &&
@@ -1426,10 +1494,10 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: hasDates ? const Color(0xFF00B4D8).withOpacity(0.4) : const Color(0xFF334155),
+          color: hasDates ? const Color(0xFF00B4D8).withValues(alpha: 0.4) : AiraColors.border(isDark),
           width: 1.5,
         ),
       ),
@@ -1440,14 +1508,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
             children: [
               Icon(
                 Icons.calendar_month,
-                color: hasDates ? const Color(0xFF00B4D8) : const Color(0xFF64748B),
+                color: hasDates ? const Color(0xFF00B4D8) : AiraColors.textSecondary(isDark),
                 size: 18,
               ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'TRIP DATES',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AiraColors.textPrimary(isDark),
                   fontWeight: FontWeight.w900,
                   fontSize: 11,
                   letterSpacing: 0.5,
@@ -1458,7 +1526,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00B4D8).withOpacity(0.15),
+                    color: const Color(0xFF00B4D8).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -1480,7 +1548,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                 child: Text(
                   hasDates ? dateText : 'Set dates to customize itinerary length',
                   style: TextStyle(
-                    color: hasDates ? Colors.white : Colors.white54,
+                    color: hasDates ? AiraColors.textPrimary(isDark) : AiraColors.textSecondary(isDark),
                     fontWeight: hasDates ? FontWeight.bold : FontWeight.normal,
                     fontSize: 13,
                   ),
@@ -1488,7 +1556,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: hasDates ? const Color(0xFF334155) : const Color(0xFF2563EB),
+                  backgroundColor: hasDates ? AiraColors.border(isDark) : const Color(0xFF2563EB),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -1509,42 +1577,79 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                     lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
                     builder: (context, child) {
                       return Theme(
-                        data: Theme.of(context).copyWith(
-                          appBarTheme: const AppBarTheme(
-                            backgroundColor: Color(0xFF1A2744),
-                            foregroundColor: Colors.white,
-                            iconTheme: IconThemeData(color: Colors.white),
-                          ),
-                          colorScheme: const ColorScheme.dark(
-                            primary: Color(0xFF2563EB),
-                            onPrimary: Colors.white,
-                            surface: Color(0xFF1A2744),
-                            onSurface: Colors.white,
-                            secondary: Color(0xFF00B4D8),
-                          ),
-                          dialogBackgroundColor: const Color(0xFF0A1628),
-                          datePickerTheme: DatePickerThemeData(
-                            backgroundColor: const Color(0xFF0A1628),
-                            headerBackgroundColor: const Color(0xFF1E293B),
-                            headerForegroundColor: Colors.white,
-                            rangePickerHeaderBackgroundColor: const Color(0xFF1E293B),
-                            rangePickerHeaderForegroundColor: Colors.white,
-                            confirmButtonStyle: ButtonStyle(
-                              foregroundColor: WidgetStateProperty.all(const Color(0xFF60A5FA)),
-                              textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
-                            ),
-                            cancelButtonStyle: ButtonStyle(
-                              foregroundColor: WidgetStateProperty.all(const Color(0xFF94A3B8)),
-                              textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
-                            ),
-                          ),
-                          textButtonTheme: TextButtonThemeData(
-                            style: TextButton.styleFrom(
-                              foregroundColor: const Color(0xFF60A5FA),
-                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
+                        data: isDark
+                            ? ThemeData.dark().copyWith(
+                                appBarTheme: const AppBarTheme(
+                                  backgroundColor: Color(0xFF1A2744),
+                                  foregroundColor: Colors.white,
+                                  iconTheme: IconThemeData(color: Colors.white),
+                                ),
+                                colorScheme: const ColorScheme.dark(
+                                  primary: Color(0xFF2563EB),
+                                  onPrimary: Colors.white,
+                                  surface: Color(0xFF1A2744),
+                                  onSurface: Colors.white,
+                                  secondary: Color(0xFF00B4D8),
+                                ),
+                                dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF0A1628),),
+                                datePickerTheme: DatePickerThemeData(
+                                  backgroundColor: const Color(0xFF0A1628),
+                                  headerBackgroundColor: const Color(0xFF1A2744),
+                                  headerForegroundColor: Colors.white,
+                                  rangePickerHeaderBackgroundColor: const Color(0xFF1A2744),
+                                  rangePickerHeaderForegroundColor: Colors.white,
+                                  confirmButtonStyle: ButtonStyle(
+                                    foregroundColor: WidgetStateProperty.all(const Color(0xFF60A5FA)),
+                                    textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                  cancelButtonStyle: ButtonStyle(
+                                    foregroundColor: WidgetStateProperty.all(const Color(0xFF94A3B8)),
+                                    textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                                textButtonTheme: TextButtonThemeData(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: const Color(0xFF60A5FA),
+                                    textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              )
+                            : ThemeData.light().copyWith(
+                                appBarTheme: const AppBarTheme(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Color(0xFF0A1628),
+                                  iconTheme: IconThemeData(color: Color(0xFF0A1628)),
+                                ),
+                                colorScheme: const ColorScheme.light(
+                                  primary: Color(0xFF2563EB),
+                                  onPrimary: Colors.white,
+                                  surface: Colors.white,
+                                  onSurface: Color(0xFF0A1628),
+                                  secondary: Color(0xFF2563EB),
+                                ),
+                                dialogTheme: DialogThemeData(backgroundColor: Colors.white,),
+                                datePickerTheme: DatePickerThemeData(
+                                  backgroundColor: Colors.white,
+                                  headerBackgroundColor: const Color(0xFF2563EB),
+                                  headerForegroundColor: Colors.white,
+                                  rangePickerHeaderBackgroundColor: const Color(0xFF2563EB),
+                                  rangePickerHeaderForegroundColor: Colors.white,
+                                  confirmButtonStyle: ButtonStyle(
+                                    foregroundColor: WidgetStateProperty.all(const Color(0xFF2563EB)),
+                                    textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                  cancelButtonStyle: ButtonStyle(
+                                    foregroundColor: WidgetStateProperty.all(const Color(0xFF64748B)),
+                                    textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                                textButtonTheme: TextButtonThemeData(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: const Color(0xFF2563EB),
+                                    textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
                         child: child!,
                       );
                     },
@@ -1558,8 +1663,8 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                 },
                 child: Text(
                   hasDates ? 'Change' : 'Select Dates',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: hasDates ? AiraColors.textPrimary(isDark) : Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 11,
                   ),
@@ -1573,10 +1678,11 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   void _showImportModal(List<TravelExpense> flights, List<TravelExpense> hotels) {
+    final isDark = ref.read(isDarkProvider);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1598,31 +1704,31 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withOpacity(0.2),
+                        color: const Color(0xFF10B981).withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(Icons.download, color: Color(0xFF34D399), size: 20),
                     ),
                     const SizedBox(width: 12),
-                    const Text('IMPORT APP BOOKINGS',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5),
+                    Text('IMPORT APP BOOKINGS',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark), letterSpacing: 0.5),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'Import flights and hotels you already reserved in the app\'s booking sections directly into this itinerary wizard.',
-                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11, height: 1.3),
+                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, height: 1.3),
                 ),
                 const SizedBox(height: 20),
                 if (flights.isNotEmpty) ...[
-                  const Text('AVAILABLE FLIGHTS', style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
+                  Text('AVAILABLE FLIGHTS', style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
                   const SizedBox(height: 8),
                   ...flights.map((f) => _buildImportExpenseRow(f, true, ctx)),
                   const SizedBox(height: 16),
                 ],
                 if (hotels.isNotEmpty) ...[
-                  const Text('AVAILABLE HOTEL RESERVATIONS', style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
+                  Text('AVAILABLE HOTEL RESERVATIONS', style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5)),
                   const SizedBox(height: 8),
                   ...hotels.map((h) => _buildImportExpenseRow(h, false, ctx)),
                   const SizedBox(height: 16),
@@ -1663,13 +1769,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _buildImportExpenseRow(TravelExpense expense, bool isFlight, BuildContext ctx) {
+    final isDark = ref.read(isDarkProvider);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: AiraColors.border(isDark)),
       ),
       child: Row(
         children: [
@@ -1685,14 +1792,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
               children: [
                 Text(
                   expense.label,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Price: \$${expense.amount.toInt()}  |  Date: ${expense.date}',
-                  style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10),
                 ),
               ],
             ),
@@ -1736,21 +1843,22 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   @override
   Widget build(BuildContext context) {
     final bookings = ref.watch(tripBookingsProvider);
+    final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A1628),
+        backgroundColor: AiraColors.scaffoldBg(isDark),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: AiraColors.textPrimary(isDark)),
           onPressed: () => context.pop(),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Itinerary Wizard', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-            Text('STEP 1 — UPLOAD BOOKINGS', style: TextStyle(color: Color(0xFF00B4D8), fontWeight: FontWeight.w800, fontSize: 9, letterSpacing: 0.5)),
+            Text('Itinerary Wizard', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text('STEP 1 — UPLOAD BOOKINGS', style: TextStyle(color: Color(0xFF00B4D8), fontWeight: FontWeight.w800, fontSize: 9, letterSpacing: 0.5)),
           ],
         ),
         actions: [
@@ -1758,15 +1866,15 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF2563EB).withOpacity(0.15),
+              color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.15 : 0.08),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.looks_one, color: Color(0xFF60A5FA), size: 14),
-                SizedBox(width: 4),
-                Text('1/4', style: TextStyle(color: Color(0xFF60A5FA), fontWeight: FontWeight.bold, fontSize: 11)),
+                Icon(Icons.looks_one, color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB), size: 14),
+                const SizedBox(width: 4),
+                Text('1/4', style: TextStyle(color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB), fontWeight: FontWeight.bold, fontSize: 11)),
               ],
             ),
           ),
@@ -1806,37 +1914,42 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              const Color(0xFF1E3A5F).withOpacity(0.8 + _pulseController.value * 0.2),
-                              const Color(0xFF0A1628),
-                            ],
+                            colors: isDark
+                                ? [
+                                    const Color(0xFF1E3A5F).withValues(alpha: 0.8 + _pulseController.value * 0.2),
+                                    const Color(0xFF0A1628),
+                                  ]
+                                : [
+                                    const Color(0xFFDCE9F9).withValues(alpha: 0.8 + _pulseController.value * 0.2),
+                                    const Color(0xFFF8FAFC),
+                                  ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.3)),
+                          border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.3 : 0.15)),
                         ),
                         child: Row(
                           children: [
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF2563EB).withOpacity(0.2),
+                                color: const Color(0xFF2563EB).withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.upload_file, color: Color(0xFF60A5FA), size: 24),
+                              child: Icon(Icons.upload_file, color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB), size: 24),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Upload Your Bookings',
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                  Text('Upload Your Bookings',
+                                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14),
                                   ),
                                   const SizedBox(height: 4),
                                   Text('Add your flight tickets, hotel reservations, and any pre-booked activities to build your trip.',
-                                    style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11, height: 1.3),
+                                    style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, height: 1.3),
                                   ),
                                 ],
                               ),
@@ -1873,10 +1986,10 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0F2D24),
+                        color: isDark ? const Color(0xFF0F2D24) : const Color(0xFFE6F4EA),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFF10B981).withOpacity(0.4),
+                          color: const Color(0xFF10B981).withValues(alpha: isDark ? 0.4 : 0.2),
                           width: 1.5,
                         ),
                       ),
@@ -1891,10 +2004,10 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                                 size: 18,
                               ),
                               const SizedBox(width: 8),
-                              const Text(
+                              Text(
                                 'IMPORT AVAILABLE BOOKINGS',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AiraColors.textPrimary(isDark),
                                   fontWeight: FontWeight.w900,
                                   fontSize: 11,
                                   letterSpacing: 0.5,
@@ -1904,7 +2017,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF10B981).withOpacity(0.15),
+                                  color: const Color(0xFF10B981).withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
@@ -1919,10 +2032,10 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                             ],
                           ),
                           const SizedBox(height: 8),
-                          const Text(
+                          Text(
                             'You have active hotel/flight bookings in the app. Import them to build your itinerary automatically.',
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: AiraColors.textSecondary(isDark),
                               fontSize: 11,
                             ),
                           ),
@@ -1989,19 +2102,21 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF1E3A5F), Color(0xFF0F2847)],
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? [const Color(0xFF1E3A5F), const Color(0xFF0F2847)]
+                              : [const Color(0xFFE6F0FA), const Color(0xFFDCE9F9)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.3)),
+                        border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.3 : 0.15)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('TRIP SUMMARY',
-                            style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1),
+                          Text('TRIP SUMMARY',
+                            style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1),
                           ),
                           const SizedBox(height: 10),
                           Row(
@@ -2027,7 +2142,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: (bookings.flights.isNotEmpty || bookings.hotels.isNotEmpty)
                             ? const Color(0xFF2563EB)
-                            : const Color(0xFF334155),
+                            : AiraColors.border(isDark),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         elevation: 4,
                       ),
@@ -2057,21 +2172,22 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _stepDot(bool active, String label) {
+    final isDark = ref.watch(isDarkProvider);
     return Expanded(
       child: Column(
         children: [
           Container(
             width: 24, height: 24,
             decoration: BoxDecoration(
-              color: active ? const Color(0xFF2563EB) : const Color(0xFF1A2744),
+              color: active ? const Color(0xFF2563EB) : AiraColors.cardBg(isDark),
               shape: BoxShape.circle,
-              border: Border.all(color: active ? const Color(0xFF2563EB) : const Color(0xFF334155), width: 2),
+              border: Border.all(color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark), width: 2),
             ),
             child: active ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
           ),
           const SizedBox(height: 4),
           Text(label, style: TextStyle(
-            color: active ? const Color(0xFF60A5FA) : const Color(0xFF64748B),
+            color: active ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB)) : AiraColors.textSecondary(isDark),
             fontSize: 9, fontWeight: FontWeight.bold,
           )),
         ],
@@ -2080,29 +2196,31 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _stepLine(bool active) {
+    final isDark = ref.watch(isDarkProvider);
     return Expanded(
       child: Container(
         height: 2,
         margin: const EdgeInsets.only(bottom: 16),
-        color: active ? const Color(0xFF2563EB) : const Color(0xFF334155),
+        color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark),
       ),
     );
   }
 
   Widget _sectionHeader(String title, IconData icon, Color color, int count) {
+    final isDark = ref.watch(isDarkProvider);
     return Row(
       children: [
         Icon(icon, color: color, size: 18),
         const SizedBox(width: 8),
         Text(title.toUpperCase(),
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
         ),
         const Spacer(),
         if (count > 0)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text('$count added', style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 10)),
@@ -2159,13 +2277,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _flightCard(FlightBooking f) {
+    final isDark = ref.watch(isDarkProvider);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.3 : 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2179,7 +2298,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                   children: [
                     Expanded(
                       child: Text('${f.airline}${f.pnr.isNotEmpty ? ' (PNR: ${f.pnr})' : ''}',
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -2188,17 +2307,17 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: f.flightType == 'going'
-                            ? const Color(0xFF10B981).withOpacity(0.15)
+                            ? const Color(0xFF10B981).withValues(alpha: 0.15)
                             : (f.flightType == 'return'
-                                ? const Color(0xFF8B5CF6).withOpacity(0.15)
-                                : const Color(0xFF64748B).withOpacity(0.15)),
+                                ? const Color(0xFF8B5CF6).withValues(alpha: 0.15)
+                                : const Color(0xFF64748B).withValues(alpha: 0.15)),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
                           color: f.flightType == 'going'
-                              ? const Color(0xFF10B981).withOpacity(0.4)
+                              ? const Color(0xFF10B981).withValues(alpha: 0.4)
                               : (f.flightType == 'return'
-                                  ? const Color(0xFF8B5CF6).withOpacity(0.4)
-                                  : const Color(0xFF64748B).withOpacity(0.4)),
+                                  ? const Color(0xFF8B5CF6).withValues(alpha: 0.4)
+                                  : const Color(0xFF64748B).withValues(alpha: 0.4)),
                           width: 0.5,
                         ),
                       ),
@@ -2241,19 +2360,19 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(f.departureCity, style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text(f.departureDate, style: const TextStyle(color: Color(0xFF64748B), fontSize: 10)),
+                    Text(f.departureCity, style: TextStyle(color: AiraColors.textPrimary(isDark).withValues(alpha: 0.85), fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text(f.departureDate, style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10)),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward, color: Color(0xFF64748B), size: 14),
+              Icon(Icons.arrow_forward, color: AiraColors.textMuted(isDark), size: 14),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(f.arrivalCity, style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text(f.arrivalDate, style: const TextStyle(color: Color(0xFF64748B), fontSize: 10)),
+                    Text(f.arrivalCity, style: TextStyle(color: AiraColors.textPrimary(isDark).withValues(alpha: 0.85), fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text(f.arrivalDate, style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10)),
                   ],
                 ),
               ),
@@ -2264,7 +2383,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF2563EB).withOpacity(0.1),
+                color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.1 : 0.05),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text('PNR: ${f.pnr}  |  ${f.seatClass}  |  ${f.passengers} pax',
@@ -2278,13 +2397,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _hotelCard(HotelBooking h) {
+    final isDark = ref.watch(isDarkProvider);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF7C3AED).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF7C3AED).withValues(alpha: isDark ? 0.3 : 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2295,7 +2415,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
               const SizedBox(width: 8),
               Expanded(
                 child: Text(h.hotelName,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
               GestureDetector(
@@ -2306,7 +2426,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
           ),
           const SizedBox(height: 8),
           Text('${h.checkInDate} → ${h.checkOutDate}',
-            style: const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontWeight: FontWeight.bold),
+            style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold),
           ),
           if (h.confirmationCode.isNotEmpty) ...[
             const SizedBox(height: 6),
@@ -2320,13 +2440,14 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _otherCard(OtherBooking o) {
+    final isDark = ref.watch(isDarkProvider);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF059669).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF059669).withValues(alpha: isDark ? 0.3 : 0.15)),
       ),
       child: Row(
         children: [
@@ -2336,9 +2457,9 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(o.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                Text(o.title, style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13)),
                 Text('${o.type.toUpperCase()}${o.date.isNotEmpty ? '  •  ${o.date}' : ''}',
-                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 10, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -2353,6 +2474,7 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _addButton(String label, Color color, IconData icon, VoidCallback onTap) {
+    final isDark = ref.read(isDarkProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: SizedBox(
@@ -2360,10 +2482,10 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
         height: 44,
         child: OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-            side: BorderSide(color: color.withOpacity(0.4)),
+            side: BorderSide(color: color.withValues(alpha: isDark ? 0.4 : 0.2)),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             foregroundColor: color,
-            backgroundColor: color.withOpacity(0.05),
+            backgroundColor: color.withValues(alpha: isDark ? 0.05 : 0.03),
           ),
           onPressed: onTap,
           icon: Icon(icon, size: 16, color: color),
@@ -2374,10 +2496,11 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
   }
 
   Widget _summaryChip(IconData icon, String text, Color color) {
+    final isDark = ref.read(isDarkProvider);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: isDark ? 0.1 : 0.05),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -2391,3 +2514,4 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
     );
   }
 }
+

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 
-class MapScreen extends StatelessWidget {
+class MapScreen extends ConsumerWidget {
   final String fromCity;
   final String destinationCity;
   final List<String>? layovers;
@@ -59,7 +62,8 @@ class MapScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(isDarkProvider);
     final startLatLng = _getCoordinates(fromCity);
     final endLatLng = _getCoordinates(destinationCity);
 
@@ -107,14 +111,19 @@ class MapScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A2744),
+        backgroundColor: AiraColors.cardBg(isDark),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text(
+        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        title: Text(
           'FLIGHT PATH VISUALIZER',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 0.5),
+          style: TextStyle(
+            color: AiraColors.textPrimary(isDark),
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            letterSpacing: 0.5,
+          ),
         ),
       ),
       body: Stack(
@@ -174,7 +183,7 @@ class MapScreen extends StatelessWidget {
                     height: 44,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -191,7 +200,7 @@ class MapScreen extends StatelessWidget {
                     height: 44,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -209,7 +218,7 @@ class MapScreen extends StatelessWidget {
                       height: 40,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha: 0.5),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -231,20 +240,25 @@ class MapScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF0F172A).withOpacity(0.9),
+                color: AiraColors.dialogBg(isDark).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF334155)),
+                border: Border.all(color: AiraColors.border(isDark)),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 10, offset: const Offset(0, 4)),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 10, offset: const Offset(0, 4)),
                 ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'FLIGHT ROUTE DETAILS',
-                    style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 0.8),
+                    style: TextStyle(
+                      color: AiraColors.textSecondary(isDark),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                      letterSpacing: 0.8,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -252,21 +266,29 @@ class MapScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                           fromCity,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(
+                            color: AiraColors.textPrimary(isDark),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                       const Icon(Icons.swap_horiz, color: Color(0xFF60A5FA)),
                       Expanded(
                         child: Text(
                           destinationCity,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(
+                            color: AiraColors.textPrimary(isDark),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                           textAlign: TextAlign.end,
                         ),
                       ),
                     ],
                   ),
                   if (cleanLayovers.isNotEmpty) ...[
-                    const Divider(height: 16, color: Color(0xFF334155)),
+                    Divider(height: 16, color: AiraColors.border(isDark)),
                     Row(
                       children: [
                         const Icon(Icons.airline_stops, color: Colors.orangeAccent, size: 14),
@@ -289,3 +311,4 @@ class MapScreen extends StatelessWidget {
     );
   }
 }
+

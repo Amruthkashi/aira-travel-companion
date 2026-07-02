@@ -235,28 +235,6 @@ class GeoapifyService {
     return 'Adventure';
   }
 
-  String _getImageForGenre(String genre) {
-    switch (genre) {
-      case 'Summer & Beach':
-        return 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400';
-      case 'Kids & Family':
-        return 'https://images.unsplash.com/photo-1534567153574-2b12153a63f0?w=400';
-      case 'Religious':
-        return 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400';
-      case 'Adventure':
-        return 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=400';
-      case 'Food & Culinary':
-        return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400';
-      case 'Culture & History':
-        return 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=400';
-      case 'Shopping':
-        return 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400';
-      case 'Nightlife':
-        return 'https://images.unsplash.com/photo-1532236204992-f5e85c024202?w=400';
-      default:
-        return 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400';
-    }
-  }
 
   int _getDurationForGenre(String genre) {
     switch (genre) {

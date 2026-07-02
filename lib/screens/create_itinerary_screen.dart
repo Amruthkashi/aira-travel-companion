@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/models/travel_models.dart';
 import '../core/services/ai_service.dart';
@@ -171,7 +173,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
       days = end.difference(start).inDays + 1;
       if (days <= 0) days = 1;
     } catch (e) {
-      print('Error parsing dates for itinerary: $e');
+      debugPrint('Error parsing dates for itinerary: $e');
     }
 
     final List<String> prefList = prefs.isNotEmpty 
@@ -206,7 +208,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
         days: days,
       );
     } catch (e) {
-      print('Failed to generate real-time itinerary: $e');
+      debugPrint('Failed to generate real-time itinerary: $e');
       hourlyItinerary = _generateFallbackItinerary(city, days);
     }
 
@@ -325,23 +327,25 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(isDarkProvider);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628), // Slate 900
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A1628),
+        backgroundColor: AiraColors.scaffoldBg(isDark),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: AiraColors.textPrimary(isDark)),
           onPressed: () => context.pop(),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Create Itinerary',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 18),
             ),
-            Text(
+            const Text(
               'CONTINUOUS COMPILATION',
               style: TextStyle(color: Color(0xFF00B4D8), fontWeight: FontWeight.w800, fontSize: 9, letterSpacing: 0.5),
             ),
@@ -360,33 +364,33 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0A1628), // Dark Indigo 900
+                    color: AiraColors.scaffoldBg(isDark),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFF312E81)),
+                    border: Border.all(color: AiraColors.border(isDark)),
                   ),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF312E81).withOpacity(0.5),
+                          color: isDark ? const Color(0xFF312E81).withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.confirmation_number, color: Color(0xFFC7D2FE), size: 24),
+                        child: Icon(Icons.confirmation_number, color: isDark ? const Color(0xFFC7D2FE) : const Color(0xFFFF6B35), size: 24),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Smart Ticket Sync',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.5),
+                              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13.5),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Scan your boarding pass or booking voucher with your device camera for instant form auto-fill!',
-                              style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 10.5, height: 1.3),
+                              style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10.5, height: 1.3),
                             ),
                           ],
                         ),
@@ -409,23 +413,23 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                 const SizedBox(height: 24),
 
                 // 2. Title Section
-                const Text(
+                Text(
                   'Custom Traveler Flight & Dates Parameters',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.5),
+                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14.5),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'Set your custom flight details, budget caps, and specific travel themes. Our compiler loads fully grounded itineraries in seconds.',
-                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, height: 1.4),
+                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, height: 1.4),
                 ),
                 const SizedBox(height: 20),
 
                 // 3. Form Fields
                 Row(
                   children: [
-                    Expanded(child: _buildFormField('SOURCE LOCATION', _sourceCtrl, 'e.g. Bangalore, India')),
+                    Expanded(child: _buildFormField('SOURCE LOCATION', _sourceCtrl, 'e.g. Bangalore, India', isDark)),
                     const SizedBox(width: 14),
-                    Expanded(child: _buildFormField('DESTINATION', _destCtrl, 'e.g. Tokyo, Japan')),
+                    Expanded(child: _buildFormField('DESTINATION', _destCtrl, 'e.g. Tokyo, Japan', isDark)),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -436,25 +440,25 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'MODE OF TRANSPORT',
-                            style: TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
+                            style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
                           ),
                           const SizedBox(height: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1A2744),
+                              color: AiraColors.cardBg(isDark),
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: const Color(0xFF334155)),
+                              border: Border.all(color: AiraColors.border(isDark)),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: _transportMode,
-                                dropdownColor: const Color(0xFF1A2744),
+                                dropdownColor: AiraColors.cardBg(isDark),
                                 isExpanded: true,
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
-                                icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white54),
+                                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
+                                icon: Icon(Icons.keyboard_arrow_down, color: AiraColors.textSecondary(isDark)),
                                 items: <String>['Flight', 'Train', 'Car'].map((String val) {
                                   return DropdownMenuItem<String>(
                                     value: val,
@@ -468,7 +472,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                                           size: 14,
                                         ),
                                         const SizedBox(width: 8),
-                                        Text(val),
+                                        Text(val, style: TextStyle(color: AiraColors.textPrimary(isDark))),
                                       ],
                                     ),
                                   );
@@ -487,33 +491,33 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                       ),
                     ),
                     const SizedBox(width: 14),
-                    Expanded(child: _buildFormField('TRAVEL PROVIDER', _providerCtrl, 'e.g. Direct Airline')),
+                    Expanded(child: _buildFormField('TRAVEL PROVIDER', _providerCtrl, 'e.g. Direct Airline', isDark)),
                   ],
                 ),
                 const SizedBox(height: 14),
 
                 Row(
                   children: [
-                    Expanded(child: _buildFormField('FLIGHT PNR CODE', _pnrCtrl, 'e.g. NH-782Y9W')),
+                    Expanded(child: _buildFormField('FLIGHT PNR CODE', _pnrCtrl, 'e.g. NH-782Y9W', isDark)),
                     const SizedBox(width: 14),
-                    Expanded(child: _buildFormField('TRAIN NUMBER (OPTIONAL)', _trainCtrl, 'e.g. JR East')),
+                    Expanded(child: _buildFormField('TRAIN NUMBER (OPTIONAL)', _trainCtrl, 'e.g. JR East', isDark)),
                   ],
                 ),
                 const SizedBox(height: 14),
 
                 Row(
                   children: [
-                    Expanded(child: _buildDateRangeField('TRAVEL DATES', _datesCtrl)),
+                    Expanded(child: _buildDateRangeField('TRAVEL DATES', _datesCtrl, isDark)),
                     const SizedBox(width: 14),
-                    Expanded(child: _buildFormField('TRAVELERS', _travelersCtrl, '1', isNumeric: true)),
+                    Expanded(child: _buildFormField('TRAVELERS', _travelersCtrl, '1', isDark, isNumeric: true)),
                   ],
                 ),
                 const SizedBox(height: 14),
 
-                _buildFormField('TOTAL ALLOCATED BUDGET', _budgetCtrl, 'e.g. \$1,500'),
+                _buildFormField('TOTAL ALLOCATED BUDGET', _budgetCtrl, 'e.g. \$1,500', isDark),
                 const SizedBox(height: 14),
 
-                _buildFormField('TRAVEL STYLE & PREFERENCES', _preferencesCtrl, 'e.g. Anime Shopping, Food Stalls, Temples', maxLines: 2),
+                _buildFormField('TRAVEL STYLE & PREFERENCES', _preferencesCtrl, 'e.g. Anime Shopping, Food Stalls, Temples', isDark, maxLines: 2),
                 const SizedBox(height: 32),
 
                 // Full Wizard Button (Primary CTA)
@@ -574,7 +578,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFF2563EB)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      foregroundColor: const Color(0xFF60A5FA),
+                      foregroundColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
                     ),
                     onPressed: _startHourlyCompileSimulation,
                     child: const Row(
@@ -600,36 +604,36 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
           if (_isScanning) _buildScanningOverlay(),
 
           // 5. Compiling Overlay
-          if (_isCompiling) _buildCompilingOverlay(),
+          if (_isCompiling) _buildCompilingOverlay(isDark),
         ],
       ),
     );
   }
 
-  Widget _buildFormField(String label, TextEditingController ctrl, String hint, {int maxLines = 1, bool isNumeric = false}) {
+  Widget _buildFormField(String label, TextEditingController ctrl, String hint, bool isDark, {int maxLines = 1, bool isNumeric = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
+          style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
         ),
         const SizedBox(height: 6),
         TextField(
           controller: ctrl,
           maxLines: maxLines,
           keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
           decoration: InputDecoration(
             isDense: true,
             hintText: hint,
-            hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+            hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
             filled: true,
-            fillColor: const Color(0xFF1A2744),
+            fillColor: AiraColors.cardBg(isDark),
             contentPadding: const EdgeInsets.all(12),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFF334155)),
+              borderSide: BorderSide(color: AiraColors.border(isDark)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -641,13 +645,13 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
     );
   }
 
-  Widget _buildDateRangeField(String label, TextEditingController ctrl) {
+  Widget _buildDateRangeField(String label, TextEditingController ctrl, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
+          style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
         ),
         const SizedBox(height: 6),
         TextField(
@@ -664,42 +668,63 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
               ),
               builder: (context, child) {
                 return Theme(
-                  data: Theme.of(context).copyWith(
-                    appBarTheme: const AppBarTheme(
-                      backgroundColor: Color(0xFF1A2744),
-                      foregroundColor: Colors.white,
-                      iconTheme: IconThemeData(color: Colors.white),
-                    ),
-                    colorScheme: const ColorScheme.dark(
-                      primary: Color(0xFF2563EB), // Royal Blue
-                      onPrimary: Colors.white,
-                      surface: Color(0xFF1A2744),
-                      onSurface: Colors.white,
-                      secondary: Color(0xFF00B4D8),
-                    ),
-                    dialogBackgroundColor: const Color(0xFF0A1628),
-                    datePickerTheme: DatePickerThemeData(
-                      backgroundColor: const Color(0xFF0A1628),
-                      headerBackgroundColor: const Color(0xFF1E293B),
-                      headerForegroundColor: Colors.white,
-                      rangePickerHeaderBackgroundColor: const Color(0xFF1E293B),
-                      rangePickerHeaderForegroundColor: Colors.white,
-                      confirmButtonStyle: ButtonStyle(
-                        foregroundColor: WidgetStateProperty.all(const Color(0xFF60A5FA)),
-                        textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      cancelButtonStyle: ButtonStyle(
-                        foregroundColor: WidgetStateProperty.all(const Color(0xFF94A3B8)),
-                        textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                    textButtonTheme: TextButtonThemeData(
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF60A5FA), // Visible cyan/blue action text color
-                        textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
+                  data: isDark
+                      ? Theme.of(context).copyWith(
+                          appBarTheme: const AppBarTheme(
+                            backgroundColor: Color(0xFF1A2744),
+                            foregroundColor: Colors.white,
+                            iconTheme: IconThemeData(color: Colors.white),
+                          ),
+                          colorScheme: const ColorScheme.dark(
+                            primary: Color(0xFF2563EB), // Royal Blue
+                            onPrimary: Colors.white,
+                            surface: Color(0xFF1A2744),
+                            onSurface: Colors.white,
+                            secondary: Color(0xFF00B4D8),
+                          ),
+                          dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF0A1628),),
+                          datePickerTheme: const DatePickerThemeData(
+                            backgroundColor: Color(0xFF0A1628),
+                            headerBackgroundColor: Color(0xFF1A2744),
+                            headerForegroundColor: Colors.white,
+                            rangePickerHeaderBackgroundColor: Color(0xFF1A2744),
+                            rangePickerHeaderForegroundColor: Colors.white,
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF60A5FA),
+                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        )
+                      : Theme.of(context).copyWith(
+                          appBarTheme: const AppBarTheme(
+                            backgroundColor: Color(0xFFF1F5F9),
+                            foregroundColor: Colors.black87,
+                            iconTheme: IconThemeData(color: Colors.black87),
+                          ),
+                          colorScheme: const ColorScheme.light(
+                            primary: Color(0xFF2563EB),
+                            onPrimary: Colors.white,
+                            surface: Colors.white,
+                            onSurface: Colors.black87,
+                            secondary: Color(0xFF00B4D8),
+                          ),
+                          dialogTheme: DialogThemeData(backgroundColor: Colors.white,),
+                          datePickerTheme: const DatePickerThemeData(
+                            backgroundColor: Colors.white,
+                            headerBackgroundColor: Color(0xFFE2E8F0),
+                            headerForegroundColor: Colors.black87,
+                            rangePickerHeaderBackgroundColor: Color(0xFFE2E8F0),
+                            rangePickerHeaderForegroundColor: Colors.black87,
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF2563EB),
+                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                   child: child!,
                 );
               },
@@ -716,18 +741,18 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
               ctrl.text = '$startY-$startM-$startD to $endY-$endM-$endD';
             }
           },
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
           decoration: InputDecoration(
             isDense: true,
             hintText: 'Tap to select date range',
-            hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+            hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
             suffixIcon: const Icon(Icons.calendar_month, color: Color(0xFF2563EB), size: 16),
             filled: true,
-            fillColor: const Color(0xFF1A2744),
+            fillColor: AiraColors.cardBg(isDark),
             contentPadding: const EdgeInsets.all(12),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFF334155)),
+              borderSide: BorderSide(color: AiraColors.border(isDark)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -742,7 +767,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
   Widget _buildScanningOverlay() {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withOpacity(0.85),
+        color: Colors.black.withValues(alpha: 0.85),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -809,10 +834,10 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
     );
   }
 
-  Widget _buildCompilingOverlay() {
+  Widget _buildCompilingOverlay(bool isDark) {
     return Positioned.fill(
       child: Container(
-        color: const Color(0xFF0A1628).withOpacity(0.92),
+        color: AiraColors.dialogBg(isDark).withValues(alpha: 0.92),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -827,7 +852,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
             const SizedBox(height: 8),
             Text(
               _compileStatus,
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -836,7 +861,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                 borderRadius: BorderRadius.circular(10),
                 child: LinearProgressIndicator(
                   value: _compileProgress,
-                  backgroundColor: const Color(0xFF1A2744),
+                  backgroundColor: AiraColors.scaffoldBg(isDark),
                   valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
                   minHeight: 6,
                 ),
@@ -848,3 +873,4 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
     );
   }
 }
+

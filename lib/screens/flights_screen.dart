@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/models/travel_models.dart';
 import '../core/services/aviationstack_service.dart';
@@ -60,6 +62,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
   }
 
   void _showBookingDialog(AviationFlight flight) {
+    final isDark = ref.read(isDarkProvider);
     final nameCtrl = TextEditingController(text: 'Alex Mercer');
     final passengersCtrl = TextEditingController(text: '1');
     String seatClass = 'Economy';
@@ -69,7 +72,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDlgState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: AiraColors.dialogBg(isDark),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
@@ -77,7 +80,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
               const SizedBox(width: 8),
               Text(
                 'Book Flight ${flight.flightNumber}',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ],
           ),
@@ -86,14 +89,15 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _dialogField('Passenger Name', nameCtrl),
-                _dialogField('Passengers Count', passengersCtrl, isNumeric: true),
+                _dialogField('Passenger Name', nameCtrl, isDark),
+                _dialogField('Passengers Count', passengersCtrl, isDark, isNumeric: true),
                 const SizedBox(height: 12),
                 _dropdownField(
                   label: 'Seat Class',
                   value: seatClass,
                   items: const ['Economy', 'Premium Economy', 'Business', 'First Class'],
                   onChanged: (val) => setDlgState(() => seatClass = val!),
+                  isDark: isDark,
                 ),
                 const SizedBox(height: 12),
                 _dropdownField(
@@ -102,11 +106,16 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                   items: const ['Outbound (going)', 'Inbound (return)', 'Internal (other)'],
                   onChanged: (val) {
                     setDlgState(() {
-                      if (val == 'Outbound (going)') flightType = 'going';
-                      else if (val == 'Inbound (return)') flightType = 'return';
-                      else flightType = 'other';
+                      if (val == 'Outbound (going)') {
+                        flightType = 'going';
+                      } else if (val == 'Inbound (return)') {
+                        flightType = 'return';
+                      } else {
+                        flightType = 'other';
+                      }
                     });
                   },
+                  isDark: isDark,
                 ),
               ],
             ),
@@ -167,26 +176,26 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
     );
   }
 
-  Widget _dialogField(String label, TextEditingController ctrl, {bool isNumeric = false}) {
+  Widget _dialogField(String label, TextEditingController ctrl, bool isDark, {bool isNumeric = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8))),
+          Text(label.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AiraColors.textSecondary(isDark))),
           const SizedBox(height: 6),
           TextField(
             controller: ctrl,
             keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-            style: const TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 13, color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold),
             decoration: InputDecoration(
               isDense: true,
               filled: true,
-              fillColor: const Color(0xFF0F172A),
+              fillColor: AiraColors.scaffoldBg(isDark),
               contentPadding: const EdgeInsets.all(12),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFF334155)),
+                borderSide: BorderSide(color: AiraColors.border(isDark)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -204,29 +213,30 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
     required String value,
     required List<String> items,
     required ValueChanged<String?> onChanged,
+    required bool isDark,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8))),
+        Text(label.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AiraColors.textSecondary(isDark))),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF0F172A),
+            color: AiraColors.scaffoldBg(isDark),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFF334155)),
+            border: Border.all(color: AiraColors.border(isDark)),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: value,
               isExpanded: true,
-              dropdownColor: const Color(0xFF1E293B),
-              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+              dropdownColor: AiraColors.dialogBg(isDark),
+              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold),
               items: items.map((item) {
                 return DropdownMenuItem<String>(
                   value: item,
-                  child: Text(item),
+                  child: Text(item, style: TextStyle(color: AiraColors.textPrimary(isDark))),
                 );
               }).toList(),
               onChanged: onChanged,
@@ -239,38 +249,47 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(isDarkProvider);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A2744),
+        backgroundColor: AiraColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('Flight procurement', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        title: Text(
+          'Flight procurement',
+          style: TextStyle(
+            color: AiraColors.textPrimary(isDark),
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
       ),
       body: Column(
         children: [
           // Premium Search Panel
           Container(
             padding: const EdgeInsets.all(16),
-            color: const Color(0xFF1A2744),
+            color: AiraColors.cardBg(isDark),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _searchController,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13),
                     decoration: InputDecoration(
                       hintText: 'Search Flight (e.g. NH820, SQ12)',
-                      hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
                       isDense: true,
                       filled: true,
-                      fillColor: const Color(0xFF0A1628),
+                      fillColor: AiraColors.scaffoldBg(isDark),
                       prefixIcon: const Icon(Icons.search, color: Color(0xFF2563EB), size: 18),
                       contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFF334155)),
+                        borderSide: BorderSide(color: AiraColors.border(isDark)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -307,23 +326,33 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A2744),
+                        color: AiraColors.cardBg(isDark),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
                       ),
                       child: Column(
                         children: [
-                          const CircleAvatar(
-                            radius: 28,
-                            backgroundColor: Color(0xFF1E293B),
-                            child: Icon(Icons.check, color: Colors.green, size: 32),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AiraColors.scaffoldBg(isDark),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.check, color: Colors.green, size: 32),
                           ),
                           const SizedBox(height: 16),
-                          const Text('FLIGHT BOOKED SECURELY', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
+                          Text(
+                            'FLIGHT BOOKED SECURELY',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              color: AiraColors.textPrimary(isDark),
+                            ),
+                          ),
                           const SizedBox(height: 6),
-                          const Text(
+                          Text(
                             'Your flight has been ticketed and logged into your dashboard timeline. +250 XP earned.',
-                            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+                            style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 20),
@@ -358,17 +387,25 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                         ),
                       )
                     else if (_apiFlights.isEmpty)
-                      const Center(
+                      Center(
                         child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 40.0),
+                          padding: const EdgeInsets.symmetric(vertical: 40.0),
                           child: Text(
                             'No flights found. Enter a flight number like NH820 to search.',
-                            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                            style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
                           ),
                         ),
                       )
                     else ...[
-                      const Text('SEARCHED FLIGHT OPTIONS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white70)),
+                      Text(
+                        'SEARCHED FLIGHT OPTIONS',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.0,
+                          color: isDark ? Colors.white70 : const Color(0xFF475569),
+                        ),
+                      ),
                       const SizedBox(height: 12),
                       ..._apiFlights.map((flight) {
                         final price = 450.0 + (flight.flightNumber.hashCode.abs() % 350);
@@ -377,9 +414,9 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                           margin: const EdgeInsets.only(bottom: 14),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1A2744),
+                            color: AiraColors.cardBg(isDark),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFF334155)),
+                            border: Border.all(color: AiraColors.border(isDark)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,9 +427,9 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF0F172A),
+                                      color: AiraColors.scaffoldBg(isDark),
                                       borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: const Color(0xFF334155)),
+                                      border: Border.all(color: AiraColors.border(isDark)),
                                     ),
                                     child: Text(
                                       flight.flightStatus.toUpperCase(),
@@ -408,7 +445,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                               const SizedBox(height: 12),
                               Row(
                                 children: [
-                                  const Icon(Icons.flight_takeoff, color: Color(0xFF94A3B8), size: 20),
+                                  Icon(Icons.flight_takeoff, color: AiraColors.textMuted(isDark), size: 20),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Column(
@@ -416,24 +453,24 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                                       children: [
                                         Text(
                                           '${flight.airlineName} • ${flight.flightNumber}',
-                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AiraColors.textPrimary(isDark)),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           '${flight.departureCity} (${flight.departureIata}) → ${flight.arrivalCity} (${flight.arrivalIata})',
-                                          style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
+                                          style: TextStyle(color: isDark ? Colors.white70 : const Color(0xFF475569), fontSize: 12, fontWeight: FontWeight.bold),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           'Dept: ${flight.departureDate} at ${flight.departureTime} | Arr: ${flight.arrivalDate} at ${flight.arrivalTime}',
-                                          style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+                                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10),
                                         ),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
-                              const Divider(height: 24, color: Color(0xFF334155)),
+                              Divider(height: 24, color: AiraColors.border(isDark)),
                               Row(
                                 children: [
                                   const Icon(Icons.location_on, color: Colors.orangeAccent, size: 14),
@@ -441,7 +478,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                                   Expanded(
                                     child: Text(
                                       'Terminal: Dep: ${flight.departureAirport} | Arr: ${flight.arrivalAirport}',
-                                      style: const TextStyle(fontSize: 10, color: Colors.white70),
+                                      style: TextStyle(fontSize: 10, color: isDark ? Colors.white70 : const Color(0xFF475569)),
                                     ),
                                   ),
                                 ],
@@ -478,3 +515,4 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
     );
   }
 }
+

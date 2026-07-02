@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/providers/theme_provider.dart';
 import '../core/theme/app_theme.dart';
 import '../core/utils/sound_synthesizer.dart';
 
@@ -99,29 +100,33 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
   }
 
   void _showArrivalDialog() {
+    final isDark = ref.read(isDarkProvider);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AiraColors.dialogBg(isDark),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.auto_awesome, color: Color(0xFF818CF8)),
-            SizedBox(width: 10),
-            Text('Arrived Safely', style: TextStyle(color: Colors.white)),
+            const Icon(Icons.auto_awesome, color: Color(0xFF00B4D8)),
+            const SizedBox(width: 10),
+            Text(
+              'Arrived Safely',
+              style: TextStyle(color: AiraColors.textPrimary(isDark)),
+            ),
           ],
         ),
-        content: const Text(
+        content: Text(
           'AI Travel Companion confirms you have reached Sky View Deck. Scanning gate voucher or prepaid transit card recommended.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AiraColors.textSecondary(isDark)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Dismiss', style: TextStyle(color: Color(0xFF818CF8))),
+            child: const Text('Dismiss', style: TextStyle(color: Color(0xFF00B4D8))),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4F46E5)),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF6B35)),
             onPressed: () {
               Navigator.pop(context);
               // Switch to bookings tab (index 2 / or redirect to utilities)
@@ -142,22 +147,28 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(isDarkProvider);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF020617), // Midnight Blue
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AiraColors.cardBg(isDark),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: AiraColors.textPrimary(isDark)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'AI Real-Time Guidance',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(
+            color: AiraColors.textPrimary(isDark),
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.gps_fixed, color: Color(0xFF818CF8)),
+            icon: const Icon(Icons.gps_fixed, color: Color(0xFF00B4D8)),
             onPressed: () {
               SoundSynthesizer.playTone(frequency: 520, durationSeconds: 0.15, name: 'gps_sync.wav');
             },
@@ -173,12 +184,13 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                 // Simulated Vector Map Grid
                 Container(
                   width: double.infinity,
-                  color: const Color(0xFF030712), // Deepest charcoal
+                  color: isDark ? const Color(0xFF030712) : const Color(0xFFF1F5F9), // Deepest charcoal vs soft gray
                   child: CustomPaint(
                     painter: MapSimPainter(
                       progress: _progress,
                       currentStepIndex: _currentStepIndex,
                       totalSteps: _steps.length,
+                      isDark: isDark,
                     ),
                   ),
                 ),
@@ -190,11 +202,15 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A).withValues(alpha: 0.8),
+                      color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white10),
+                      border: Border.all(color: AiraColors.border(isDark)),
                     ),
-                    child: const Icon(Icons.compass_calibration_outlined, color: Colors.white70, size: 24),
+                    child: Icon(
+                      Icons.compass_calibration_outlined,
+                      color: AiraColors.textSecondary(isDark),
+                      size: 24,
+                    ),
                   ),
                 ),
 
@@ -205,15 +221,22 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A).withValues(alpha: 0.8),
+                      color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white10),
+                      border: Border.all(color: AiraColors.border(isDark)),
                     ),
                     child: Row(
                       children: [
                         Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle)),
                         const SizedBox(width: 6),
-                        const Text('GPS Signal Locked', style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
+                        Text(
+                          'GPS Signal Locked',
+                          style: TextStyle(
+                            color: AiraColors.textSecondary(isDark),
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -226,15 +249,15 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   right: 16,
                   child: Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: AppTheme.glassDecoration(isDark: true, radius: 20),
+                    decoration: AppTheme.glassDecoration(isDark: isDark, radius: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _hudItem('REMAINING', '${_distanceRemaining.toStringAsFixed(1)} km', Icons.route),
-                        Container(width: 1, height: 30, color: Colors.white10),
-                        _hudItem('EST. TIME', '$_timeRemaining mins', Icons.timer_outlined),
-                        Container(width: 1, height: 30, color: Colors.white10),
-                        _hudItem('SPEED', _isNavigating ? '4.8 km/h' : '0.0 km/h', Icons.speed),
+                        _hudItem('REMAINING', '${_distanceRemaining.toStringAsFixed(1)} km', Icons.route, isDark),
+                        Container(width: 1, height: 30, color: AiraColors.border(isDark)),
+                        _hudItem('EST. TIME', '$_timeRemaining mins', Icons.timer_outlined, isDark),
+                        Container(width: 1, height: 30, color: AiraColors.border(isDark)),
+                        _hudItem('SPEED', _isNavigating ? '4.8 km/h' : '0.0 km/h', Icons.speed, isDark),
                       ],
                     ),
                   ),
@@ -246,9 +269,16 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
           // Directions Card & Control Deck
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Color(0xFF0F172A),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            decoration: BoxDecoration(
+              color: AiraColors.cardBg(isDark),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.08),
+                  blurRadius: 10,
+                  offset: const Offset(0, -4),
+                )
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,7 +290,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   children: [
                     Text(
                       'STEP ${_currentStepIndex + 1} OF ${_steps.length}',
-                      style: const TextStyle(color: Color(0xFF818CF8), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                      style: const TextStyle(color: Color(0xFF00B4D8), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
                     ),
                     if (_isNavigating)
                       const Row(
@@ -284,8 +314,8 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundColor: const Color(0xFF1E293B),
-                      child: Icon(_steps[_currentStepIndex]['icon'], color: const Color(0xFF818CF8), size: 20),
+                      backgroundColor: AiraColors.scaffoldBg(isDark),
+                      child: Icon(_steps[_currentStepIndex]['icon'], color: const Color(0xFF00B4D8), size: 20),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -294,12 +324,20 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                         children: [
                           Text(
                             _steps[_currentStepIndex]['instruction'],
-                            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, height: 1.4),
+                            style: TextStyle(
+                              color: AiraColors.textPrimary(isDark),
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              height: 1.4,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Next action in ${_steps[_currentStepIndex]['distance']}',
-                            style: const TextStyle(color: Colors.white30, fontSize: 11),
+                            style: TextStyle(
+                              color: AiraColors.textMuted(isDark),
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
@@ -313,8 +351,8 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: _progress,
-                    backgroundColor: const Color(0xFF1E293B),
-                    color: const Color(0xFF4F46E5),
+                    backgroundColor: AiraColors.scaffoldBg(isDark),
+                    color: const Color(0xFFFF6B35),
                     minHeight: 6,
                   ),
                 ),
@@ -327,7 +365,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF4F46E5),
+                            backgroundColor: const Color(0xFFFF6B35),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           ),
@@ -359,14 +397,14 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
     );
   }
 
-  Widget _hudItem(String title, String val, IconData icon) {
+  Widget _hudItem(String title, String val, IconData icon, bool isDark) {
     return Column(
       children: [
-        Icon(icon, color: const Color(0xFF818CF8), size: 16),
+        Icon(icon, color: isDark ? const Color(0xFF00B4D8) : const Color(0xFFFF6B35), size: 16),
         const SizedBox(height: 6),
-        Text(title, style: const TextStyle(color: Colors.white30, fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+        Text(title, style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
         const SizedBox(height: 2),
-        Text(val, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900)),
+        Text(val, style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.w900)),
       ],
     );
   }
@@ -376,17 +414,19 @@ class MapSimPainter extends CustomPainter {
   final double progress;
   final int currentStepIndex;
   final int totalSteps;
+  final bool isDark;
 
   MapSimPainter({
     required this.progress,
     required this.currentStepIndex,
     required this.totalSteps,
+    required this.isDark,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final gridPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.03)
+      ..color = isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.05)
       ..strokeWidth = 1;
 
     // Draw Grid Lines
@@ -399,13 +439,13 @@ class MapSimPainter extends CustomPainter {
 
     // Draw main route path line
     final pathPaint = Paint()
-      ..color = const Color(0xFF1E293B)
+      ..color = isDark ? const Color(0xFF1A2744) : const Color(0xFFCBD5E1)
       ..strokeWidth = 6
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
     final activePathPaint = Paint()
-      ..color = const Color(0xFF4F46E5)
+      ..color = const Color(0xFFFF6B35)
       ..strokeWidth = 6
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -452,17 +492,17 @@ class MapSimPainter extends CustomPainter {
 
     // Draw nodes/stations
     final nodePaint = Paint()
-      ..color = const Color(0xFF0F172A)
+      ..color = isDark ? const Color(0xFF0A1628) : Colors.white
       ..strokeWidth = 2
       ..style = PaintingStyle.fill;
 
     final nodeOutlinePaint = Paint()
-      ..color = const Color(0xFF64748B)
+      ..color = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
     final activeNodePaint = Paint()
-      ..color = const Color(0xFF818CF8)
+      ..color = const Color(0xFF00B4D8)
       ..style = PaintingStyle.fill;
 
     for (int i = 0; i < points.length; i++) {
@@ -477,7 +517,7 @@ class MapSimPainter extends CustomPainter {
     if (currentStepIndex < points.length) {
       final currentPos = points[currentStepIndex];
       final pulsePaint = Paint()
-        ..color = const Color(0xFF818CF8).withValues(alpha: 0.25)
+        ..color = const Color(0xFF00B4D8).withValues(alpha: 0.25)
         ..style = PaintingStyle.fill;
       canvas.drawCircle(currentPos, 18.0, pulsePaint);
     }
@@ -485,6 +525,7 @@ class MapSimPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant MapSimPainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.currentStepIndex != currentStepIndex;
+    return oldDelegate.progress != progress || oldDelegate.currentStepIndex != currentStepIndex || oldDelegate.isDark != isDark;
   }
 }
+

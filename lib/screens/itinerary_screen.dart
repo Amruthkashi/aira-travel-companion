@@ -1,10 +1,12 @@
 import 'dart:async';
-import 'dart:js' as js;
 import 'package:flutter/foundation.dart';
+import '../core/utils/js_helper_exporter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/models/travel_models.dart';
 
@@ -23,6 +25,11 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   DateTime? _mockTime;
   bool _isShowingAlert = false;
   final Set<String> _dismissedActivityAlerts = {};
+
+  double _tripRating = 5.0;
+  double _appRating = 5.0;
+  final TextEditingController _feedbackController = TextEditingController();
+  bool _feedbackSubmitted = false;
 
   DateTime get _nowTime {
     if (_useMockTime && _mockTime != null) {
@@ -304,21 +311,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               onPressed: () {
                 if (kIsWeb) {
                   try {
-                    js.context.callMethod('eval', [
-                      '''
-                      (function(content, filename) {
-                        const blob = new Blob([content], { type: 'text/html' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                      })(${js.context['JSON'].callMethod('stringify', [htmlContent])}, 'aira_itinerary.html');
-                      '''
-                    ]);
+                    downloadHtmlFile(htmlContent, 'aira_itinerary.html');
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('HTML file download started!')),
                     );
@@ -346,19 +339,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               onPressed: () {
                 if (kIsWeb) {
                   try {
-                    js.context.callMethod('eval', [
-                      '''
-                      (function(content) {
-                        const win = window.open('', '_blank');
-                        if (win) {
-                          win.document.write(content);
-                          win.document.close();
-                        } else {
-                          alert('Please allow popups to open print version.');
-                        }
-                      })(${js.context['JSON'].callMethod('stringify', [htmlContent])});
-                      '''
-                    ]);
+                    openPrintWindow(htmlContent);
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Error opening print preview: $e')),
@@ -645,6 +626,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   @override
   void dispose() {
     _reminderTimer?.cancel();
+    _feedbackController.dispose();
     super.dispose();
   }
 
@@ -894,14 +876,14 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   @override
   Widget build(BuildContext context) {
     final itinerary = ref.watch(itineraryProvider);
-    const isDark = true;
-    const bgColor = Color(0xFF0A1628);
-    const cardColor = Color(0xFF1A2744);
-    const textColor = Colors.white;
-    const mutedTextColor = Color(0xFF94A3B8);
-    const borderColor = Color(0xFF334155);
+    final isDark = ref.watch(isDarkProvider);
+    final bgColor = AiraColors.scaffoldBg(isDark);
+    final cardColor = AiraColors.cardBg(isDark);
+    final textColor = AiraColors.textPrimary(isDark);
+    final mutedTextColor = AiraColors.textMuted(isDark);
+    final borderColor = AiraColors.border(isDark);
     const pillActive = Color(0xFF2563EB);
-    const pillInactive = Color(0xFF1A2744);
+    final pillInactive = AiraColors.cardBg(isDark);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -914,14 +896,14 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.schedule, color: Color(0xFF2563EB), size: 20),
-                      SizedBox(width: 8),
+                      const Icon(Icons.schedule, color: Color(0xFF2563EB), size: 20),
+                      const SizedBox(width: 8),
                       Text(
                         'HOURLY SCHEDULE',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AiraColors.textPrimary(isDark),
                           fontWeight: FontWeight.w900,
                           fontSize: 15,
                           letterSpacing: 0.5,
@@ -933,14 +915,14 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                     children: [
                       IconButton(
                         tooltip: 'Share Itinerary (HTML)',
-                        icon: const Icon(Icons.share_rounded, color: Colors.white, size: 20),
+                        icon: Icon(Icons.share_rounded, color: AiraColors.textPrimary(isDark), size: 20),
                         onPressed: _showShareItineraryDialog,
                       ),
                       IconButton(
                         tooltip: 'Simulate Time',
                         icon: Icon(
                           Icons.more_time_rounded,
-                          color: _useMockTime ? Colors.amberAccent : Colors.white,
+                          color: _useMockTime ? Colors.amberAccent : AiraColors.textPrimary(isDark),
                           size: 20,
                         ),
                         onPressed: _showTimeSimulatorDialog,
@@ -1026,7 +1008,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   }
 
   Widget _buildTransportSyncCard(ItineraryDay dayObj, Color textColor, Color mutedTextColor) {
-    const isDark = true;
+    final isDark = ref.watch(isDarkProvider);
 
     // Detect primary event type of the day
     String syncTitle = 'DAY ${_activeDay + 1} ACTIVITY SYNC';
@@ -1142,7 +1124,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 Text(
                   syncDetails,
                   style: TextStyle(
-                    color: mutedTextColor,
+                    color: isDark ? Colors.white70 : const Color(0xFF475569),
                     fontSize: 11,
                   ),
                 ),
@@ -1408,7 +1390,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   }
 
   Widget _buildItineraryBody(List<ItineraryDay> itinerary, Color cardColor, Color textColor, Color mutedTextColor, Color borderColor) {
-    const isDark = true;
+    final isDark = ref.watch(isDarkProvider);
     if (itinerary.isEmpty) {
       return Center(
         child: SingleChildScrollView(
@@ -1457,9 +1439,12 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     final hasReminder = reminderWidget != null;
     final int headerOffset = (hasReminder ? 1 : 0) + 3;
 
+    final entireItineraryCompleted = itinerary.isNotEmpty && itinerary.every((day) => day.activities.every((act) => act.checked));
+    final showFeedback = entireItineraryCompleted && (_activeDay == itinerary.length - 1);
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: dayObj.activities.length + headerOffset + 1,
+      itemCount: dayObj.activities.length + headerOffset + 1 + (showFeedback ? 1 : 0),
       itemBuilder: (context, idx) {
         int currentIdx = idx;
         
@@ -1511,7 +1496,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
         if (activityIdx == dayObj.activities.length) {
           // Add custom itinerary item button
           return Padding(
-            padding: const EdgeInsets.only(top: 8.0, bottom: 32.0),
+            padding: EdgeInsets.only(top: 8.0, bottom: showFeedback ? 16.0 : 32.0),
             child: SizedBox(
               width: double.infinity,
               height: 48,
@@ -1530,16 +1515,27 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
           );
         }
         
+        if (showFeedback && activityIdx == dayObj.activities.length + 1) {
+          return _buildTripFeedbackCard(cardColor, textColor, mutedTextColor, borderColor, isDark);
+        }
+        
         final act = dayObj.activities[activityIdx];
         
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 250),
-            opacity: act.checked ? 0.65 : 1.0,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildTimelineColumn(activityIdx, dayObj.activities.length, act, dayObj.activities),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 250),
+                    opacity: act.checked ? 0.65 : 1.0,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
                 // Activity Details Card matching the style of reference image
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -1809,7 +1805,11 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               ],
             ),
           ),
-        );
+        ),
+      ),
+    ],
+  ),
+);
       },
     );
   }
@@ -1848,4 +1848,644 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
       ],
     );
   }
+
+  Widget _buildTimelineColumn(int index, int total, ActivityItem currentAct, List<ActivityItem> allActivities) {
+    final isCompleted = currentAct.checked;
+    final isDark = ref.watch(isDarkProvider);
+
+    int latestCompletedIdx = -1;
+    for (int i = 0; i < allActivities.length; i++) {
+      if (allActivities[i].checked) {
+        latestCompletedIdx = i;
+      }
+    }
+
+    final activeColor = const Color(0xFF00B4D8);
+    final inactiveColor = isDark ? const Color(0xFF1E2D4A) : const Color(0xFFE2E8F0);
+
+    final isUpperLineActive = index > 0 && index <= latestCompletedIdx + 1;
+    final isLowerLineActive = index <= latestCompletedIdx;
+
+    final isCurrentStep = index == latestCompletedIdx + 1;
+
+    return SizedBox(
+      width: 44,
+      child: Column(
+        children: [
+          // Upper line segment
+          index == 0
+              ? const SizedBox(height: 26)
+              : FlowingTimelineLine(
+                  isActive: isUpperLineActive,
+                  height: 26,
+                  activeColor: activeColor,
+                  inactiveColor: inactiveColor,
+                ),
+          // Node / Circle
+          _buildTimelineNode(currentAct, isCompleted, isCurrentStep, activeColor, inactiveColor),
+          // Lower line segment
+          Expanded(
+            child: index == total - 1
+                ? const SizedBox.shrink()
+                : FlowingTimelineLine(
+                    isActive: isLowerLineActive,
+                    activeColor: activeColor,
+                    inactiveColor: inactiveColor,
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineNode(ActivityItem currentAct, bool isCompleted, bool isCurrentStep, Color activeColor, Color inactiveColor) {
+    final imgUrl = _getTimelineImage(currentAct.activity, currentAct.description);
+    
+    Widget circle = Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: isCurrentStep 
+              ? const Color(0xFF00B4D8)
+              : (isCompleted ? activeColor : inactiveColor.withValues(alpha: 0.8)),
+          width: isCurrentStep ? 2.5 : 2.0,
+        ),
+        boxShadow: isCurrentStep || isCompleted ? [
+          BoxShadow(
+            color: activeColor.withValues(alpha: 0.25),
+            blurRadius: 6,
+            spreadRadius: 1,
+          )
+        ] : null,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Image.network(
+          imgUrl,
+          width: 32,
+          height: 32,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Container(
+            color: inactiveColor.withValues(alpha: 0.2),
+            child: Icon(
+              Icons.place_rounded,
+              size: 14,
+              color: isCompleted ? activeColor : inactiveColor,
+            ),
+          ),
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              color: inactiveColor.withValues(alpha: 0.1),
+            );
+          },
+        ),
+      ),
+    );
+
+    if (isCurrentStep) {
+      return Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          PulsingRing(color: activeColor, size: 36),
+          circle,
+          Positioned(
+            bottom: -2,
+            right: -2,
+            child: Container(
+              padding: const EdgeInsets.all(1.5),
+              decoration: const BoxDecoration(
+                color: Color(0xFF00B4D8),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.play_arrow_rounded, size: 10, color: Colors.white),
+            ),
+          ),
+        ],
+      );
+    } else if (isCompleted) {
+      return Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          circle,
+          Positioned(
+            bottom: -2,
+            right: -2,
+            child: Container(
+              padding: const EdgeInsets.all(1.5),
+              decoration: const BoxDecoration(
+                color: Colors.green,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.check, size: 10, color: Colors.white),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return circle;
+  }
+
+  Widget _buildTripFeedbackCard(Color cardColor, Color textColor, Color mutedTextColor, Color borderColor, bool isDark) {
+    return Container(
+      margin: const EdgeInsets.only(left: 4, right: 4, bottom: 32),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor, width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: _feedbackSubmitted
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle_outline, color: Color(0xFF10B981), size: 48),
+                const SizedBox(height: 12),
+                Text(
+                  'Thank You for Your Feedback!',
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Your review helps us make Aira better for future journeys. Happy travels!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: mutedTextColor,
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    const Text('🌟', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Rate Your Journey',
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15.5,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Congrats on completing today\'s plan! Help us improve Aira by reviewing your trip and app experience.',
+                  style: TextStyle(
+                    color: mutedTextColor,
+                    fontSize: 12,
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Trip Experience Rating
+                Text(
+                  'How was your Trip Experience?',
+                  style: TextStyle(
+                    color: textColor.withOpacity(0.9),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: List.generate(5, (index) {
+                    final ratingVal = index + 1.0;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _tripRating = ratingVal;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 6.0),
+                        child: Icon(
+                          _tripRating >= ratingVal ? Icons.star : Icons.star_border,
+                          color: Colors.amber,
+                          size: 26,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(height: 16),
+                
+                // App Experience Rating
+                Text(
+                  'How was your App Experience with Aira?',
+                  style: TextStyle(
+                    color: textColor.withOpacity(0.9),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: List.generate(5, (index) {
+                    final ratingVal = index + 1.0;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _appRating = ratingVal;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 6.0),
+                        child: Icon(
+                          _appRating >= ratingVal ? Icons.star : Icons.star_border,
+                          color: Colors.amber,
+                          size: 26,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(height: 16),
+                
+                // Feedback Input
+                Text(
+                  'Any additional comments?',
+                  style: TextStyle(
+                    color: textColor.withOpacity(0.9),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _feedbackController,
+                  maxLines: 2,
+                  style: TextStyle(color: textColor, fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: 'Tell us what you liked or how we can improve...',
+                    hintStyle: TextStyle(color: mutedTextColor.withOpacity(0.7), fontSize: 12),
+                    filled: true,
+                    fillColor: isDark ? const Color(0xFF1E2D4A).withOpacity(0.3) : const Color(0xFFF1F5F9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: borderColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: borderColor.withOpacity(0.5)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFF00B4D8)),
+                    ),
+                    contentPadding: const EdgeInsets.all(12),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _feedbackSubmitted = true;
+                      });
+                    },
+                    child: const Text(
+                      'Submit Feedback',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
 }
+
+String _getTimelineImage(String activity, String description) {
+  final act = activity.toLowerCase();
+  final desc = description.toLowerCase();
+  
+  if (act.contains('balloon')) {
+    return 'https://images.unsplash.com/photo-1507504038482-76210062ecee?w=200&q=85';
+  }
+  if (act.contains('boat') || act.contains('cruise') || act.contains('lake') || act.contains('river') || act.contains('water') || act.contains('sailing') || act.contains('ferry')) {
+    return 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=200&q=85';
+  }
+  if (act.contains('temple') || act.contains('shrine') || act.contains('pagoda') || act.contains('church') || act.contains('monastery')) {
+    return 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=200&q=85';
+  }
+  if (act.contains('food') || act.contains('eat') || act.contains('dinner') || act.contains('lunch') || act.contains('cafe') || act.contains('dining') || act.contains('ramen') || act.contains('breakfast') || act.contains('sushi') || act.contains('cuisine')) {
+    return 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&q=85';
+  }
+  if (act.contains('train') || act.contains('subway') || act.contains('shinkansen') || act.contains('metro') || act.contains('rail') || act.contains('transit')) {
+    return 'https://images.unsplash.com/photo-1541417904950-b855846fe074?w=200&q=85';
+  }
+  if (act.contains('flight') || act.contains('airport') || act.contains('plane')) {
+    return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=200&q=85';
+  }
+  if (act.contains('hotel') || act.contains('stay') || act.contains('check-in') || act.contains('resort') || act.contains('hostel') || act.contains('lodging')) {
+    return 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&q=85';
+  }
+  if (act.contains('walk') || act.contains('hike') || act.contains('trek') || act.contains('park') || act.contains('garden') || act.contains('nature') || act.contains('mountain') || act.contains('trail')) {
+    return 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=200&q=85';
+  }
+  if (act.contains('shop') || act.contains('market') || act.contains('mall') || act.contains('store') || act.contains('souvenir')) {
+    return 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=200&q=85';
+  }
+  
+  if (desc.contains('balloon')) {
+    return 'https://images.unsplash.com/photo-1507504038482-76210062ecee?w=200&q=85';
+  }
+  if (desc.contains('boat') || desc.contains('lake') || desc.contains('river') || desc.contains('water')) {
+    return 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=200&q=85';
+  }
+  if (desc.contains('temple') || desc.contains('shrine') || desc.contains('pagoda')) {
+    return 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=200&q=85';
+  }
+  if (desc.contains('food') || desc.contains('restaurant') || desc.contains('dining') || desc.contains('cafe')) {
+    return 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&q=85';
+  }
+  if (desc.contains('train') || desc.contains('metro') || desc.contains('subway')) {
+    return 'https://images.unsplash.com/photo-1541417904950-b855846fe074?w=200&q=85';
+  }
+  if (desc.contains('flight') || desc.contains('airport') || desc.contains('plane')) {
+    return 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=200&q=85';
+  }
+  if (desc.contains('hotel') || desc.contains('stay') || desc.contains('check-in')) {
+    return 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&q=85';
+  }
+  if (desc.contains('walk') || desc.contains('hike') || desc.contains('trek') || desc.contains('park') || desc.contains('garden')) {
+    return 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=200&q=85';
+  }
+  if (desc.contains('shop') || desc.contains('market') || desc.contains('mall')) {
+    return 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=200&q=85';
+  }
+  
+  return 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=200&q=85';
+}
+
+class FlowingTimelineLine extends StatefulWidget {
+  final bool isActive;
+  final double? height;
+  final Color activeColor;
+  final Color inactiveColor;
+
+  const FlowingTimelineLine({
+    super.key,
+    required this.isActive,
+    this.height,
+    required this.activeColor,
+    required this.inactiveColor,
+  });
+
+  @override
+  State<FlowingTimelineLine> createState() => _FlowingTimelineLineState();
+}
+
+class _FlowingTimelineLineState extends State<FlowingTimelineLine>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+    if (widget.isActive) {
+      _controller.repeat();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant FlowingTimelineLine oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive != oldWidget.isActive) {
+      if (widget.isActive) {
+        _controller.repeat();
+      } else {
+        _controller.stop();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.isActive) {
+      return Container(
+        width: 3.0,
+        height: widget.height,
+        color: widget.inactiveColor,
+      );
+    }
+
+    final Widget paint = AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return CustomPaint(
+          painter: _FlowingLinePainter(
+            progress: _controller.value,
+            activeColor: widget.activeColor,
+            inactiveColor: widget.inactiveColor,
+          ),
+        );
+      },
+    );
+
+    if (widget.height != null) {
+      return SizedBox(
+        width: 3.0,
+        height: widget.height,
+        child: paint,
+      );
+    }
+
+    return SizedBox(
+      width: 3.0,
+      child: paint,
+    );
+  }
+}
+
+class _FlowingLinePainter extends CustomPainter {
+  final double progress;
+  final Color activeColor;
+  final Color inactiveColor;
+
+  _FlowingLinePainter({
+    required this.progress,
+    required this.activeColor,
+    required this.inactiveColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.height <= 0 || size.width <= 0) return;
+
+    final Paint bgPaint = Paint()
+      ..color = activeColor.withValues(alpha: 0.25)
+      ..strokeWidth = size.width
+      ..strokeCap = StrokeCap.round;
+
+    // Draw baseline
+    canvas.drawLine(
+      Offset(size.width / 2, 0),
+      Offset(size.width / 2, size.height),
+      bgPaint,
+    );
+
+    // Draw completed/flowing highlight
+    final double pulseY = size.height * progress;
+    final double pulseLength = size.height * 0.45; // length of energy glow
+    
+    final double startY = pulseY - pulseLength;
+    final double endY = pulseY;
+
+    final Paint pulsePaint = Paint()
+      ..strokeWidth = size.width + 1.0
+      ..strokeCap = StrokeCap.round;
+
+    pulsePaint.shader = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        activeColor.withValues(alpha: 0.1),
+        activeColor,
+        activeColor.withValues(alpha: 0.1),
+      ],
+      stops: const [0.0, 0.5, 1.0],
+    ).createShader(Rect.fromLTRB(
+      size.width / 2, 
+      startY.clamp(0.0, size.height), 
+      size.width / 2, 
+      endY.clamp(0.0, size.height)
+    ));
+
+    if (startY < 0) {
+      canvas.drawLine(
+        Offset(size.width / 2, 0),
+        Offset(size.width / 2, endY.clamp(0.0, size.height)),
+        pulsePaint,
+      );
+      final double remainderStartY = size.height + startY;
+      canvas.drawLine(
+        Offset(size.width / 2, remainderStartY.clamp(0.0, size.height)),
+        Offset(size.width / 2, size.height),
+        pulsePaint,
+      );
+    } else {
+      canvas.drawLine(
+        Offset(size.width / 2, startY.clamp(0.0, size.height)),
+        Offset(size.width / 2, endY.clamp(0.0, size.height)),
+        pulsePaint,
+      );
+    }
+
+    // White core light running dot
+    final Paint glowPaint = Paint()
+      ..color = Colors.white
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.0);
+    canvas.drawCircle(Offset(size.width / 2, pulseY), 3.5, glowPaint);
+    canvas.drawCircle(Offset(size.width / 2, pulseY), 1.5, Paint()..color = activeColor);
+  }
+
+  @override
+  bool shouldRepaint(covariant _FlowingLinePainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.activeColor != activeColor ||
+        oldDelegate.inactiveColor != inactiveColor;
+  }
+}
+
+class PulsingRing extends StatefulWidget {
+  final Color color;
+  final double size;
+  const PulsingRing({super.key, required this.color, required this.size});
+
+  @override
+  State<PulsingRing> createState() => _PulsingRingState();
+}
+
+class _PulsingRingState extends State<PulsingRing> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: (widget.size + 12) * (1.0 + _controller.value * 0.35),
+              height: (widget.size + 12) * (1.0 + _controller.value * 0.35),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: widget.color.withValues(alpha: 0.12 * (1.0 - _controller.value)),
+              ),
+            ),
+            Container(
+              width: (widget.size + 6) * (1.0 + _controller.value * 0.18),
+              height: (widget.size + 6) * (1.0 + _controller.value * 0.18),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: widget.color.withValues(alpha: 0.22 * (1.0 - _controller.value)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+

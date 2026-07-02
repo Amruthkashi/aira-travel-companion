@@ -209,7 +209,7 @@ class _HotelSearchResults extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 4, bottom: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: const Color(0xFF1A2744),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0xFF334155)),
       ),
@@ -219,7 +219,7 @@ class _HotelSearchResults extends StatelessWidget {
           padding: EdgeInsets.zero,
           shrinkWrap: true,
           itemCount: suggestions.length,
-          separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFF334155)),
+          separatorBuilder: (_, _) => const Divider(height: 1, color: Color(0xFF334155)),
           itemBuilder: (context, index) {
             final hotel = suggestions[index];
             return Material(

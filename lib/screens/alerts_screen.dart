@@ -1,5 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/models/travel_models.dart';
 import '../core/utils/sound_synthesizer.dart';
@@ -92,15 +94,21 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(isDarkProvider);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF020617), // Midnight Blue
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A1628),
+        backgroundColor: AiraColors.cardBg(isDark),
         elevation: 0.5,
-        title: const Text('Real-Time Crisis Alerts', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        title: Text(
+          'Real-Time Crisis Alerts',
+          style: TextStyle(
+            color: AiraColors.textPrimary(isDark),
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
       ),
       body: Stack(
@@ -114,9 +122,9 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0A1628),
+                    color: AiraColors.cardBg(isDark),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                    border: Border.all(color: AiraColors.border(isDark)),
                   ),
                   child: Row(
                     children: [
@@ -129,18 +137,25 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
                         child: const Icon(Icons.security, color: Colors.redAccent, size: 24),
                       ),
                       const SizedBox(width: 14),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'AI Crisis Hub Active',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                              style: TextStyle(
+                                color: AiraColors.textPrimary(isDark),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
                               'Constantly scanning weather, transit, and city databases for safety anomalies.',
-                              style: TextStyle(color: Colors.white30, fontSize: 10),
+                              style: TextStyle(
+                                color: AiraColors.textMuted(isDark),
+                                fontSize: 10,
+                              ),
                             ),
                           ],
                         ),
@@ -150,7 +165,15 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                const Text('ACTIVE ALERTS & RADAR DISRUPTIONS', style: TextStyle(color: Colors.white30, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                Text(
+                  'ACTIVE ALERTS & RADAR DISRUPTIONS',
+                  style: TextStyle(
+                    color: isDark ? Colors.white30 : const Color(0xFF64748B),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  ),
+                ),
                 const SizedBox(height: 12),
 
                 ..._alerts.map((alert) {
@@ -158,7 +181,7 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0A1628),
+                      color: AiraColors.cardBg(isDark),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
                         color: alert['color'].withValues(alpha: 0.3),
@@ -177,7 +200,11 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
                                 const SizedBox(width: 8),
                                 Text(
                                   alert['title'],
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                  style: TextStyle(
+                                    color: AiraColors.textPrimary(isDark),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ],
                             ),
@@ -194,16 +221,20 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
                             ),
                           ],
                         ),
-                        const Divider(height: 24, color: Colors.white10),
+                        Divider(height: 24, color: AiraColors.border(isDark)),
                         Text(
                           alert['description'],
-                          style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.4),
+                          style: TextStyle(
+                            color: isDark ? Colors.white70 : const Color(0xFF475569),
+                            fontSize: 12,
+                            height: 1.4,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.03),
+                            color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.03),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Row(
@@ -213,7 +244,11 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
                               Expanded(
                                 child: Text(
                                   'Impact: ${alert['impact']}',
-                                  style: const TextStyle(color: Color(0xFFC7D2FE), fontSize: 10.5, fontWeight: FontWeight.w500),
+                                  style: TextStyle(
+                                    color: isDark ? const Color(0xFFC7D2FE) : const Color(0xFF312E81),
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                             ],
@@ -270,20 +305,28 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
           if (_reroutingInProgress)
             Positioned.fill(
               child: Container(
-                color: Colors.black87,
-                child: const Column(
+                color: isDark ? Colors.black87 : Colors.white.withValues(alpha: 0.9),
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(color: Color(0xFF00B4D8)),
-                    SizedBox(height: 20),
+                    const CircularProgressIndicator(color: Color(0xFF00B4D8)),
+                    const SizedBox(height: 20),
                     Text(
                       'COMPUTING SAFE CLOUD PATHS...',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 2.0),
+                      style: TextStyle(
+                        color: AiraColors.textPrimary(isDark),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        letterSpacing: 2.0,
+                      ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
                       'Updating itinerary blocks with weather-proof indoor activities.',
-                      style: TextStyle(color: Colors.white54, fontSize: 10),
+                      style: TextStyle(
+                        color: AiraColors.textSecondary(isDark),
+                        fontSize: 10,
+                      ),
                     ),
                   ],
                 ),
@@ -294,3 +337,4 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
     );
   }
 }
+

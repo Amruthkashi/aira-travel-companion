@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class WikipediaSummary {
@@ -118,7 +119,7 @@ class WikipediaService {
 
       return null;
     } catch (e) {
-      print('Error fetching Wikipedia summary for $placeName: $e');
+      debugPrint('Error fetching Wikipedia summary for $placeName: $e');
       return null;
     }
   }

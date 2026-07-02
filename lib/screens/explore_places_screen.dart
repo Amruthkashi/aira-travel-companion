@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/providers/travel_providers.dart';
+import '../core/providers/theme_provider.dart';
 import '../core/models/travel_models.dart';
 import '../core/services/geoapify_service.dart';
 import '../core/services/foursquare_service.dart';
 import '../core/services/wikipedia_service.dart';
+import '../core/theme/app_theme.dart';
 
 class ExplorePlacesScreen extends ConsumerStatefulWidget {
   const ExplorePlacesScreen({super.key});
@@ -78,7 +80,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
         });
       }
     } catch (e) {
-      print('Error fetching Wikipedia summary in screen: $e');
+      debugPrint('Error fetching Wikipedia summary in screen: $e');
       if (mounted) {
         setState(() {
           _wikiLoading[placeId] = false;
@@ -223,7 +225,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
           throw Exception("Foursquare returned too few places (${fsqPlaces.length})");
         }
       } catch (fsqError) {
-        print("Foursquare fetch failed, falling back to Geoapify: $fsqError");
+        debugPrint("Foursquare fetch failed, falling back to Geoapify: $fsqError");
         // Fallback to Geoapify Places search
         try {
           final geoPlaces = await geoService.fetchNearbyPlaces(
@@ -238,7 +240,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
             throw Exception("Geoapify returned too few places (${geoPlaces.length})");
           }
         } catch (geoError) {
-          print("Geoapify fetch failed as well: $geoError");
+          debugPrint("Geoapify fetch failed as well: $geoError");
           rethrow;
         }
       }
@@ -271,7 +273,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
         _preloadWikipediaForActiveGenre();
       }
     } catch (e) {
-      print('Real-time Places Fetch Failed completely: $e');
+      debugPrint('Real-time Places Fetch Failed completely: $e');
       // Graceful fallback to generic places
       if (mounted) {
         setState(() {
@@ -286,19 +288,6 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
     }
   }
 
-  int _getGenreIndex(String genre) {
-    switch (genre) {
-      case 'Summer & Beach': return 0;
-      case 'Kids & Family': return 1;
-      case 'Religious': return 2;
-      case 'Adventure': return 3;
-      case 'Food & Culinary': return 4;
-      case 'Culture & History': return 5;
-      case 'Shopping': return 6;
-      case 'Nightlife': return 7;
-      default: return 0;
-    }
-  }
 
   Map<int, List<ExplorePlaceItem>> _buildPlacesData(String destination) {
     final cleanDest = destination.trim().toLowerCase();
@@ -873,6 +862,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
   }
 
   void _showScheduleToDayDialog(ExplorePlaceItem place) {
+    final isDark = ref.read(isDarkProvider);
     final bookings = ref.read(tripBookingsProvider);
     final numDays = bookings.tripDays;
     final startDateStr = bookings.startDate;
@@ -885,7 +875,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -900,20 +890,20 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                 child: Container(
                   width: 40, height: 5,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF334155),
+                    color: AiraColors.border(isDark),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'SCHEDULE TO DAY',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
+                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
               ),
               const SizedBox(height: 4),
               Text(
                 'Select a day to add and schedule ${place.name}',
-                style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
               ),
               const SizedBox(height: 20),
               Flexible(
@@ -935,10 +925,10 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                         height: 48,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1A2744),
+                            backgroundColor: AiraColors.cardBg(isDark),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: const BorderSide(color: Color(0xFF334155)),
+                              side: BorderSide(color: AiraColors.border(isDark)),
                             ),
                           ),
                           onPressed: () {
@@ -978,11 +968,14 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                           },
                           child: Row(
                             children: [
-                              const Icon(Icons.calendar_today, color: Color(0xFF60A5FA), size: 16),
+                              Icon(Icons.calendar_today, color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB), size: 16),
                               const SizedBox(width: 12),
                               Text(
                                 'Day ${idx + 1}$dateLabel',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  color: AiraColors.textPrimary(isDark),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const Spacer(),
                               const Icon(Icons.add_circle_outline, color: Color(0xFF10B981), size: 18),
@@ -1008,6 +1001,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(isDarkProvider);
     final selectedPlaces = ref.watch(selectedPlacesProvider);
     final activeLabel = _genres[_activeGenre]['label'] as String;
     final allPlaces = _placesByGenre[activeLabel] ?? [];
@@ -1041,19 +1035,19 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
 
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A1628),
+        backgroundColor: AiraColors.scaffoldBg(isDark),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: AiraColors.textPrimary(isDark)),
           onPressed: () => context.pop(),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Explore Places', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-            Text('STEP 2 — SELECT ATTRACTIONS', style: TextStyle(color: Color(0xFF00B4D8), fontWeight: FontWeight.w800, fontSize: 9, letterSpacing: 0.5)),
+            Text('Explore Places', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text('STEP 2 — SELECT ATTRACTIONS', style: TextStyle(color: Color(0xFF00B4D8), fontWeight: FontWeight.w800, fontSize: 9, letterSpacing: 0.5)),
           ],
         ),
         actions: [
@@ -1061,7 +1055,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF2563EB).withOpacity(0.15),
+              color: const Color(0xFF2563EB).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Row(
@@ -1082,13 +1076,13 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: Row(
               children: [
-                _stepDot(true, 'Bookings'),
-                _stepLine(true),
-                _stepDot(true, 'Explore'),
-                _stepLine(false),
-                _stepDot(false, 'Schedule'),
-                _stepLine(false),
-                _stepDot(false, 'Preview'),
+                _stepDot(true, 'Bookings', isDark),
+                _stepLine(true, isDark),
+                _stepDot(true, 'Explore', isDark),
+                _stepLine(false, isDark),
+                _stepDot(false, 'Schedule', isDark),
+                _stepLine(false, isDark),
+                _stepDot(false, 'Preview', isDark),
               ],
             ),
           ),
@@ -1113,14 +1107,14 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                     margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     decoration: BoxDecoration(
-                      color: active ? (genre['color'] as Color) : const Color(0xFF1A2744),
+                      color: active ? (genre['color'] as Color) : AiraColors.cardBg(isDark),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: active ? (genre['color'] as Color) : const Color(0xFF334155),
+                        color: active ? (genre['color'] as Color) : AiraColors.border(isDark),
                       ),
                       boxShadow: active ? [
                         BoxShadow(
-                          color: (genre['color'] as Color).withOpacity(0.3),
+                          color: (genre['color'] as Color).withValues(alpha: 0.3),
                           blurRadius: 8, offset: const Offset(0, 3),
                         ),
                       ] : null,
@@ -1129,12 +1123,12 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(genre['icon'] as IconData, size: 14,
-                          color: active ? Colors.white : const Color(0xFF94A3B8),
+                          color: active ? Colors.white : AiraColors.textSecondary(isDark),
                         ),
                         const SizedBox(width: 6),
                         Text(genre['label'] as String,
                           style: TextStyle(
-                            color: active ? Colors.white : const Color(0xFF94A3B8),
+                            color: active ? Colors.white : AiraColors.textSecondary(isDark),
                             fontWeight: FontWeight.bold, fontSize: 11,
                           ),
                         ),
@@ -1150,15 +1144,15 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: TextField(
               controller: _searchCtrl,
-              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 isDense: true,
                 hintText: 'Search places by name...',
-                hintStyle: const TextStyle(color: Colors.white30, fontSize: 13),
+                hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 13),
                 prefixIcon: const Icon(Icons.search, color: Color(0xFF60A5FA), size: 18),
                 suffixIcon: _searchCtrl.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white70, size: 16),
+                        icon: Icon(Icons.close, color: AiraColors.textSecondary(isDark), size: 16),
                         onPressed: () {
                           _searchCtrl.clear();
                           setState(() {
@@ -1168,11 +1162,11 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                       )
                     : null,
                 filled: true,
-                fillColor: const Color(0xFF1A2744),
+                fillColor: AiraColors.cardBg(isDark),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFF334155)),
+                  borderSide: BorderSide(color: AiraColors.border(isDark)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -1197,13 +1191,13 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text('${(genreInfo['label'] as String).toUpperCase()} IN ${_destinationName.toUpperCase()}',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text('${currentPlaces.length} places',
-                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 11, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -1216,9 +1210,9 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFF59E0B).withOpacity(0.15),
+                color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFF59E0B).withOpacity(0.3)),
+                border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -1235,24 +1229,24 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
             ),
           Expanded(
             child: _isLoading
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircularProgressIndicator(color: Color(0xFF2563EB)),
-                        SizedBox(height: 16),
+                        const CircularProgressIndicator(color: Color(0xFF2563EB)),
+                        const SizedBox(height: 16),
                         Text(
                           'Seeking best local attractions...',
-                          style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 13, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                   )
                 : currentPlaces.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No attractions found in this category.',
-                          style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 13),
                         ),
                       )
                     : ListView.builder(
@@ -1269,17 +1263,17 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.only(bottom: 14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A2744),
+                    color: AiraColors.cardBg(isDark),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isSelected
                           ? const Color(0xFF10B981)
-                          : const Color(0xFF334155),
+                          : AiraColors.border(isDark),
                       width: isSelected ? 2 : 1,
                     ),
                     boxShadow: isSelected ? [
                       BoxShadow(
-                        color: const Color(0xFF10B981).withOpacity(0.15),
+                        color: const Color(0xFF10B981).withValues(alpha: 0.15),
                         blurRadius: 12, offset: const Offset(0, 4),
                       ),
                     ] : null,
@@ -1299,20 +1293,20 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                     fit: BoxFit.cover,
                                     errorBuilder: (ctx, err, st) => Container(
                                       height: 150,
-                                      color: (genreInfo['color'] as Color).withOpacity(0.2),
+                                      color: (genreInfo['color'] as Color).withValues(alpha: 0.2),
                                       child: Center(
                                         child: Icon(genreInfo['icon'] as IconData,
-                                          size: 48, color: (genreInfo['color'] as Color).withOpacity(0.5),
+                                          size: 48, color: (genreInfo['color'] as Color).withValues(alpha: 0.5),
                                         ),
                                       ),
                                     ),
                                   )
                                 : Container(
                                     height: 150, width: double.infinity,
-                                    color: (genreInfo['color'] as Color).withOpacity(0.2),
+                                    color: (genreInfo['color'] as Color).withValues(alpha: 0.2),
                                     child: Center(
                                       child: Icon(genreInfo['icon'] as IconData,
-                                        size: 48, color: (genreInfo['color'] as Color).withOpacity(0.5),
+                                        size: 48, color: (genreInfo['color'] as Color).withValues(alpha: 0.5),
                                       ),
                                     ),
                                   ),
@@ -1326,7 +1320,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                 gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
-                                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
                                 ),
                               ),
                             ),
@@ -1337,7 +1331,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.6),
+                                color: Colors.black.withValues(alpha: 0.6),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
@@ -1398,7 +1392,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(place.name,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                             const SizedBox(height: 6),
                             Row(
@@ -1413,7 +1407,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                             const SizedBox(height: 10),
                             Text(
                               wiki?.description ?? place.description,
-                              style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.4),
+                              style: TextStyle(color: AiraColors.textPrimary(isDark).withValues(alpha: 0.7), fontSize: 12, height: 1.4),
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1450,9 +1444,9 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                     return Container(
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF0F172A),
+                                        color: AiraColors.surfaceElevated(isDark),
                                         borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: const Color(0xFF334155).withOpacity(0.5)),
+                                        border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.5)),
                                       ),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1462,9 +1456,9 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                               Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                                 decoration: BoxDecoration(
-                                                  color: const Color(0xFF2563EB).withOpacity(0.15),
+                                                  color: const Color(0xFF2563EB).withValues(alpha: 0.15),
                                                   borderRadius: BorderRadius.circular(6),
-                                                  border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.3)),
+                                                  border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: 0.3)),
                                                 ),
                                                 child: const Row(
                                                   mainAxisSize: MainAxisSize.min,
@@ -1500,8 +1494,8 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                                   children: [
                                                     Text(
                                                       wiki.title,
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
+                                                      style: TextStyle(
+                                                        color: AiraColors.textPrimary(isDark),
                                                         fontWeight: FontWeight.bold,
                                                         fontSize: 13,
                                                       ),
@@ -1509,8 +1503,8 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                                     const SizedBox(height: 6),
                                                     Text(
                                                       wiki.description,
-                                                      style: const TextStyle(
-                                                        color: Color(0xFFCBD5E1),
+                                                      style: TextStyle(
+                                                        color: AiraColors.textSecondary(isDark),
                                                         fontSize: 12,
                                                         height: 1.4,
                                                       ),
@@ -1530,7 +1524,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                                     width: 70,
                                                     height: 70,
                                                     fit: BoxFit.cover,
-                                                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                                                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
                                                   ),
                                                 ),
                                               ],
@@ -1543,7 +1537,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                 ),
                               ] else ...[
                                 Text(place.description,
-                                  style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.4),
+                                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12, height: 1.4),
                                 ),
                               ],
                             ],
@@ -1704,8 +1698,8 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF0F2847),
-              border: Border(top: BorderSide(color: const Color(0xFF334155).withOpacity(0.5))),
+              color: isDark ? const Color(0xFF0F2847) : Colors.white,
+              border: Border(top: BorderSide(color: AiraColors.border(isDark).withValues(alpha: 0.5))),
             ),
             child: SafeArea(
               top: false,
@@ -1714,7 +1708,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withOpacity(0.15),
+                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -1736,7 +1730,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                         style: ElevatedButton.styleFrom(
                           backgroundColor: selectedPlaces.isNotEmpty
                               ? const Color(0xFF2563EB)
-                              : const Color(0xFF334155),
+                              : AiraColors.border(isDark),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         onPressed: selectedPlaces.isNotEmpty ? () {
@@ -1775,7 +1769,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
@@ -1789,22 +1783,22 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
     );
   }
 
-  Widget _stepDot(bool active, String label) {
+  Widget _stepDot(bool active, String label, bool isDark) {
     return Expanded(
       child: Column(
         children: [
           Container(
             width: 24, height: 24,
             decoration: BoxDecoration(
-              color: active ? const Color(0xFF2563EB) : const Color(0xFF1A2744),
+              color: active ? const Color(0xFF2563EB) : AiraColors.cardBg(isDark),
               shape: BoxShape.circle,
-              border: Border.all(color: active ? const Color(0xFF2563EB) : const Color(0xFF334155), width: 2),
+              border: Border.all(color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark), width: 2),
             ),
             child: active ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
           ),
           const SizedBox(height: 4),
           Text(label, style: TextStyle(
-            color: active ? const Color(0xFF60A5FA) : const Color(0xFF64748B),
+            color: active ? const Color(0xFF60A5FA) : AiraColors.textMuted(isDark),
             fontSize: 9, fontWeight: FontWeight.bold,
           )),
         ],
@@ -1812,12 +1806,12 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
     );
   }
 
-  Widget _stepLine(bool active) {
+  Widget _stepLine(bool active, bool isDark) {
     return Expanded(
       child: Container(
         height: 2,
         margin: const EdgeInsets.only(bottom: 16),
-        color: active ? const Color(0xFF2563EB) : const Color(0xFF334155),
+        color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark),
       ),
     );
   }

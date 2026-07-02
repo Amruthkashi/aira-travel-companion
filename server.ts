@@ -41,7 +41,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // Custom Groq API Client adapter to mimic Google GenAI client structure
-class GroqClient {
+class OpenAiCompatibleClient {
   public models: {
     generateContent: (options: {
       model: string;
@@ -54,8 +54,7 @@ class GroqClient {
     }) => Promise<{ text: string }>;
   };
 
-  constructor(apiKey: string) {
-    const baseUrl = "https://api.groq.com/openai/v1/chat/completions";
+  constructor(apiKey: string, baseUrl: string, defaultModel: string) {
     this.models = {
       generateContent: async (options) => {
         const messages: any[] = [];
@@ -84,10 +83,8 @@ class GroqClient {
           }
         }
 
-        const groqModel = "llama-3.3-70b-versatile";
-
         const body: any = {
-          model: groqModel,
+          model: defaultModel,
           messages: messages,
           temperature: options.config?.temperature ?? 0.7,
         };
@@ -107,7 +104,7 @@ class GroqClient {
 
         if (!res.ok) {
           const errorText = await res.text();
-          throw new Error(`Groq API Error (${res.status}): ${errorText}`);
+          throw new Error(`API Error (${res.status}): ${errorText}`);
         }
 
         const data = await res.json();
@@ -118,15 +115,18 @@ class GroqClient {
   }
 }
 
-// Initialize AI Client (Gemini or Groq fallback)
+// Initialize AI Client (Gemini, Groq, or xAI Grok fallback)
 let ai: any = null;
-const apiKey = process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY || process.env.GROQ_API_KEY;
 
 if (apiKey && apiKey !== 'MY_GEMINI_API_KEY' && apiKey.trim() !== '') {
   try {
     if (apiKey.startsWith('gsk_')) {
-      ai = new GroqClient(apiKey);
+      ai = new OpenAiCompatibleClient(apiKey, "https://api.groq.com/openai/v1/chat/completions", "llama-3.3-70b-versatile");
       console.log('Groq AI Client successfully initialized using key from .env.');
+    } else if (apiKey.startsWith('xai-')) {
+      ai = new OpenAiCompatibleClient(apiKey, "https://api.x.ai/v1/chat/completions", "grok-beta");
+      console.log('xAI Grok Client successfully initialized using key from .env.');
     } else {
       ai = new GoogleGenAI({
         apiKey: apiKey,
@@ -547,7 +547,7 @@ Response Format:
 `;
 
     const response = await ai!.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -2030,7 +2030,7 @@ Response Format:
 `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -2118,7 +2118,7 @@ Response format:
 `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -2287,7 +2287,7 @@ app.get('/api/status', (req, res) => {
     geminiConfigured: !!ai,
     rateLimited: isRateLimited(),
     rateLimitResetsInSeconds: remaining,
-    model: 'gemini-2.0-flash',
+    model: 'gemini-3.5-flash',
   });
 });
 
@@ -2425,7 +2425,7 @@ Return ONLY a valid JSON array of objects with these fields: activity, descripti
 
   try {
     const result = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -2496,7 +2496,7 @@ Keep your answers helpful, friendly, conversational, concise (max 3-4 sentences)
     }));
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash',
       contents: contents,
       config: {
         systemInstruction: systemPrompt,
@@ -2506,14 +2506,7 @@ Keep your answers helpful, friendly, conversational, concise (max 3-4 sentences)
 
     res.json({ text: response.text });
   } catch (error: any) {
-    // Handle 429 rate limit — engage circuit breaker
-    if (error?.status === 429) {
-      const retryMatch = JSON.stringify(error).match(/retryDelay[":\s]+([0-9]+)/);
-      const retrySeconds = retryMatch ? parseInt(retryMatch[1]) + 30 : 120;
-      markRateLimited(retrySeconds);
-    } else {
-      console.error('Error contacting Gemini API:', error?.message || error);
-    }
+    console.error('FULL ERROR FROM GEMINI API CALL:', error);
     // Always return a smart personalized fallback instead of 500
     const fallbackResponse = generateSmartChatFallback(lastMessage, name, style, preferences, activeProfile);
     res.json({ text: fallbackResponse });
@@ -2532,7 +2525,7 @@ app.post('/api/translate', async (req, res) => {
   try {
     if (ai) {
       const result = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-3.5-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/models/travel_models.dart';
 import '../core/services/geoapify_service.dart';
@@ -256,7 +258,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
         _searchingHotels = false;
       });
     } catch (e) {
-      print('Hotel search error, falling back: $e');
+      debugPrint('Hotel search error, falling back: $e');
       setState(() {
         _searchedHotels = _generateMockHotels(cityQuery);
         _searchingHotels = false;
@@ -294,7 +296,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
         _searchingCruises = false;
       });
     } catch (e) {
-      print('Cruise search error, falling back: $e');
+      debugPrint('Cruise search error, falling back: $e');
       setState(() {
         _searchedCruises = _generateMockCruises(cityQuery);
         _searchingCruises = false;
@@ -307,6 +309,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
     final TextEditingController nightsCtrl = TextEditingController(text: '3');
     final TextEditingController guestsCtrl = TextEditingController(text: '2');
     DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
+    final isDark = ref.read(isDarkProvider);
 
     showDialog(
       context: context,
@@ -314,8 +317,8 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF0F172A),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: Color(0xFF334155))),
+              backgroundColor: AiraColors.dialogBg(isDark),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: AiraColors.border(isDark))),
               title: Row(
                 children: [
                   Icon(category == 'Hotels' ? Icons.hotel_rounded : Icons.directions_boat_rounded, color: const Color(0xFF2563EB), size: 24),
@@ -323,7 +326,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                   Expanded(
                     child: Text(
                       'BOOK ${category.toUpperCase()}',
-                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                      style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0),
                     ),
                   ),
                 ],
@@ -333,18 +336,18 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                    Text(item.name, style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13)),
                     const SizedBox(height: 4),
-                    Text(item.address, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10.5)),
-                    const Divider(height: 20, color: Color(0xFF334155)),
+                    Text(item.address, style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10.5)),
+                    Divider(height: 20, color: AiraColors.border(isDark)),
                     
-                    const Text('Guest Name', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                    Text('Guest Name', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 6),
                     TextField(
                       controller: nameCtrl,
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12),
                       decoration: InputDecoration(
-                        fillColor: Colors.white10,
+                        fillColor: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
                         filled: true,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -358,14 +361,14 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(category == 'Hotels' ? 'Nights' : 'Tickets', style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                              Text(category == 'Hotels' ? 'Nights' : 'Tickets', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
                               TextField(
                                 controller: nightsCtrl,
                                 keyboardType: TextInputType.number,
-                                style: const TextStyle(color: Colors.white, fontSize: 12),
+                                style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12),
                                 decoration: InputDecoration(
-                                  fillColor: Colors.white10,
+                                  fillColor: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
                                   filled: true,
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -379,14 +382,14 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Guests', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                              Text('Guests', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
                               TextField(
                                 controller: guestsCtrl,
                                 keyboardType: TextInputType.number,
-                                style: const TextStyle(color: Colors.white, fontSize: 12),
+                                style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12),
                                 decoration: InputDecoration(
-                                  fillColor: Colors.white10,
+                                  fillColor: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
                                   filled: true,
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -399,7 +402,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                     ),
                     const SizedBox(height: 12),
                     
-                    const Text('Departure / Check-in Date', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                    Text('Departure / Check-in Date', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 6),
                     GestureDetector(
                       onTap: () async {
@@ -410,12 +413,21 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                           lastDate: DateTime.now().add(const Duration(days: 365)),
                           builder: (context, child) {
                             return Theme(
-                              data: Theme.of(context).copyWith(
-                                colorScheme: const ColorScheme.dark(
-                                  primary: Color(0xFF2563EB),
-                                  surface: Color(0xFF0F172A),
-                                ),
-                              ),
+                              data: isDark
+                                  ? ThemeData.dark().copyWith(
+                                      colorScheme: const ColorScheme.dark(
+                                        primary: Color(0xFF2563EB),
+                                        surface: Color(0xFF0A1628),
+                                        onSurface: Colors.white,
+                                      ),
+                                    )
+                                  : ThemeData.light().copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: Color(0xFF2563EB),
+                                        surface: Colors.white,
+                                        onSurface: Colors.black87,
+                                      ),
+                                    ),
                               child: child!,
                             );
                           },
@@ -429,7 +441,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         decoration: BoxDecoration(
-                          color: Colors.white10,
+                          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
@@ -437,9 +449,9 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                           children: [
                             Text(
                               '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
-                              style: const TextStyle(color: Colors.white, fontSize: 12),
+                              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12),
                             ),
-                            const Icon(Icons.calendar_today, color: Color(0xFF94A3B8), size: 14),
+                            Icon(Icons.calendar_today, color: AiraColors.textSecondary(isDark), size: 14),
                           ],
                         ),
                       ),
@@ -450,7 +462,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel', style: TextStyle(color: Color(0xFF94A3B8))),
+                  child: Text('Cancel', style: TextStyle(color: AiraColors.textSecondary(isDark))),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB)),
@@ -474,7 +486,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                     Navigator.pop(context);
                     
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      backgroundColor: const Color(0xFF0F172A),
+                      backgroundColor: AiraColors.dialogBg(isDark),
                       content: Row(
                         children: [
                           const Icon(Icons.check_circle, color: Colors.green, size: 18),
@@ -482,7 +494,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                           Expanded(
                             child: Text(
                               'Successfully booked ${item.name}! logged in budget.',
-                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -504,6 +516,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
   @override
   Widget build(BuildContext context) {
     final expenses = ref.watch(expensesProvider);
+    final isDark = ref.watch(isDarkProvider);
     
     final bookedFlights = expenses.where((e) => e.category == 'Flights').toList();
     final bookedHotels = expenses.where((e) => e.category == 'Hotels').toList();
@@ -511,35 +524,35 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
     final bookedBuses = expenses.where((e) => e.category == 'Bus' || (e.category == 'Commute' && e.label.contains('Bus'))).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A2744),
+        backgroundColor: AiraColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('Unified Bookings Hub', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        title: Text('Unified Bookings Hub', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 16)),
       ),
       body: Column(
         children: [
           // Sub-Tab Switcher
           Container(
-            color: const Color(0xFF1A2744),
+            color: AiraColors.cardBg(isDark),
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _tabItem('flights', '✈️ Flights', bookedFlights.isNotEmpty),
+                  _tabItem('flights', '✈️ Flights', bookedFlights.isNotEmpty, isDark),
                   const SizedBox(width: 8),
-                  _tabItem('hotels', '🏨 Stays', bookedHotels.isNotEmpty),
+                  _tabItem('hotels', '🏨 Stays', bookedHotels.isNotEmpty, isDark),
                   const SizedBox(width: 8),
-                  _tabItem('cruise', '🚢 Cruises', bookedCruises.isNotEmpty),
+                  _tabItem('cruise', '🚢 Cruises', bookedCruises.isNotEmpty, isDark),
                   const SizedBox(width: 8),
-                  _tabItem('bus', '🚌 Bus Stops', bookedBuses.isNotEmpty),
+                  _tabItem('bus', '🚌 Bus Stops', bookedBuses.isNotEmpty, isDark),
                   const SizedBox(width: 8),
-                  _tabItem('cabs', '🚕 Cab Dispatch', _cabDispatched),
+                  _tabItem('cabs', '🚕 Cab Dispatch', _cabDispatched, isDark),
                   const SizedBox(width: 8),
-                  _tabItem('tickets', '🎫 Tickets', true),
+                  _tabItem('tickets', '🎫  Tickets', true, isDark),
                 ],
               ),
             ),
@@ -548,7 +561,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
-              child: _buildActiveTabContent(bookedFlights, bookedHotels),
+              child: _buildActiveTabContent(bookedFlights, bookedHotels, isDark),
             ),
           ),
         ],
@@ -556,7 +569,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
     );
   }
 
-  Widget _tabItem(String tabId, String label, bool activeIndicator) {
+  Widget _tabItem(String tabId, String label, bool activeIndicator, bool isDark) {
     final isSelected = _activeTab == tabId;
     return ChoiceChip(
       label: Row(
@@ -572,26 +585,26 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
       selected: isSelected,
       onSelected: (_) => setState(() => _activeTab = tabId),
       selectedColor: const Color(0xFF2563EB),
-      backgroundColor: const Color(0xFF0A1628),
-      disabledColor: const Color(0xFF0A1628),
-      side: BorderSide(color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF334155)),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
+      disabledColor: AiraColors.scaffoldBg(isDark),
+      side: BorderSide(color: isSelected ? const Color(0xFF2563EB) : AiraColors.border(isDark)),
       labelStyle: TextStyle(
         fontSize: 11,
-        color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+        color: isSelected ? Colors.white : AiraColors.textSecondary(isDark),
         fontWeight: FontWeight.bold,
       ),
     );
   }
 
-  Widget _buildActiveTabContent(List<TravelExpense> flights, List<TravelExpense> hotels) {
+  Widget _buildActiveTabContent(List<TravelExpense> flights, List<TravelExpense> hotels, bool isDark) {
     final expenses = ref.watch(expensesProvider);
 
     if (_activeTab == 'flights') {
       if (flights.isEmpty) {
-        return _buildEmptyState('No Flight reservations found.', 'Browse outbound flight packages and book one to register.', '/flights');
+        return _buildEmptyState('No Flight reservations found.', 'Browse outbound flight packages and book one to register.', '/flights', isDark);
       }
       return Column(
-        children: flights.map((f) => _buildBookingCard(f.label, 'Class: Economy • Gate: Terminal 1', Icons.flight_takeoff)).toList(),
+        children: flights.map((f) => _buildBookingCard(f.label, 'Class: Economy • Gate: Terminal 1', Icons.flight_takeoff, isDark)).toList(),
       );
     }
 
@@ -610,15 +623,15 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
               Expanded(
                 child: TextField(
                   controller: _hotelSearchCtrl,
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13),
                   decoration: InputDecoration(
                     hintText: 'Enter city (e.g. London, Singapore, Tokyo)',
-                    hintStyle: const TextStyle(color: Colors.white30, fontSize: 13),
-                    fillColor: const Color(0xFF1A2744),
+                    hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 13),
+                    fillColor: AiraColors.cardBg(isDark),
                     filled: true,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF334155)),
+                      borderSide: BorderSide(color: AiraColors.border(isDark)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -627,7 +640,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     suffixIcon: _hotelSearchCtrl.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, color: Colors.white30, size: 16),
+                            icon: Icon(Icons.clear, color: AiraColors.textMuted(isDark), size: 16),
                             onPressed: () {
                               _hotelSearchCtrl.clear();
                               setState(() {
@@ -664,7 +677,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                   children: [
                     CircularProgressIndicator(color: Color(0xFF00B4D8)),
                     SizedBox(height: 10),
-                    Text('Searching hotels...', style: TextStyle(color: Colors.white60, fontSize: 11)),
+                    Text('Searching hotels...', style: TextStyle(color: Color(0xFF00B4D8), fontSize: 11)),
                   ],
                 ),
               ),
@@ -675,7 +688,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: Colors.redAccent.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
                 child: Text(_hotelSearchError!, style: const TextStyle(color: Colors.redAccent, fontSize: 11)),
               ),
             ),
@@ -683,24 +696,24 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
           if (_searchedHotels.isNotEmpty) ...[
             Text(
               'REAL HOTELS IN ${_hotelSearchCity?.toUpperCase()}',
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white54),
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: AiraColors.textSecondary(isDark)),
             ),
             const SizedBox(height: 10),
-            ..._searchedHotels.map((hotel) => _buildApiPlaceSearchCard(hotel, 'Hotels')),
+            ..._searchedHotels.map((hotel) => _buildApiPlaceSearchCard(hotel, 'Hotels', isDark)),
             const SizedBox(height: 16),
           ],
 
           // Confirmed Stays Section
           const Text(
             'CONFIRMED RESERVATIONS',
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: Colors.white70),
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: Color(0xFF00B4D8)),
           ),
           const SizedBox(height: 10),
           if (hotels.isEmpty)
-            _buildEmptyState('No hotel lodgings confirmed yet.', 'Search a city above and book a stay, or register an external stay.', '/hotels')
+            _buildEmptyState('No hotel lodgings confirmed yet.', 'Search a city above and book a stay, or register an external stay.', '/hotels', isDark)
           else
             Column(
-              children: hotels.map((h) => _buildBookingCard(h.label, 'Scheduled: ${h.date} • Secured Room', Icons.hotel)).toList(),
+              children: hotels.map((h) => _buildBookingCard(h.label, 'Scheduled: ${h.date} • Secured Room', Icons.hotel, isDark)).toList(),
             ),
         ],
       );
@@ -722,24 +735,24 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
               Expanded(
                 child: TextField(
                   controller: _cruiseSearchCtrl,
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13),
                   decoration: InputDecoration(
                     hintText: 'Enter coastal city (e.g. Miami, Singapore, Yokohama)',
-                    hintStyle: const TextStyle(color: Colors.white30, fontSize: 13),
-                    fillColor: const Color(0xFF1A2744),
+                    hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 13),
+                    fillColor: AiraColors.cardBg(isDark),
                     filled: true,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF334155)),
+                      borderSide: BorderSide(color: AiraColors.border(isDark)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF2563EB)),
+                      borderSide: BorderSide(color: Color(0xFF2563EB)),
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     suffixIcon: _cruiseSearchCtrl.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, color: Colors.white30, size: 16),
+                            icon: Icon(Icons.clear, color: AiraColors.textMuted(isDark), size: 16),
                             onPressed: () {
                               _cruiseSearchCtrl.clear();
                               setState(() {
@@ -776,7 +789,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                   children: [
                     CircularProgressIndicator(color: Color(0xFF00B4D8)),
                     SizedBox(height: 10),
-                    Text('Searching coastal routes and cruises near port...', style: TextStyle(color: Colors.white60, fontSize: 11)),
+                    Text('Searching coastal routes and cruises near port...', style: TextStyle(color: Color(0xFF00B4D8), fontSize: 11)),
                   ],
                 ),
               ),
@@ -787,7 +800,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: Colors.redAccent.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
                 child: Text(_cruiseSearchError!, style: const TextStyle(color: Colors.redAccent, fontSize: 11)),
               ),
             ),
@@ -795,21 +808,21 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
           if (_searchedCruises.isNotEmpty) ...[
             Text(
               'CRUISES & PORTS IN ${_cruiseSearchCity?.toUpperCase()}',
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white54),
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: AiraColors.textSecondary(isDark)),
             ),
             const SizedBox(height: 10),
-            ..._searchedCruises.map((cruise) => _buildApiPlaceSearchCard(cruise, 'Cruise')),
+            ..._searchedCruises.map((cruise) => _buildApiPlaceSearchCard(cruise, 'Cruise', isDark)),
             const SizedBox(height: 16),
           ],
 
           // Confirmed cruises
           const Text(
             'CONFIRMED CRUISE EXPEDITIONS',
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: Colors.white70),
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: Color(0xFF00B4D8)),
           ),
           const SizedBox(height: 10),
           if (cruiseExpenses.isEmpty && !_bookingAnotherCruise) ...[
-            _buildEmptyState('No cruise expeditions confirmed yet.', 'Search a port city above or select from default packages.', ''),
+            _buildEmptyState('No cruise expeditions confirmed yet.', 'Search a port city above or select from default packages.', '', isDark),
             const SizedBox(height: 12),
             OutlinedButton(
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF2563EB))),
@@ -824,7 +837,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('MOCK OFFERS SELECTOR', style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold)),
+                Text('MOCK OFFERS SELECTOR', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold)),
                 TextButton(
                   onPressed: () => setState(() => _bookingAnotherCruise = false),
                   child: const Text('Back to search', style: TextStyle(color: Color(0xFF00B4D8), fontSize: 11)),
@@ -838,9 +851,9 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A2744),
+                  color: AiraColors.cardBg(isDark),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF334155), width: isSelected ? 2 : 1),
+                  border: Border.all(color: isSelected ? const Color(0xFF2563EB) : AiraColors.border(isDark), width: isSelected ? 2 : 1),
                 ),
                 child: Row(
                   children: [
@@ -850,8 +863,8 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(c['type'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white)),
-                          Text('Duration: ${c['duration']}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                          Text(c['type'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AiraColors.textPrimary(isDark))),
+                          Text('Duration: ${c['duration']}', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10)),
                         ],
                       ),
                     ),
@@ -895,7 +908,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
               ),
             ]
           ] else ...[
-            ...cruiseExpenses.map((c) => _buildBookingCard(c.label, 'Scheduled: ${c.date} • Port Terminal Entrance', Icons.directions_boat)),
+            ...cruiseExpenses.map((c) => _buildBookingCard(c.label, 'Scheduled: ${c.date} • Port Terminal Entrance', Icons.directions_boat, isDark)),
             const SizedBox(height: 12),
             OutlinedButton(
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF2563EB))),
@@ -915,7 +928,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
       if (busExpenses.isNotEmpty && !_bookingAnotherBus) {
         return Column(
           children: [
-            ...busExpenses.map((b) => _buildBookingCard(b.label, 'Status: Confirmed • Seat: Row 5', Icons.directions_bus)),
+            ...busExpenses.map((b) => _buildBookingCard(b.label, 'Status: Confirmed • Seat: Row 5', Icons.directions_bus, isDark)),
             const SizedBox(height: 12),
             OutlinedButton(
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF2563EB))),
@@ -932,7 +945,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('SELECT BUS BLOCK COMMUTE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white70)),
+          const Text('SELECT BUS BLOCK COMMUTE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Color(0xFF00B4D8))),
           const SizedBox(height: 10),
           ..._busOptions.map((b) {
             final isSelected = _selectedBusType == b['type'];
@@ -940,9 +953,9 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A2744),
+                color: AiraColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF334155), width: isSelected ? 2 : 1),
+                border: Border.all(color: isSelected ? const Color(0xFF2563EB) : AiraColors.border(isDark), width: isSelected ? 2 : 1),
               ),
               child: Row(
                 children: [
@@ -952,8 +965,8 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(b['type'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white)),
-                        Text('Details: ${b['duration']}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                        Text(b['type'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AiraColors.textPrimary(isDark))),
+                        Text('Details: ${b['duration']}', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10)),
                       ],
                     ),
                   ),
@@ -1007,23 +1020,23 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A2744),
+            color: AiraColors.cardBg(isDark),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFF334155)),
+            border: Border.all(color: AiraColors.border(isDark)),
           ),
           child: Column(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 28,
-                backgroundColor: Color(0xFF1E293B),
-                child: Icon(Icons.airport_shuttle, color: Color(0xFF00B4D8), size: 32),
+                backgroundColor: isDark ? const Color(0xFF1A2744) : const Color(0xFFE2E8F0),
+                child: const Icon(Icons.airport_shuttle, color: Color(0xFF00B4D8), size: 32),
               ),
               const SizedBox(height: 16),
-              const Text('TAXI EN ROUTE', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
+              Text('TAXI EN ROUTE', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark))),
               const SizedBox(height: 6),
               Text(
                 '$_selectedCabType has been dispatched to Famous Scramble Crossing. Estimated ETA: 4 mins.',
-                style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+                style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -1043,7 +1056,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('DISPATCH LOCAL AIRA TAXI', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white70)),
+          const Text('DISPATCH LOCAL AIRA TAXI', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Color(0xFF00B4D8))),
           const SizedBox(height: 10),
           ..._cabOptions.map((cab) {
             final isSelected = _selectedCabType == cab['type'];
@@ -1051,9 +1064,9 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A2744),
+                color: AiraColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF334155), width: isSelected ? 2 : 1),
+                border: Border.all(color: isSelected ? const Color(0xFF2563EB) : AiraColors.border(isDark), width: isSelected ? 2 : 1),
               ),
               child: Row(
                 children: [
@@ -1063,8 +1076,8 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(cab['type'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white)),
-                        Text('ETA: ${cab['eta']}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                        Text(cab['type'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AiraColors.textPrimary(isDark))),
+                        Text('ETA: ${cab['eta']}', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10)),
                       ],
                     ),
                   ),
@@ -1116,23 +1129,23 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('ACTIVE LANDMARK PASSES', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white70)),
+        const Text('ACTIVE LANDMARK PASSES', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Color(0xFF00B4D8))),
         const SizedBox(height: 10),
         ..._landmarkTickets.map((t) {
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: const Color(0xFF1A2744), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFF334155))),
+            decoration: BoxDecoration(color: AiraColors.cardBg(isDark), borderRadius: BorderRadius.circular(16), border: Border.all(color: AiraColors.border(isDark))),
             child: Row(
               children: [
-                const Icon(Icons.qr_code_2, color: Colors.white, size: 40),
+                Icon(Icons.qr_code_2, color: AiraColors.textPrimary(isDark), size: 40),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(t['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white)),
-                      Text('Scheduled: ${t['time']} • code: ${t['code']}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                      Text(t['name'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AiraColors.textPrimary(isDark))),
+                      Text('Scheduled: ${t['time']} • code: ${t['code']}', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10)),
                     ],
                   ),
                 ),
@@ -1149,15 +1162,15 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
     );
   }
 
-  Widget _buildBookingCard(String title, String details, IconData icon) {
+  Widget _buildBookingCard(String title, String details, IconData icon, bool isDark) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF334155)),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 6)],
+        border: Border.all(color: AiraColors.border(isDark)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.05), blurRadius: 6)],
       ),
       child: Row(
         children: [
@@ -1167,9 +1180,9 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white)),
+                Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AiraColors.textPrimary(isDark))),
                 const SizedBox(height: 2),
-                Text(details, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                Text(details, style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10)),
               ],
             ),
           ),
@@ -1178,18 +1191,18 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
     );
   }
 
-  Widget _buildEmptyState(String msg, String cta, String route) {
+  Widget _buildEmptyState(String msg, String cta, String route, bool isDark) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(color: const Color(0xFF1A2744), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFF334155))),
+      decoration: BoxDecoration(color: AiraColors.cardBg(isDark), borderRadius: BorderRadius.circular(20), border: Border.all(color: AiraColors.border(isDark))),
       child: Column(
         children: [
-          const Icon(Icons.info_outline, color: Color(0xFF94A3B8), size: 32),
+          Icon(Icons.info_outline, color: AiraColors.textSecondary(isDark), size: 32),
           const SizedBox(height: 12),
-          Text(msg, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white)),
+          Text(msg, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AiraColors.textPrimary(isDark))),
           const SizedBox(height: 4),
-          Text(cta, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10), textAlign: TextAlign.center),
+          Text(cta, style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10), textAlign: TextAlign.center),
           const SizedBox(height: 16),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB)),
@@ -1201,16 +1214,16 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
     );
   }
 
-  Widget _buildApiPlaceSearchCard(ExplorePlaceItem item, String category) {
+  Widget _buildApiPlaceSearchCard(ExplorePlaceItem item, String category, bool isDark) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: AiraColors.border(isDark)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           )
@@ -1230,8 +1243,8 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     height: 140,
-                    color: const Color(0xFF0F172A),
-                    child: const Icon(Icons.image_not_supported, color: Colors.white24, size: 40),
+                    color: AiraColors.scaffoldBg(isDark),
+                    child: Icon(Icons.image_not_supported, color: AiraColors.textMuted(isDark), size: 40),
                   ),
                 ),
               ),
@@ -1241,7 +1254,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -1266,7 +1279,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
               children: [
                 Text(
                   item.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AiraColors.textPrimary(isDark)),
                 ),
                 const SizedBox(height: 4),
                 Row(
@@ -1276,17 +1289,17 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                     Expanded(
                       child: Text(
                         item.address,
-                        style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10.5),
+                        style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10.5),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                const Divider(height: 20, color: Color(0xFF334155)),
+                Divider(height: 20, color: AiraColors.border(isDark)),
                 Text(
                   item.description,
-                  style: const TextStyle(fontSize: 11, color: Colors.white70, height: 1.45),
+                  style: TextStyle(fontSize: 11, color: AiraColors.textSecondary(isDark), height: 1.45),
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -1301,7 +1314,7 @@ class _BookingsHubScreenState extends ConsumerState<BookingsHubScreen> {
                         ),
                         Text(
                           category == 'Hotels' ? 'Estimated price / night' : 'Estimated ticket price',
-                          style: const TextStyle(fontSize: 9, color: Color(0xFF94A3B8)),
+                          style: TextStyle(fontSize: 9, color: AiraColors.textMuted(isDark)),
                         ),
                       ],
                     ),

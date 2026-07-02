@@ -1,19 +1,22 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/services/ai_service.dart';
 import '../core/utils/sound_synthesizer.dart';
 import '../core/utils/tts_helper.dart';
 
-class TranslatorScreen extends StatefulWidget {
+class TranslatorScreen extends ConsumerStatefulWidget {
   const TranslatorScreen({super.key});
 
   @override
-  State<TranslatorScreen> createState() => _TranslatorScreenState();
+  ConsumerState<TranslatorScreen> createState() => _TranslatorScreenState();
 }
 
-class _TranslatorScreenState extends State<TranslatorScreen> {
+class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
   String _sourceLang = 'English';
   String _targetLang = 'Japanese';
   String _activeCategory = 'Dining';
@@ -96,7 +99,7 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
         {'eng': 'How much is this?', 'tr': '¿Cuánto cuesta esto?', 'rom': 'Kwan-toh kwes-tah es-toh?'},
       ],
       'German': [
-        {'eng': 'How much is this?', 'tr': 'Wie viel kostet das?', 'rom': 'Vee feel kos-tet dahs?'},
+        {'eng': 'How much is this?', 'tr': 'Wie viel kostet das?', 'rom': 'Wie feel kos-tet das?'},
       ],
       'Italian': [
         {'eng': 'How much is this?', 'tr': 'Quanto costa questo?', 'rom': 'Kwan-toh kos-tah kwes-toh?'},
@@ -178,7 +181,7 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
         }
       });
     } catch (e) {
-      print('TTS execution failed: $e');
+      debugPrint('TTS execution failed: $e');
       if (mounted) {
         setState(() => _ttsPlaying = false);
       }
@@ -236,15 +239,23 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
   @override
   Widget build(BuildContext context) {
     final phraseList = _phrasebook[_activeCategory]?[_targetLang] ?? [];
+    final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A2744),
+        backgroundColor: AiraColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('Real-Time AI Translator', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        title: Text(
+          'Real-Time AI Translator',
+          style: TextStyle(
+            color: AiraColors.textPrimary(isDark),
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -255,40 +266,45 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A2744),
+                color: AiraColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF334155)),
+                border: Border.all(color: AiraColors.border(isDark)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   DropdownButton<String>(
                     value: _sourceLang,
-                    dropdownColor: const Color(0xFF1A2744),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    dropdownColor: AiraColors.cardBg(isDark),
+                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold),
                     underline: const SizedBox(),
                     onChanged: (v) => setState(() => _sourceLang = v!),
-                    items: const [DropdownMenuItem(value: 'English', child: Text('English'))],
+                    items: [
+                      DropdownMenuItem(
+                        value: 'English',
+                        child: Text('English', style: TextStyle(color: AiraColors.textPrimary(isDark))),
+                      )
+                    ],
                   ),
-                  const Icon(Icons.arrow_forward_rounded, color: Color(0xFF94A3B8)),
+                  Icon(Icons.arrow_forward_rounded, color: AiraColors.textSecondary(isDark)),
                   DropdownButton<String>(
                     value: _targetLang,
-                    dropdownColor: const Color(0xFF1A2744),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    dropdownColor: AiraColors.cardBg(isDark),
+                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold),
                     underline: const SizedBox(),
                     onChanged: (v) => setState(() {
                       _targetLang = v!;
                       _resultText = '';
                       _romajiText = '';
                     }),
-                    items: const [
-                      DropdownMenuItem(value: 'Japanese', child: Text('Japanese')),
-                      DropdownMenuItem(value: 'French', child: Text('French')),
-                      DropdownMenuItem(value: 'Spanish', child: Text('Spanish')),
-                      DropdownMenuItem(value: 'German', child: Text('German')),
-                      DropdownMenuItem(value: 'Italian', child: Text('Italian')),
-                      DropdownMenuItem(value: 'Chinese', child: Text('Chinese')),
-                      DropdownMenuItem(value: 'Korean', child: Text('Korean')),
+                    items: [
+                      DropdownMenuItem(value: 'Japanese', child: Text('Japanese', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'French', child: Text('French', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'Spanish', child: Text('Spanish', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'German', child: Text('German', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'Italian', child: Text('Italian', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'Chinese', child: Text('Chinese', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'Korean', child: Text('Korean', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
                     ],
                   ),
                 ],
@@ -300,23 +316,23 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A2744),
+                color: AiraColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF334155)),
+                border: Border.all(color: AiraColors.border(isDark)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
                     controller: _inputCtrl,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
                     decoration: InputDecoration(
                       hintText: 'Type phrase here (e.g. hello, thank you...)',
-                      hintStyle: const TextStyle(color: Colors.white30, fontSize: 13),
+                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 13),
                       filled: true,
-                      fillColor: const Color(0xFF0A1628),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF334155))),
-                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF334155))),
+                      fillColor: AiraColors.scaffoldBg(isDark),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
                       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF2563EB))),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.translate, color: Color(0xFF2563EB)),
@@ -326,8 +342,15 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                     onSubmitted: (v) => _translateCustomText(v),
                   ),
                   if (_resultText.isNotEmpty) ...[
-                    const Divider(height: 24, color: Color(0xFF334155)),
-                    const Text('TRANSLATED OUTPUT', style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8), fontWeight: FontWeight.bold)),
+                    Divider(height: 24, color: AiraColors.border(isDark)),
+                    Text(
+                      'TRANSLATED OUTPUT',
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: AiraColors.textSecondary(isDark),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -339,7 +362,14 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                               Text(_resultText, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF00B4D8))),
                               if (_romajiText.isNotEmpty) ...[
                                 const SizedBox(height: 4),
-                                Text(_romajiText, style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8), fontWeight: FontWeight.bold)),
+                                Text(
+                                  _romajiText,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AiraColors.textSecondary(isDark),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ]
                             ],
                           ),
@@ -360,13 +390,15 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1E1B4B), Color(0xFF111827)],
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? const [Color(0xFF1E1B4B), Color(0xFF111827)]
+                      : const [Color(0xFFEEF2FF), Color(0xFFE0E7FF)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF334155)),
+                border: Border.all(color: AiraColors.border(isDark)),
               ),
               child: Row(
                 children: [
@@ -374,11 +406,22 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('VOICE DIALOGUE TRANSLATOR', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.bold)),
+                        Text(
+                          'VOICE DIALOGUE TRANSLATOR',
+                          style: TextStyle(
+                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFFFF6B35),
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 4),
                         Text(
                           _isListening ? 'Listening to voice logs...' : 'Hold Mic to scan audio speech',
-                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: AiraColors.textPrimary(isDark),
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -397,7 +440,15 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
             const SizedBox(height: 20),
 
             // Phrasebook Category Chips
-            const Text('PHRASEBOOK DICTIONARY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.white70)),
+            Text(
+              'PHRASEBOOK DICTIONARY',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.0,
+                color: isDark ? Colors.white70 : const Color(0xFF475569),
+              ),
+            ),
             const SizedBox(height: 10),
             Row(
               children: ['Dining', 'Directions', 'Shopping'].map((cat) {
@@ -408,10 +459,14 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                     label: Text(cat),
                     selected: active,
                     selectedColor: const Color(0xFF2563EB),
-                    backgroundColor: const Color(0xFF1A2744),
-                    disabledColor: const Color(0xFF1A2744),
-                    side: BorderSide(color: active ? const Color(0xFF2563EB) : const Color(0xFF334155)),
-                    labelStyle: TextStyle(fontSize: 11, color: active ? Colors.white : const Color(0xFF94A3B8), fontWeight: FontWeight.bold),
+                    backgroundColor: AiraColors.cardBg(isDark),
+                    disabledColor: AiraColors.cardBg(isDark),
+                    side: BorderSide(color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark)),
+                    labelStyle: TextStyle(
+                      fontSize: 11,
+                      color: active ? Colors.white : AiraColors.textSecondary(isDark),
+                      fontWeight: FontWeight.bold,
+                    ),
                     onSelected: (sel) {
                       if (sel) setState(() => _activeCategory = cat);
                     },
@@ -423,10 +478,13 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
 
             // Phrasebook list
             if (phraseList.isEmpty)
-              const Center(
+              Center(
                 child: Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Text('No offline phrases found for this category.', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    'No offline phrases found for this category.',
+                    style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+                  ),
                 ),
               )
             else
@@ -449,9 +507,9 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A2744),
+                        color: AiraColors.cardBg(isDark),
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0xFF334155)),
+                        border: Border.all(color: AiraColors.border(isDark)),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -460,10 +518,10 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(p['eng']!, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
+                                Text(p['eng']!, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark))),
                                 const SizedBox(height: 4),
                                 Text(p['tr']!, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF00B4D8))),
-                                Text(p['rom']!, style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8), fontWeight: FontWeight.bold)),
+                                Text(p['rom']!, style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),

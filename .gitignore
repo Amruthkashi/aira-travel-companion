@@ -7,3 +7,7 @@ coverage/
 *.log
 .env*
 !.env.example
+.dart_tool/
+build/
+android/.kotlin/
+*.apk

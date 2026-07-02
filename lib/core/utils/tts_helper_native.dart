@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 final FlutterTts _flutterTts = FlutterTts();
@@ -27,7 +28,7 @@ Future<void> speakText(String text, String targetLang) async {
     await _flutterTts.setSpeechRate(0.45);
     await _flutterTts.speak(text);
   } catch (e) {
-    print('Native TTS execution failed: $e');
+    debugPrint('Native TTS execution failed: $e');
   }
 }
 
@@ -35,6 +36,6 @@ Future<void> stopTts() async {
   try {
     await _flutterTts.stop();
   } catch (e) {
-    print('Native TTS stop failed: $e');
+    debugPrint('Native TTS stop failed: $e');
   }
 }

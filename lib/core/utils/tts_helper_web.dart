@@ -1,4 +1,6 @@
+// ignore_for_file: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:js' as js;
+import 'package:flutter/foundation.dart';
 
 Future<void> speakText(String text, String targetLang) async {
   String localeCode = 'en-US';
@@ -28,7 +30,7 @@ Future<void> speakText(String text, String targetLang) async {
       }
     ''']);
   } catch (e) {
-    print('Web TTS execution failed: $e');
+    debugPrint('Web TTS execution failed: $e');
   }
 }
 
@@ -40,6 +42,6 @@ Future<void> stopTts() async {
       }
     ''']);
   } catch (e) {
-    print('Web TTS stop failed: $e');
+    debugPrint('Web TTS stop failed: $e');
   }
 }

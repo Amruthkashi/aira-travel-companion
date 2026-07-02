@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/providers/travel_providers.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/models/travel_models.dart';
 import '../core/utils/sound_synthesizer.dart';
 import '../core/services/ai_service.dart';
@@ -90,17 +92,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final connectionStatus = ref.watch(serverConnectionProvider);
     final serverUrl = ref.watch(serverUrlProvider);
 
-    const isDark = true;
-    const bgColor = Color(0xFF0A1628);
-    const cardColor = Color(0xFF1A2744);
-    const textColor = Colors.white;
-    const mutedTextColor = Color(0xFF94A3B8);
-    const borderColor = Color(0xFF334155);
+    final isDark = ref.watch(isDarkProvider);
+    final textColor = AiraColors.textPrimary(isDark);
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF1A2744) : Colors.white,
+        backgroundColor: AiraColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
         leadingWidth: 56,
@@ -111,7 +109,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
+                color: AiraColors.scaffoldBg(isDark),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
@@ -140,20 +138,51 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         centerTitle: true,
         actions: [
+          // Theme toggle button
+          Padding(
+            padding: const EdgeInsets.only(right: 4.0),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AiraColors.scaffoldBg(isDark),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 350),
+                  transitionBuilder: (child, anim) => RotationTransition(
+                    turns: Tween(begin: 0.75, end: 1.0).animate(anim),
+                    child: FadeTransition(opacity: anim, child: child),
+                  ),
+                  child: Icon(
+                    isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                    key: ValueKey(isDark),
+                    color: isDark ? const Color(0xFFFBBF24) : const Color(0xFF6366F1),
+                    size: 18,
+                  ),
+                ),
+                onPressed: () {
+                  ref.read(themeModeProvider.notifier).toggle();
+                },
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: Container(
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
+                color: AiraColors.scaffoldBg(isDark),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
                 icon: Icon(Icons.settings, color: textColor, size: 18),
                 onPressed: () {
-                  _showSettingsModal(context, connectionStatus, serverUrl);
+                  _showSettingsModal(context, connectionStatus, serverUrl, isDark);
                 },
               ),
             ),
@@ -173,7 +202,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             _buildSuicaCardWidget(suicaState),
             
             // Hotel Key Section
-            _buildSectionHeader('HOTEL NFC DIGITAL KEY', tagText: 'BLUETOOTH ACTIVE', tagColor: const Color(0xFF818CF8)),
+            _buildSectionHeader('HOTEL NFC DIGITAL KEY', tagText: 'BLUETOOTH ACTIVE', tagColor: const Color(0xFF00B4D8)),
             _buildNfcKeyWidget(),
             
             // Passport Stamp Book Section
@@ -181,7 +210,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                _buildPassportStampsWidget(),
+                _buildPassportStampsWidget(isDark),
                 Positioned(
                   top: -50,
                   right: 4,
@@ -192,7 +221,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         durationSeconds: 0.08,
                         name: 'sos_tap.wav',
                       );
-                      _showEmergencySheetFromProfile(context);
+                      _showEmergencySheetFromProfile(context, isDark);
                     },
                     child: Container(
                       width: 44,
@@ -200,7 +229,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: const Color(0xFFEF4444),
-                        border: Border.all(color: const Color(0xFF1A2744), width: 3),
+                        border: Border.all(color: AiraColors.scaffoldBg(isDark), width: 3),
                         boxShadow: [
                           BoxShadow(
                             color: const Color(0xFFEF4444).withValues(alpha: 0.3),
@@ -220,11 +249,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             
             // DNA Archetype Section
             _buildSectionHeader('INTERACTIVE AI TRAVEL DNA PROFILE', tagText: 'TWEAK SLIDERS TO MORPH ARCHETYPE', tagColor: const Color(0xFF94A3B8)),
-            _buildDnaSlidersWidget(userProfileState),
+            _buildDnaSlidersWidget(userProfileState, isDark),
             
             // Bookings Section
             _buildSectionHeader('MY ACTIVE BOOKINGS'),
-            _buildAppleWalletPassesWidget(),
+            _buildAppleWalletPassesWidget(isDark),
             const SizedBox(height: 32),
           ],
         ),
@@ -233,6 +262,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildSectionHeader(String title, {String? tagText, Color? tagColor}) {
+    final isDark = ref.watch(isDarkProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 24.0, bottom: 12.0),
       child: Row(
@@ -240,11 +270,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w900,
               letterSpacing: 1.2,
-              color: Color(0xFF94A3B8),
+              color: AiraColors.textSecondary(isDark),
               fontFamily: 'monospace',
             ),
           ),
@@ -276,6 +306,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildProfileHeader(UserProfileState userProfileState) {
+    final isDark = ref.watch(isDarkProvider);
     final name = userProfileState.profile['fullName'] ?? 'Shreyas Aswini';
     final user = userProfileState.profile['username'] ?? 'shreyas';
     final archetype = userProfileState.travelArchetype;
@@ -283,15 +314,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+        gradient: LinearGradient(
+          colors: AiraColors.headerGradient(isDark),
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.06),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -319,10 +350,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                        color: AiraColors.textPrimary(isDark),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -332,9 +363,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(height: 4),
                 Text(
                   '@$user • $archetype',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF94A3B8),
+                    color: AiraColors.textSecondary(isDark),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -552,13 +583,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildNfcKeyWidget() {
+    final isDark = ref.watch(isDarkProvider);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF334155), width: 1),
+        border: Border.all(color: AiraColors.border(isDark), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -577,9 +609,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0A1628),
+                  color: AiraColors.scaffoldBg(isDark),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF334155), width: 1.5),
+                  border: Border.all(color: AiraColors.border(isDark), width: 1.5),
                 ),
                 child: Center(
                   child: Icon(
@@ -594,22 +626,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'ROOM KEY • GRACERY HOTEL',
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF94A3B8),
+                        color: AiraColors.textSecondary(isDark),
                         letterSpacing: 0.5,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       _nfcUnlocked ? 'Room 1402 • Stay Active' : 'Room 1402 • Stay ID 78229',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: AiraColors.textPrimary(isDark),
                       ),
                     ),
                   ],
@@ -618,14 +650,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0A1628),
+                  color: AiraColors.scaffoldBg(isDark),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF334155)),
+                  border: Border.all(color: AiraColors.border(isDark)),
                 ),
-                child: const Text(
+                child: Text(
                   'Tokyo',
                   style: TextStyle(
-                    color: Color(0xFF94A3B8),
+                    color: AiraColors.textSecondary(isDark),
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
@@ -640,12 +672,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'STATUS STATE',
                     style: TextStyle(
                       fontSize: 8,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF94A3B8),
+                      color: AiraColors.textSecondary(isDark),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -653,7 +685,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Text(
                     _nfcUnlocked ? 'Key Unlocked (NFC Active)' : 'Key Locked (NFC Ready)',
                     style: TextStyle(
-                      color: _nfcUnlocked ? const Color(0xFF10B981) : const Color(0xFF818CF8),
+                      color: _nfcUnlocked ? const Color(0xFF10B981) : const Color(0xFF00B4D8),
                       fontSize: 11,
                       fontWeight: FontWeight.w900,
                     ),
@@ -662,7 +694,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
+                  backgroundColor: const Color(0xFFFF6B35),
                   foregroundColor: Colors.white,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -692,7 +724,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildPassportStampsWidget() {
+  Widget _buildPassportStampsWidget(bool isDark) {
     final stamps = [
       {
         'code': 'TYO',
@@ -749,9 +781,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF334155), width: 1),
+        border: Border.all(color: AiraColors.border(isDark), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -771,7 +803,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 'city': s['fullName'] as String,
                 'date': s['date'] as String,
                 'airline': s['flight'] as String,
-              }),
+              }, isDark),
               child: Padding(
                 padding: const EdgeInsets.only(right: 20.0),
                 child: Column(
@@ -818,10 +850,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: 14),
                     Text(
                       s['city'] as String,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white70,
+                        color: AiraColors.textSecondary(isDark),
                       ),
                     ),
                   ],
@@ -834,10 +866,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  void _showStampDetailsModal(Map<String, String> s) {
+  void _showStampDetailsModal(Map<String, String> s, bool isDark) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AiraColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (context) {
         return Container(
@@ -850,13 +882,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 children: [
                   const Icon(Icons.verified_outlined, color: Color(0xFF2563EB), size: 24),
                   const SizedBox(width: 8),
-                  Text('PASSPORT ENTRY LOG: ${s['code']}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text('PASSPORT ENTRY LOG: ${s['code']}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark))),
                 ],
               ),
-              const Divider(height: 24, color: Color(0xFF334155)),
-              _stampDetailLine('Custom Port Station', s['city']!),
-              _stampDetailLine('Entry Clear Date', s['date']!),
-              _stampDetailLine('Validated Flight PNR', s['airline']!),
+              Divider(height: 24, color: AiraColors.border(isDark)),
+              _stampDetailLine('Custom Port Station', s['city']!, isDark),
+              _stampDetailLine('Entry Clear Date', s['date']!, isDark),
+              _stampDetailLine('Validated Flight PNR', s['airline']!, isDark),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -877,26 +909,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _stampDetailLine(String label, String val) {
+  Widget _stampDetailLine(String label, String val, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
-          Text(val, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white)),
+          Text(label, style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12)),
+          Text(val, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AiraColors.textPrimary(isDark))),
         ],
       ),
     );
   }
 
-  Widget _buildDnaSlidersWidget(UserProfileState userProfileState) {
+  Widget _buildDnaSlidersWidget(UserProfileState userProfileState, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF334155), width: 1),
+        border: Border.all(color: AiraColors.border(isDark), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -914,13 +946,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             val: userProfileState.dnaFoodie,
             key: 'foodie',
             activeColor: const Color(0xFF0D9488),
+            isDark: isDark,
           ),
           _dnaSlider(
             emoji: '⛩️',
             title: 'Heritage Path',
             val: userProfileState.dnaHeritage,
             key: 'heritage',
-            activeColor: const Color(0xFF4F46E5),
+            activeColor: const Color(0xFFFF6B35),
+            isDark: isDark,
           ),
           _dnaSlider(
             emoji: '🧳',
@@ -928,6 +962,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             val: userProfileState.dnaTech,
             key: 'tech',
             activeColor: const Color(0xFF7C3AED),
+            isDark: isDark,
           ),
           _dnaSlider(
             emoji: '🌿',
@@ -935,27 +970,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             val: userProfileState.dnaAdventure,
             key: 'adventure',
             activeColor: const Color(0xFF10B981),
+            isDark: isDark,
           ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFF0A1628),
+              color: AiraColors.cardBgAlt(isDark),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF334155), width: 1),
+              border: Border.all(color: AiraColors.border(isDark), width: 1),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.auto_awesome_rounded, color: Color(0xFF818CF8), size: 18),
+                const Icon(Icons.auto_awesome_rounded, color: Color(0xFF00B4D8), size: 18),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Aira dynamically structures routes to prioritize traditional tavern food crawls & Michelin ramen spots based on your DNA profile metrics.',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFC7D2FE),
+                      color: AiraColors.textSecondary(isDark),
                       height: 1.4,
                     ),
                   ),
@@ -974,6 +1010,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     required double val,
     required String key,
     required Color activeColor,
+    required bool isDark,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -989,10 +1026,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(width: 8),
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: AiraColors.textPrimary(isDark),
                     ),
                   ),
                 ],
@@ -1012,7 +1049,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             data: SliderThemeData(
               trackHeight: 6,
               activeTrackColor: activeColor,
-              inactiveTrackColor: const Color(0xFF0A1628),
+              inactiveTrackColor: AiraColors.cardBgAlt(isDark),
               thumbColor: activeColor,
               overlayColor: activeColor.withValues(alpha: 0.1),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
@@ -1032,23 +1069,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildAppleWalletPassesWidget() {
+  Widget _buildAppleWalletPassesWidget(bool isDark) {
     return Column(
       children: [
-        _buildFlightPassCard(),
+        _buildFlightPassCard(isDark),
         const SizedBox(height: 12),
-        _buildHotelPassCard(),
+        _buildHotelPassCard(isDark),
       ],
     );
   }
 
-  Widget _buildFlightPassCard() {
+  Widget _buildFlightPassCard(bool isDark) {
     final expanded = _expandedPass == 'flight';
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF334155), width: 1),
+        border: Border.all(color: AiraColors.border(isDark), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -1067,7 +1104,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                    colors: [Color(0xFFFF6B35), Color(0xFF7C3AED)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -1105,25 +1142,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('FROM', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8))),
-                          Text('SFO', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white)),
-                          Text('San Francisco', style: TextStyle(fontSize: 10, color: Colors.white70, fontWeight: FontWeight.w500)),
+                          Text('FROM', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('SFO', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark))),
+                          Text('San Francisco', style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
                         ],
                       ),
                       Expanded(
                         child: Column(
                           children: [
-                            const Text(
+                            Text(
                               'Skyline Airlines • SQ-638',
-                              style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8)),
+                              style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark)),
                             ),
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Expanded(child: Divider(color: Color(0xFF334155), thickness: 1)),
+                                Expanded(child: Divider(color: AiraColors.border(isDark), thickness: 1)),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                   child: Transform.rotate(
@@ -1131,14 +1168,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     child: const Icon(Icons.flight, color: Color(0xFF00B4D8), size: 16),
                                   ),
                                 ),
-                                const Expanded(child: Divider(color: Color(0xFF334155), thickness: 1)),
+                                Expanded(child: Divider(color: AiraColors.border(isDark), thickness: 1)),
                               ],
                             ),
                             const SizedBox(height: 4),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF0A1628),
+                                color: AiraColors.cardBgAlt(isDark),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text(
@@ -1146,19 +1183,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 style: TextStyle(
                                   fontSize: 9,
                                   fontWeight: FontWeight.w900,
-                                  color: Color(0xFF818CF8),
+                                  color: Color(0xFF00B4D8),
                                 ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text('TO', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8))),
-                          Text('NRT', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white)),
-                          Text('Tokyo Narita', style: TextStyle(fontSize: 10, color: Colors.white70, fontWeight: FontWeight.w500)),
+                          Text('TO', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('NRT', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark))),
+                          Text('Tokyo Narita', style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ],
@@ -1166,7 +1203,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(height: 16),
                   CustomPaint(
                     size: const Size(double.infinity, 1),
-                    painter: DashedLinePainter(),
+                    painter: DashedLinePainter(color: AiraColors.border(isDark)),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -1175,38 +1212,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('SEAT', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8))),
+                          Text('SEAT', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
                           const SizedBox(height: 2),
-                          Text('14A', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.white70)),
+                          Text('14A', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('CLASS', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8))),
+                          Text('CLASS', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
                           const SizedBox(height: 2),
-                          Text('Premium Econ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.white70)),
+                          Text('Premium Econ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text('PNR CODE', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8))),
+                          Text('PNR CODE', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
                           const SizedBox(height: 2),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0A1628),
+                              color: AiraColors.cardBgAlt(isDark),
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: const Color(0xFF334155)),
+                              border: Border.all(color: AiraColors.border(isDark)),
                             ),
                             child: const Text(
                               'NH-782Y9W',
                               style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900,
-                                color: Color(0xFF818CF8),
-                              ),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF00B4D8)),
                             ),
                           ),
                         ],
@@ -1217,7 +1253,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: 16),
                     CustomPaint(
                       size: const Size(double.infinity, 1),
-                      painter: DashedLinePainter(),
+                      painter: DashedLinePainter(color: AiraColors.border(isDark)),
                     ),
                     const SizedBox(height: 16),
                     Container(
@@ -1230,15 +1266,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
+                    Text(
                       '*NH-782Y9W*',
-                      style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'monospace', fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: AiraColors.textSecondary(isDark), fontFamily: 'monospace', fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF334155),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AiraColors.cardBgAlt(isDark),
+                        foregroundColor: AiraColors.textPrimary(isDark),
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
@@ -1256,13 +1292,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildHotelPassCard() {
+  Widget _buildHotelPassCard(bool isDark) {
     final expanded = _expandedPass == 'hotel';
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF334155), width: 1),
+        border: Border.all(color: AiraColors.border(isDark), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -1323,23 +1359,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('HOTEL', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8))),
-                          Text('Skyline Godzilla Hotel Tokyo', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.white)),
-                          Text('West Central Tokyo, Tokyo', style: TextStyle(fontSize: 10, color: Colors.white70, fontWeight: FontWeight.w500)),
+                          Text('HOTEL', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('Skyline Godzilla Hotel Tokyo', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark))),
+                          Text('West Central Tokyo, Tokyo', style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text('ROOM', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8))),
-                          Text('Room 1402', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.white)),
-                          Text('Stay ID 78229', style: TextStyle(fontSize: 10, color: Colors.white70, fontWeight: FontWeight.w500)),
+                          Text('ROOM', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('Room 1402', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark))),
+                          Text('Stay ID 78229', style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ],
@@ -1347,7 +1383,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(height: 16),
                   CustomPaint(
                     size: const Size(double.infinity, 1),
-                    painter: DashedLinePainter(),
+                    painter: DashedLinePainter(color: AiraColors.border(isDark)),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -1356,17 +1392,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('CHECK-IN', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8))),
+                          Text('CHECK-IN', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
                           const SizedBox(height: 2),
-                          Text('Jun 16 • 3:00 PM', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.white70)),
+                          Text('Jun 16 • 3:00 PM', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text('DURATION', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF94A3B8))),
+                          Text('DURATION', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
                           const SizedBox(height: 2),
-                          Text('5 Nights Stay', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.white70)),
+                          Text('5 Nights Stay', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
                         ],
                       ),
                     ],
@@ -1375,7 +1411,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: 16),
                     CustomPaint(
                       size: const Size(double.infinity, 1),
-                      painter: DashedLinePainter(),
+                      painter: DashedLinePainter(color: AiraColors.border(isDark)),
                     ),
                     const SizedBox(height: 16),
                     Container(
@@ -1388,14 +1424,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
+                    Text(
                       '*ST-78229*',
-                      style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'monospace', fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: AiraColors.textSecondary(isDark), fontFamily: 'monospace', fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF334155),
+                        backgroundColor: AiraColors.cardBgAlt(isDark),
                         foregroundColor: const Color(0xFF10B981),
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1414,10 +1450,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  void _showSettingsModal(BuildContext context, ServerConnectionStatus status, String serverUrl) {
+  void _showSettingsModal(BuildContext context, ServerConnectionStatus status, String serverUrl, bool isDark) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AiraColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       isScrollControlled: true,
       builder: (context) {
@@ -1436,19 +1472,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: Container(
                   width: 40,
                   height: 5,
-                  decoration: BoxDecoration(color: const Color(0xFF334155), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: AiraColors.border(isDark), borderRadius: BorderRadius.circular(10)),
                 ),
               ),
               const SizedBox(height: 16),
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.settings, color: Color(0xFF2563EB), size: 22),
-                  SizedBox(width: 8),
-                  Text('SYSTEM SETTINGS', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  const Icon(Icons.settings, color: Color(0xFF2563EB), size: 22),
+                  const SizedBox(width: 8),
+                  Text('SYSTEM SETTINGS', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark))),
                 ],
               ),
-              const Divider(height: 24, color: Color(0xFF334155)),
-              _buildServerConnectionWidget(status, serverUrl),
+              Divider(height: 24, color: AiraColors.border(isDark)),
+              _buildServerConnectionWidget(status, serverUrl, isDark),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
@@ -1475,7 +1511,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildServerConnectionWidget(ServerConnectionStatus status, String serverUrl) {
+  Widget _buildServerConnectionWidget(ServerConnectionStatus status, String serverUrl, bool isDark) {
     Color badgeColor;
     String statusText;
     IconData statusIcon;
@@ -1502,9 +1538,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: AiraColors.border(isDark)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1512,9 +1548,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Aira AI Core Server',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1540,7 +1576,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           const SizedBox(height: 12),
           Text(
             'Ensure the client base URL points to your running Node/Express backend. If running on a physical mobile device, enter your host computer\'s local network IP.',
-            style: TextStyle(fontSize: 10.5, color: Colors.white.withValues(alpha: 0.6), height: 1.3),
+            style: TextStyle(fontSize: 10.5, color: AiraColors.textSecondary(isDark), height: 1.3),
           ),
           const SizedBox(height: 14),
           Row(
@@ -1550,13 +1586,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   height: 38,
                   child: TextField(
                     controller: _serverUrlCtrl,
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
                       isDense: true,
                       labelText: 'Server Base URL',
-                      labelStyle: TextStyle(color: Colors.white70, fontSize: 11),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white30)),
-                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white70)),
+                      labelStyle: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AiraColors.border(isDark))),
+                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AiraColors.textPrimary(isDark))),
                     ),
                   ),
                 ),
@@ -1589,10 +1625,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  void _showEmergencySheetFromProfile(BuildContext context) {
+  void _showEmergencySheetFromProfile(BuildContext context, bool isDark) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AiraColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1609,7 +1645,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   width: 40,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF334155),
+                    color: AiraColors.border(isDark),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -1626,23 +1662,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     child: const Icon(Icons.shield_outlined, color: Color(0xFFF87171), size: 22),
                   ),
                   const SizedBox(width: 12),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'EMERGENCY ASSIST CARD',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AiraColors.textPrimary(isDark),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.0,
                         ),
                       ),
-                      SizedBox(height: 2),
+                      const SizedBox(height: 2),
                       Text(
                         'Local Authorities & Health Information',
                         style: TextStyle(
-                          color: Color(0xFF94A3B8),
+                          color: AiraColors.textSecondary(isDark),
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
                         ),
@@ -1672,6 +1708,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         Navigator.pop(context);
                         SoundSynthesizer.playSuicaBeep();
                       },
+                      isDark: isDark,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -1683,15 +1720,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         Navigator.pop(context);
                         SoundSynthesizer.playSuicaBeep();
                       },
+                      isDark: isDark,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'PERSONAL EMERGENCY HEALTH CARD',
                 style: TextStyle(
-                  color: Color(0xFF94A3B8),
+                  color: AiraColors.textSecondary(isDark),
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.0,
@@ -1701,21 +1739,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
+                  color: AiraColors.cardBg(isDark),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF334155)),
+                  border: Border.all(color: AiraColors.border(isDark)),
                 ),
                 child: Column(
                   children: [
-                    _buildMedRow('Full Name', 'Alex Mercer'),
-                    const Divider(color: Color(0xFF334155), height: 16),
-                    _buildMedRow('Blood Group', 'O-Positive (O+)'),
-                    const Divider(color: Color(0xFF334155), height: 16),
-                    _buildMedRow('Allergies', 'Penicillin, Peanuts'),
-                    const Divider(color: Color(0xFF334155), height: 16),
-                    _buildMedRow('Insurance Policy', 'Allianz Global #AZ-99201-X'),
-                    const Divider(color: Color(0xFF334155), height: 16),
-                    _buildMedRow('Emergency Contact', 'Sarah Mercer (Sister)\n+1 (555) 019-9482'),
+                    _buildMedRow('Full Name', 'Alex Mercer', isDark),
+                    Divider(color: AiraColors.border(isDark), height: 16),
+                    _buildMedRow('Blood Group', 'O-Positive (O+)', isDark),
+                    Divider(color: AiraColors.border(isDark), height: 16),
+                    _buildMedRow('Allergies', 'Penicillin, Peanuts', isDark),
+                    Divider(color: AiraColors.border(isDark), height: 16),
+                    _buildMedRow('Insurance Policy', 'Allianz Global #AZ-99201-X', isDark),
+                    Divider(color: AiraColors.border(isDark), height: 16),
+                    _buildMedRow('Emergency Contact', 'Sarah Mercer (Sister)\n+1 (555) 019-9482', isDark),
                   ],
                 ),
               ),
@@ -1724,17 +1762,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF334155),
+                    backgroundColor: AiraColors.cardBgAlt(isDark),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: const Text(
+                  child: Text(
                     'Close Hub',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AiraColors.textPrimary(isDark),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1751,6 +1789,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     required String label,
     required IconData icon,
     required VoidCallback onTap,
+    required bool isDark,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -1780,15 +1819,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildMedRow(String label, String value) {
+  Widget _buildMedRow(String label, String value, bool isDark) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Color(0xFF94A3B8),
+          style: TextStyle(
+            color: AiraColors.textSecondary(isDark),
             fontSize: 11,
             fontWeight: FontWeight.bold,
           ),
@@ -1798,8 +1837,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: Text(
             value,
             textAlign: TextAlign.right,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: AiraColors.textPrimary(isDark),
               fontSize: 11,
               fontWeight: FontWeight.bold,
             ),
@@ -1832,10 +1871,13 @@ class BarcodePainter extends CustomPainter {
 }
 
 class DashedLinePainter extends CustomPainter {
+  final Color color;
+  DashedLinePainter({this.color = const Color(0xFF334155)});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF334155)
+      ..color = color
       ..strokeWidth = 1.0;
 
     const double dashWidth = 5.0;

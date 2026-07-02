@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/models/travel_models.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/services/ai_service.dart';
@@ -180,7 +182,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
         _scrollToBottom();
       }
     } catch (e) {
-      print('Error sending message: $e');
+      debugPrint('Error sending message: $e');
     }
   }
 
@@ -315,9 +317,10 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
       return;
     }
     
+    final isDark = ref.read(isDarkProvider);
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A2744),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) {
         return Container(
@@ -326,7 +329,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Select Itinerary Day', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Select Itinerary Day', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 12),
               Flexible(
                 child: ListView.builder(
@@ -335,8 +338,8 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                   itemBuilder: (context, index) {
                     final day = itinerary[index];
                     return ListTile(
-                      title: Text('Day ${day.day} - ${day.theme}', style: const TextStyle(color: Colors.white70)),
-                      trailing: const Icon(Icons.chevron_right, color: Colors.white30),
+                      title: Text('Day ${day.day} - ${day.theme}', style: TextStyle(color: AiraColors.textSecondary(isDark))),
+                      trailing: Icon(Icons.chevron_right, color: AiraColors.textMuted(isDark)),
                       onTap: () {
                         Navigator.pop(ctx);
                         _executeAddActivity(index, s);
@@ -428,9 +431,10 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(isDarkProvider);
     if (_loading) {
       return Scaffold(
-        backgroundColor: const Color(0xFF020617),
+        backgroundColor: AiraColors.scaffoldBg(isDark),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -448,7 +452,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('Loading Squad...', style: TextStyle(color: Colors.white70, fontSize: 14)),
+              Text('Loading Squad...', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 14)),
             ],
           ),
         ),
@@ -457,8 +461,8 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
 
     if (_error != null || _squad == null) {
       return Scaffold(
-        backgroundColor: const Color(0xFF020617),
-        appBar: AppBar(backgroundColor: Colors.transparent, foregroundColor: Colors.white),
+        backgroundColor: AiraColors.scaffoldBg(isDark),
+        appBar: AppBar(backgroundColor: Colors.transparent, foregroundColor: AiraColors.textPrimary(isDark)),
         body: Center(child: Text(_error ?? 'Squad not found', style: const TextStyle(color: Colors.red))),
       );
     }
@@ -467,25 +471,27 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
     final members = (squad['members'] as List?) ?? [];
 
     return Scaffold(
-      backgroundColor: const Color(0xFF020617),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       body: NestedScrollView(
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
             expandedHeight: 260,
             pinned: true,
-            backgroundColor: const Color(0xFF0A1628),
-            foregroundColor: Colors.white,
+            backgroundColor: AiraColors.scaffoldBg(isDark),
+            foregroundColor: AiraColors.textPrimary(isDark),
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
                 children: [
                   // Aurora gradient background
                   Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [Color(0xFF0A1628), Color(0xFF0A1628), Color(0xFF0D1B2A)],
+                        colors: isDark
+                            ? [const Color(0xFF0A1628), const Color(0xFF0A1628), const Color(0xFF0D1B2A)]
+                            : [const Color(0xFFF1F5F9), const Color(0xFFF1F5F9), const Color(0xFFE2E8F0)],
                       ),
                     ),
                   ),
@@ -521,16 +527,16 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                           ],
                         ),
                         const SizedBox(height: 10),
-                        Text(squad['name'] ?? 'My Squad', style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+                        Text(squad['name'] ?? 'My Squad', style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            const Icon(Icons.location_on, color: Color(0xFFFFD166), size: 16),
+                            Icon(Icons.location_on, color: isDark ? const Color(0xFFFFD166) : const Color(0xFFD97706), size: 16),
                             const SizedBox(width: 4),
-                            Text(squad['destination'] ?? '', style: const TextStyle(color: Color(0xFFFFD166), fontSize: 14, fontWeight: FontWeight.w600)),
+                            Text(squad['destination'] ?? '', style: TextStyle(color: isDark ? const Color(0xFFFFD166) : const Color(0xFFD97706), fontSize: 14, fontWeight: FontWeight.w600)),
                             const Spacer(),
                             if (squad['startDate'] != null && squad['startDate'].toString().isNotEmpty)
-                              Text('${squad['startDate']} → ${squad['endDate'] ?? ''}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                              Text('${squad['startDate']} → ${squad['endDate'] ?? ''}', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11)),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -545,7 +551,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: color,
-                                  border: Border.all(color: const Color(0xFF020617), width: 2),
+                                  border: Border.all(color: AiraColors.scaffoldBg(isDark), width: 2),
                                   boxShadow: [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 8)],
                                 ),
                                 child: Center(child: Text((m['fullName'] ?? '?')[0].toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))),
@@ -554,8 +560,8 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                             if (members.length > 8)
                               Container(
                                 width: 32, height: 32,
-                                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.1)),
-                                child: Center(child: Text('+${members.length - 8}', style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold))),
+                                decoration: BoxDecoration(shape: BoxShape.circle, color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
+                                child: Center(child: Text('+${members.length - 8}', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold))),
                               ),
                             const Spacer(),
                             // Invite code button
@@ -569,15 +575,15 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                                  border: Border.all(color: AiraColors.border(isDark)),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.copy, color: Colors.white70, size: 14),
+                                    Icon(Icons.copy, color: AiraColors.textSecondary(isDark), size: 14),
                                     const SizedBox(width: 4),
-                                    Text(squad['inviteCode'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                                    Text(squad['inviteCode'] ?? '', style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2)),
                                   ],
                                 ),
                               ),
@@ -594,8 +600,8 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
               controller: _tabController,
               indicatorColor: const Color(0xFF2563EB),
               indicatorWeight: 3,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white54,
+              labelColor: AiraColors.textPrimary(isDark),
+              unselectedLabelColor: AiraColors.textSecondary(isDark),
               labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
               tabs: const [
                 Tab(icon: Icon(Icons.chat_bubble, size: 16), text: 'Chat'),
@@ -623,6 +629,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
 
   // ======== CHAT TAB ========
   Widget _buildChatTab() {
+    final isDark = ref.read(isDarkProvider);
     return Column(
       children: [
         Expanded(
@@ -645,10 +652,10 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A2744).withValues(alpha: 0.7),
+                        color: AiraColors.cardBg(isDark).withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text(msg['text'] ?? '', style: const TextStyle(color: Colors.white60, fontSize: 12), textAlign: TextAlign.center),
+                      child: Text(msg['text'] ?? '', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12), textAlign: TextAlign.center),
                     ),
                   ),
                 );
@@ -673,7 +680,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
-                          color: isMe ? const Color(0xFF2563EB) : const Color(0xFF1A2744),
+                          color: isMe ? const Color(0xFF2563EB) : AiraColors.cardBg(isDark),
                           borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
                             topRight: const Radius.circular(16),
@@ -689,7 +696,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                                 padding: const EdgeInsets.only(bottom: 4),
                                 child: Text(msg['senderName'] ?? '', style: TextStyle(color: avatarColor, fontSize: 11, fontWeight: FontWeight.bold)),
                               ),
-                            Text(msg['text'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 14)),
+                            Text(msg['text'] ?? '', style: TextStyle(color: isMe ? Colors.white : AiraColors.textPrimary(isDark), fontSize: 14)),
                           ],
                         ),
                       ),
@@ -703,9 +710,9 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
         // Message input
         Container(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-          decoration: const BoxDecoration(
-            color: Color(0xFF0A1628),
-            border: Border(top: BorderSide(color: Color(0xFF1A2744))),
+          decoration: BoxDecoration(
+            color: AiraColors.scaffoldBg(isDark),
+            border: Border(top: BorderSide(color: AiraColors.border(isDark))),
           ),
           child: SafeArea(
             top: false,
@@ -715,17 +722,17 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1A2744),
+                      color: AiraColors.cardBg(isDark),
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: TextField(
                       controller: _chatController,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 14),
+                      decoration: InputDecoration(
                         hintText: 'Message your squad...',
-                        hintStyle: TextStyle(color: Colors.white38),
+                        hintStyle: TextStyle(color: AiraColors.textMuted(isDark)),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       onSubmitted: (_) => _sendMessage(),
                     ),
@@ -754,6 +761,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
 
   // ======== EXPENSES TAB ========
   Widget _buildExpensesTab() {
+    final isDark = ref.read(isDarkProvider);
     final expenses = (_squad?['expenses'] as List?) ?? [];
     final members = (_squad?['members'] as List?) ?? [];
 
@@ -788,21 +796,23 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF0A1628), Color(0xFF312E81)],
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [const Color(0xFF0A1628), const Color(0xFF312E81)]
+                  : [const Color(0xFFE2E8F0), const Color(0xFFC7D2FE)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: AiraColors.border(isDark)),
           ),
           child: Column(
             children: [
-              const Text('TOTAL GROUP SPEND', style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+              Text('TOTAL GROUP SPEND', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
               const SizedBox(height: 6),
-              Text('\$${totalSpent.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900)),
+              Text('\$${totalSpent.toStringAsFixed(2)}', style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 36, fontWeight: FontWeight.w900)),
               const SizedBox(height: 4),
-              Text('${expenses.length} expenses · ${members.length} members', style: const TextStyle(color: Colors.white38, fontSize: 12)),
+              Text('${expenses.length} expenses · ${members.length} members', style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12)),
             ],
           ),
         ),
@@ -810,7 +820,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
 
         // Balances
         if (balances.isNotEmpty) ...[
-          const Text('WHO OWES WHOM', style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+          Text('WHO OWES WHOM', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
           const SizedBox(height: 8),
           ...balances.entries.map((e) {
             final member = members.firstWhere((m) => m['userId'] == e.key, orElse: () => {'fullName': 'Unknown', 'avatarColor': '#6366F1'});
@@ -821,9 +831,9 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A2744).withValues(alpha: 0.6),
+                color: AiraColors.cardBg(isDark).withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+                border: Border.all(color: AiraColors.border(isDark)),
               ),
               child: Row(
                 children: [
@@ -833,7 +843,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                     child: Center(child: Text(name[0].toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14))),
                   ),
                   const SizedBox(width: 10),
-                  Expanded(child: Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14))),
+                  Expanded(child: Text(name, style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w600, fontSize: 14))),
                   Text(
                     bal >= 0 ? '+\$${bal.toStringAsFixed(2)}' : '-\$${bal.abs().toStringAsFixed(2)}',
                     style: TextStyle(
@@ -853,7 +863,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A2744).withValues(alpha: 0.5),
+            color: AiraColors.cardBg(isDark).withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: 0.3)),
           ),
@@ -864,27 +874,31 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
               const SizedBox(height: 12),
               TextField(
                 controller: _expDescController,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: AiraColors.textPrimary(isDark)),
                 decoration: InputDecoration(
                   hintText: 'What was it for?',
-                  hintStyle: const TextStyle(color: Colors.white30),
+                  hintStyle: TextStyle(color: AiraColors.textMuted(isDark)),
                   filled: true,
-                  fillColor: const Color(0xFF0A1628),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  fillColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFF8FAFC),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF2563EB))),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _expAmountController,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: AiraColors.textPrimary(isDark)),
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   hintText: 'Amount (USD)',
-                  hintStyle: const TextStyle(color: Colors.white30),
+                  hintStyle: TextStyle(color: AiraColors.textMuted(isDark)),
                   filled: true,
-                  fillColor: const Color(0xFF0A1628),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  fillColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFF8FAFC),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF2563EB))),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   prefixText: '\$ ',
                   prefixStyle: const TextStyle(color: Color(0xFF06D6A0), fontWeight: FontWeight.bold),
@@ -912,31 +926,31 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
 
         // Expense history
         if (expenses.isNotEmpty) ...[
-          const Text('EXPENSE HISTORY', style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+          Text('EXPENSE HISTORY', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
           const SizedBox(height: 8),
           ...expenses.reversed.take(20).map((exp) {
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF0A1628),
+                color: AiraColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                border: Border.all(color: AiraColors.border(isDark)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.receipt, color: Color(0xFFFFD166), size: 20),
+                  Icon(Icons.receipt, color: isDark ? const Color(0xFFFFD166) : const Color(0xFFD97706), size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(exp['description'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
-                        Text('Paid by ${exp['paidByName'] ?? ''}', style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                        Text(exp['description'] ?? '', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w600, fontSize: 13)),
+                        Text('Paid by ${exp['paidByName'] ?? ''}', style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 11)),
                       ],
                     ),
                   ),
-                  Text('\$${((exp['amount'] as num?)?.toDouble() ?? 0).toStringAsFixed(2)}', style: const TextStyle(color: Color(0xFFFFD166), fontWeight: FontWeight.w900, fontSize: 15)),
+                  Text('\$${((exp['amount'] as num?)?.toDouble() ?? 0).toStringAsFixed(2)}', style: TextStyle(color: isDark ? const Color(0xFFFFD166) : const Color(0xFFD97706), fontWeight: FontWeight.w900, fontSize: 15)),
                 ],
               ),
             );
@@ -949,6 +963,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
 
   // ======== POLLS TAB ========
   Widget _buildPollsTab() {
+    final isDark = ref.read(isDarkProvider);
     final polls = (_squad?['polls'] as List?) ?? [];
     final profile = ref.read(userProfileProvider).profile;
     final myIdVal = profile['id'] ?? profile['email'] ?? '';
@@ -961,7 +976,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A2744).withValues(alpha: 0.5),
+            color: AiraColors.cardBg(isDark).withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: const Color(0xFF7B2FF7).withValues(alpha: 0.3)),
           ),
@@ -972,13 +987,15 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
               const SizedBox(height: 12),
               TextField(
                 controller: _pollQuestionController,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: AiraColors.textPrimary(isDark)),
                 decoration: InputDecoration(
                   hintText: 'What should we decide?',
-                  hintStyle: const TextStyle(color: Colors.white30),
+                  hintStyle: TextStyle(color: AiraColors.textMuted(isDark)),
                   filled: true,
-                  fillColor: const Color(0xFF0A1628),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  fillColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFF8FAFC),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF7B2FF7))),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 ),
               ),
@@ -988,13 +1005,15 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                   padding: const EdgeInsets.only(bottom: 6),
                   child: TextField(
                     controller: _pollOptionControllers[i],
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: AiraColors.textPrimary(isDark)),
                     decoration: InputDecoration(
                       hintText: 'Option ${i + 1}',
-                      hintStyle: const TextStyle(color: Colors.white30),
+                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark)),
                       filled: true,
-                      fillColor: const Color(0xFF0A1628),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                      fillColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFF8FAFC),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF7B2FF7))),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     ),
                   ),
@@ -1031,7 +1050,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
 
         // Active polls
         if (polls.isNotEmpty)
-          const Text('ACTIVE POLLS', style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+          Text('ACTIVE POLLS', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         const SizedBox(height: 8),
         ...polls.reversed.map((poll) {
           final totalVotes = (poll['options'] as List).fold<int>(0, (sum, o) => sum + ((o['votes'] as List?)?.length ?? 0));
@@ -1039,9 +1058,9 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A2744).withValues(alpha: 0.6),
+              color: AiraColors.cardBg(isDark).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              border: Border.all(color: AiraColors.border(isDark)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1050,11 +1069,11 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                   children: [
                     const Icon(Icons.poll, color: Color(0xFF7B2FF7), size: 18),
                     const SizedBox(width: 8),
-                    Expanded(child: Text(poll['question'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15))),
+                    Expanded(child: Text(poll['question'] ?? '', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w700, fontSize: 15))),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text('by ${poll['createdByName'] ?? ''} · $totalVotes votes', style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                Text('by ${poll['createdByName'] ?? ''} · $totalVotes votes', style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 11)),
                 const SizedBox(height: 12),
                 ...List.generate((poll['options'] as List).length, (i) {
                   final opt = poll['options'][i];
@@ -1071,16 +1090,16 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0A1628),
+                              color: isDark ? const Color(0xFF0A1628) : const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: voted ? const Color(0xFF2563EB) : Colors.white.withValues(alpha: 0.06), width: voted ? 2 : 1),
+                              border: Border.all(color: voted ? const Color(0xFF2563EB) : AiraColors.border(isDark), width: voted ? 2 : 1),
                             ),
                             child: Row(
                               children: [
                                 if (voted) const Icon(Icons.check_circle, color: Color(0xFF2563EB), size: 16),
                                 if (voted) const SizedBox(width: 6),
-                                Expanded(child: Text(opt['text'] ?? '', style: TextStyle(color: voted ? const Color(0xFF2563EB) : Colors.white, fontWeight: voted ? FontWeight.bold : FontWeight.normal, fontSize: 13))),
-                                Text('$votes', style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 13)),
+                                Expanded(child: Text(opt['text'] ?? '', style: TextStyle(color: voted ? const Color(0xFF2563EB) : AiraColors.textPrimary(isDark), fontWeight: voted ? FontWeight.bold : FontWeight.normal, fontSize: 13))),
+                                Text('$votes', style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 13)),
                               ],
                             ),
                           ),
@@ -1110,6 +1129,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
 
   // ======== AI IDEAS TAB ========
   Widget _buildAiTab() {
+    final isDark = ref.read(isDarkProvider);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -1117,8 +1137,10 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF0A1628), Color(0xFF312E81), Color(0xFF0A1628)],
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [const Color(0xFF0A1628), const Color(0xFF312E81), const Color(0xFF0A1628)]
+                  : [const Color(0xFFE2E8F0), const Color(0xFFC7D2FE), const Color(0xFFE2E8F0)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -1137,11 +1159,11 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                 child: const Icon(Icons.auto_awesome, color: Colors.white, size: 26),
               ),
               const SizedBox(height: 12),
-              const Text('AI Group Concierge', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
+              Text('AI Group Concierge', style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 18, fontWeight: FontWeight.w900)),
               const SizedBox(height: 4),
               Text(
                 'Get personalized activity suggestions for your squad of ${(_squad?['members'] as List?)?.length ?? 0} traveling to ${_squad?['destination'] ?? 'unknown'}',
-                style: const TextStyle(color: Colors.white54, fontSize: 12),
+                style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
@@ -1170,9 +1192,9 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A2744).withValues(alpha: 0.6),
+              color: AiraColors.cardBg(isDark).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              border: Border.all(color: AiraColors.border(isDark)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1188,11 +1210,11 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                       child: const Icon(Icons.local_activity, color: Color(0xFF00B4D8), size: 20),
                     ),
                     const SizedBox(width: 10),
-                    Expanded(child: Text(s['activity'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15))),
+                    Expanded(child: Text(s['activity'] ?? '', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w700, fontSize: 15))),
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(s['description'] ?? '', style: const TextStyle(color: Colors.white60, fontSize: 13)),
+                Text(s['description'] ?? '', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 13)),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 8,
@@ -1278,6 +1300,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
 
   // ======== BOOKINGS & TICKETS TAB ========
   Widget _buildBookingsTab() {
+    final isDark = ref.read(isDarkProvider);
     final bookings = (_squad?['bookings'] as List?) ?? [];
 
     return ListView(
@@ -1286,9 +1309,9 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'SQUAD TICKETS & BOOKINGS',
-              style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+              style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5),
             ),
             ElevatedButton.icon(
               onPressed: _showAddBookingModal,
@@ -1309,19 +1332,19 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A2744).withValues(alpha: 0.5),
+              color: AiraColors.cardBg(isDark).withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+              border: Border.all(color: AiraColors.border(isDark)),
             ),
             child: Column(
               children: [
                 const Icon(Icons.airplane_ticket, color: Color(0xFF00B4D8), size: 48),
                 const SizedBox(height: 12),
-                const Text('No bookings logged yet', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                Text('No bookings logged yet', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 15)),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Share flights, hotel stays, or event vouchers so everyone is on the same page.',
-                  style: TextStyle(color: Colors.white38, fontSize: 12),
+                  style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
@@ -1364,7 +1387,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
             return Container(
               margin: const EdgeInsets.only(bottom: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFF0A1628),
+                color: AiraColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: accentColor.withValues(alpha: 0.35), width: 1.2),
                 boxShadow: [
@@ -1395,9 +1418,9 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                              Text(title, style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14)),
                               const SizedBox(height: 2),
-                              Text('Added by $addedBy', style: const TextStyle(color: Colors.white38, fontSize: 10)),
+                              Text('Added by $addedBy', style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 10)),
                             ],
                           ),
                         ),
@@ -1417,7 +1440,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                   ),
                   Row(
                     children: [
-                      Container(width: 6, height: 12, decoration: const BoxDecoration(color: Color(0xFF020617), borderRadius: BorderRadius.horizontal(right: Radius.circular(6)))),
+                      Container(width: 6, height: 12, decoration: BoxDecoration(color: AiraColors.scaffoldBg(isDark), borderRadius: const BorderRadius.horizontal(right: Radius.circular(6)))),
                       Expanded(
                         child: LayoutBuilder(
                           builder: (context, constraints) {
@@ -1426,13 +1449,13 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: List.generate(
                                 (constraints.constrainWidth() / 8).floor(),
-                                (index) => SizedBox(width: 4, height: 1, child: DecoratedBox(decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15)))),
+                                (index) => SizedBox(width: 4, height: 1, child: DecoratedBox(decoration: BoxDecoration(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.15)))),
                               ),
                             );
                           },
                         ),
                       ),
-                      Container(width: 6, height: 12, decoration: const BoxDecoration(color: Color(0xFF020617), borderRadius: BorderRadius.horizontal(left: Radius.circular(6)))),
+                      Container(width: 6, height: 12, decoration: BoxDecoration(color: AiraColors.scaffoldBg(isDark), borderRadius: const BorderRadius.horizontal(left: Radius.circular(6)))),
                     ],
                   ),
                   Padding(
@@ -1445,9 +1468,9 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.schedule, color: Colors.white54, size: 14),
+                                Icon(Icons.schedule, color: AiraColors.textSecondary(isDark), size: 14),
                                 const SizedBox(width: 6),
-                                Text(dateStr, style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
+                                Text(dateStr, style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12, fontWeight: FontWeight.bold)),
                               ],
                             ),
                             Text(details, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold)),
@@ -1459,18 +1482,18 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                             width: double.infinity,
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.04),
+                              color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.02),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                              border: Border.all(color: AiraColors.border(isDark)),
                             ),
                             child: Text(
                               notes,
-                              style: const TextStyle(color: Colors.white60, fontSize: 11.5, height: 1.3),
+                              style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11.5, height: 1.3),
                             ),
                           ),
                         ],
                         const SizedBox(height: 12),
-                        Container(
+                        SizedBox(
                           height: 24,
                           width: double.infinity,
                           child: Row(
@@ -1484,7 +1507,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                                   width: w,
                                   height: double.infinity,
                                   margin: EdgeInsets.only(right: s),
-                                  color: Colors.white.withValues(alpha: idx % 6 == 0 ? 0.05 : 0.25),
+                                  color: (isDark ? Colors.white : Colors.black).withValues(alpha: idx % 6 == 0 ? 0.05 : 0.25),
                                 );
                               },
                             ),
@@ -1502,6 +1525,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
   }
 
   void _showAddBookingModal() {
+    final isDark = ref.read(isDarkProvider);
     final titleCtrl = TextEditingController();
     final codeCtrl = TextEditingController();
     final dateCtrl = TextEditingController(text: '2026-07-15 10:00 AM');
@@ -1512,7 +1536,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) {
         return StatefulBuilder(
@@ -1529,32 +1553,32 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: const Color(0xFF334155), borderRadius: BorderRadius.circular(10)))),
+                    Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1), borderRadius: BorderRadius.circular(10)))),
                     const SizedBox(height: 16),
-                    const Text('LOG GROUP BOOKING', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
+                    Text('LOG GROUP BOOKING', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
                     const SizedBox(height: 4),
-                    const Text('Add flight, hotel, or attraction tickets for the group', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                    Text('Add flight, hotel, or attraction tickets for the group', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12)),
                     const SizedBox(height: 16),
                     
-                    const Text('Booking Type', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8))),
+                    Text('Booking Type', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AiraColors.textSecondary(isDark))),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A2744),
+                        color: AiraColors.cardBg(isDark),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFF334155)),
+                        border: Border.all(color: AiraColors.border(isDark)),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: selectedType,
-                          dropdownColor: const Color(0xFF0A1628),
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                          items: const [
-                            DropdownMenuItem(value: 'flight', child: Row(children: [Icon(Icons.flight, color: Color(0xFF00B4D8), size: 16), SizedBox(width: 8), Text('Flight Ticket ✈️')])),
-                            DropdownMenuItem(value: 'hotel', child: Row(children: [Icon(Icons.hotel, color: Color(0xFF06D6A0), size: 16), SizedBox(width: 8), Text('Hotel Stay 🏨')])),
-                            DropdownMenuItem(value: 'transport', child: Row(children: [Icon(Icons.directions_train, color: Color(0xFFFFD166), size: 16), SizedBox(width: 8), Text('Train/Commute 🚄')])),
-                            DropdownMenuItem(value: 'attraction', child: Row(children: [Icon(Icons.local_activity, color: Color(0xFFFF477E), size: 16), SizedBox(width: 8), Text('Attraction Ticket 🎟️')])),
+                          dropdownColor: AiraColors.cardBg(isDark),
+                          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13),
+                          items: [
+                            DropdownMenuItem(value: 'flight', child: Row(children: [const Icon(Icons.flight, color: Color(0xFF00B4D8), size: 16), const SizedBox(width: 8), Text('Flight Ticket ✈️', style: TextStyle(color: AiraColors.textPrimary(isDark)))])),
+                            DropdownMenuItem(value: 'hotel', child: Row(children: [const Icon(Icons.hotel, color: Color(0xFF06D6A0), size: 16), const SizedBox(width: 8), Text('Hotel Stay 🏨', style: TextStyle(color: AiraColors.textPrimary(isDark)))])),
+                            DropdownMenuItem(value: 'transport', child: Row(children: [const Icon(Icons.directions_train, color: Color(0xFFFFD166), size: 16), const SizedBox(width: 8), Text('Train/Commute 🚄', style: TextStyle(color: AiraColors.textPrimary(isDark)))])),
+                            DropdownMenuItem(value: 'attraction', child: Row(children: [const Icon(Icons.local_activity, color: Color(0xFFFF477E), size: 16), const SizedBox(width: 8), Text('Attraction Ticket 🎟️', style: TextStyle(color: AiraColors.textPrimary(isDark)))])),
                           ],
                           onChanged: (val) {
                             if (val != null) {
@@ -1568,11 +1592,11 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                     ),
                     const SizedBox(height: 12),
 
-                    _bookingField('Booking Title (e.g. Flight to Tokyo)', titleCtrl),
-                    _bookingField('Confirmation / PNR Code (e.g. NH-782Y9W)', codeCtrl),
-                    _bookingDateTimeField(modalCtx, 'Date & Time (YYYY-MM-DD HH:MM)', dateCtrl),
-                    _bookingField('Seat, Room, or Ticket details (e.g. Seat 14A, 3 passes)', detailsCtrl),
-                    _bookingField('Notes / Info (Optional)', notesCtrl, maxLines: 2),
+                    _bookingField('Booking Title (e.g. Flight to Tokyo)', titleCtrl, isDark),
+                    _bookingField('Confirmation / PNR Code (e.g. NH-782Y9W)', codeCtrl, isDark),
+                    _bookingDateTimeField(modalCtx, 'Date & Time (YYYY-MM-DD HH:MM)', dateCtrl, isDark),
+                    _bookingField('Seat, Room, or Ticket details (e.g. Seat 14A, 3 passes)', detailsCtrl, isDark),
+                    _bookingField('Notes / Info (Optional)', notesCtrl, isDark, maxLines: 2),
                     
                     const SizedBox(height: 20),
                     Row(
@@ -1580,8 +1604,8 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                         Expanded(
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFF334155)),
-                              foregroundColor: Colors.white70,
+                              side: BorderSide(color: AiraColors.border(isDark)),
+                              foregroundColor: AiraColors.textSecondary(isDark),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () => Navigator.pop(context),
@@ -1619,6 +1643,7 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                                 'createdByName': userName,
                               });
 
+                              if (!ctx.mounted) return;
                               Navigator.pop(ctx);
                               _loadSquad();
                             },
@@ -1637,24 +1662,24 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
     );
   }
 
-  Widget _bookingField(String label, TextEditingController ctrl, {int maxLines = 1}) {
+  Widget _bookingField(String label, TextEditingController ctrl, bool isDark, {int maxLines = 1}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8))),
+          Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AiraColors.textSecondary(isDark))),
           const SizedBox(height: 4),
           TextField(
             controller: ctrl,
             maxLines: maxLines,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
             decoration: InputDecoration(
               isDense: true,
               filled: true,
-              fillColor: const Color(0xFF1A2744),
+              fillColor: isDark ? const Color(0xFF1A2744) : const Color(0xFFF8FAFC),
               contentPadding: const EdgeInsets.all(12),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF334155))),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
               focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF2563EB))),
             ),
           ),
@@ -1663,13 +1688,13 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
     );
   }
 
-  Widget _bookingDateTimeField(BuildContext context, String label, TextEditingController ctrl) {
+  Widget _bookingDateTimeField(BuildContext context, String label, TextEditingController ctrl, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8))),
+          Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AiraColors.textSecondary(isDark))),
           const SizedBox(height: 4),
           TextField(
             controller: ctrl,
@@ -1683,25 +1708,32 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                 builder: (context, child) {
                   return Theme(
                     data: Theme.of(context).copyWith(
-                      colorScheme: const ColorScheme.dark(
-                        primary: Color(0xFF2563EB), // Royal Blue
-                        onPrimary: Colors.white,
-                        surface: Color(0xFF1A2744),
-                        onSurface: Colors.white,
+                      colorScheme: isDark
+                          ? const ColorScheme.dark(
+                              primary: Color(0xFF2563EB), // Royal Blue
+                              onPrimary: Colors.white,
+                              surface: Color(0xFF1A2744),
+                              onSurface: Colors.white,
+                            )
+                          : const ColorScheme.light(
+                              primary: Color(0xFF2563EB),
+                              onPrimary: Colors.white,
+                              surface: Colors.white,
+                              onSurface: Colors.black87,
+                            ),
+                      dialogTheme: DialogThemeData(
+                        backgroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
                       ),
-                      dialogBackgroundColor: const Color(0xFF0A1628),
                       datePickerTheme: DatePickerThemeData(
-                        backgroundColor: const Color(0xFF0A1628),
-                        headerBackgroundColor: const Color(0xFF1E293B),
-                        headerForegroundColor: Colors.white,
-                        rangePickerHeaderBackgroundColor: const Color(0xFF1E293B),
-                        rangePickerHeaderForegroundColor: Colors.white,
+                        backgroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
+                        headerBackgroundColor: isDark ? const Color(0xFF1A2744) : const Color(0xFFF1F5F9),
+                        headerForegroundColor: isDark ? Colors.white : Colors.black87,
                         confirmButtonStyle: ButtonStyle(
-                          foregroundColor: WidgetStateProperty.all(const Color(0xFF60A5FA)),
+                          foregroundColor: WidgetStateProperty.all(const Color(0xFF2563EB)),
                           textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                         cancelButtonStyle: ButtonStyle(
-                          foregroundColor: WidgetStateProperty.all(const Color(0xFF94A3B8)),
+                          foregroundColor: WidgetStateProperty.all(AiraColors.textSecondary(isDark)),
                           textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
@@ -1717,13 +1749,22 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                   builder: (context, child) {
                     return Theme(
                       data: Theme.of(context).copyWith(
-                        colorScheme: const ColorScheme.dark(
-                          primary: Color(0xFF2563EB),
-                          onPrimary: Colors.white,
-                          surface: Color(0xFF1A2744),
-                          onSurface: Colors.white,
+                        colorScheme: isDark
+                            ? const ColorScheme.dark(
+                                primary: Color(0xFF2563EB),
+                                onPrimary: Colors.white,
+                                surface: Color(0xFF1A2744),
+                                onSurface: Colors.white,
+                              )
+                            : const ColorScheme.light(
+                                primary: Color(0xFF2563EB),
+                                onPrimary: Colors.white,
+                                surface: Colors.white,
+                                onSurface: Colors.black87,
+                              ),
+                        dialogTheme: DialogThemeData(
+                          backgroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
                         ),
-                        dialogBackgroundColor: const Color(0xFF0A1628),
                       ),
                       child: child!,
                     );
@@ -1739,16 +1780,16 @@ class _SquadHubScreenState extends ConsumerState<SquadHubScreen> with TickerProv
                 }
               }
             },
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
             decoration: InputDecoration(
               isDense: true,
               filled: true,
-              fillColor: const Color(0xFF1A2744),
+              fillColor: isDark ? const Color(0xFF1A2744) : const Color(0xFFF8FAFC),
               hintText: 'Tap to select date & time',
-              hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+              hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
               suffixIcon: const Icon(Icons.calendar_month, color: Color(0xFF2563EB), size: 16),
               contentPadding: const EdgeInsets.all(12),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF334155))),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
               focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF2563EB))),
             ),
           ),

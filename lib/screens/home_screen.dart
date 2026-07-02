@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/utils/sound_synthesizer.dart';
 import '../core/services/ai_service.dart';
@@ -18,197 +20,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final Set<String> likedDestinations = {"Santorini", "Amalfi Coast"};
   final Set<String> _connectedBuddies = {};
 
-  final Map<String, List<Map<String, dynamic>>> _destinationsDb = {
-    "👤 Solo Traveler": [
-      {
-        "name": "Tokyo Crossing District",
-        "country": "Japan",
-        "countryCode": "JPN",
-        "rating": 4.9,
-        "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=400",
-        "desc": "Bustling neon streets, capsule hotels, retro arcades, and solo-friendly sushi counters.",
-        "tags": ["Neon", "Tech", "Solo-Friendly"]
-      },
-      {
-        "name": "Reykjavik",
-        "country": "Iceland",
-        "countryCode": "ISL",
-        "rating": 4.8,
-        "image": "https://images.unsplash.com/photo-1504829857797-ddff28127792?w=400",
-        "desc": "The safest country for solo explorers, featuring hot springs, waterfalls, and northern lights.",
-        "tags": ["Nature", "Safety", "Adventure"]
-      },
-      {
-        "name": "Berlin Kreuzberg",
-        "country": "Germany",
-        "countryCode": "DEU",
-        "rating": 4.7,
-        "image": "https://images.unsplash.com/photo-1560969184-10fe8719e047?w=400",
-        "desc": "A vibrant hub of art, cafes, historic hostels, and open-minded nightlife perfect for solo travelers.",
-        "tags": ["Art", "Nightlife", "Hostels"]
-      },
-      {
-        "name": "Chiang Mai",
-        "country": "Thailand",
-        "countryCode": "THA",
-        "rating": 4.8,
-        "image": "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=400",
-        "desc": "A peaceful digital nomad haven surrounded by mist-covered mountains and ancient temples.",
-        "tags": ["Nomad", "Temples", "Budget"]
-      },
-      {
-        "name": "Queenstown",
-        "country": "New Zealand",
-        "countryCode": "NZL",
-        "rating": 4.9,
-        "image": "https://images.unsplash.com/photo-1589871190903-5182103f677d?w=400",
-        "desc": "The adventure capital of the world. Great social scenes, bungee jumps, and lake cruises.",
-        "tags": ["Extreme", "Social", "Scenic"]
-      }
-    ],
-    "👩‍❤️‍👨 Couple / Romantic": [
-      {
-        "name": "Oia Santorini",
-        "country": "Greece",
-        "countryCode": "GRC",
-        "rating": 4.9,
-        "image": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=400",
-        "desc": "Iconic whitewashed houses with blue domes perched high on volcanic cliffs overlooking the sunset.",
-        "tags": ["Romantic", "Sunset", "Luxury"]
-      },
-      {
-        "name": "Positano Coast",
-        "country": "Italy",
-        "countryCode": "ITA",
-        "rating": 4.9,
-        "image": "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=400",
-        "desc": "Cliffside pastel villages cascade down to turquoise waters. Famous for romance and limoncello.",
-        "tags": ["Scenic", "Cozy", "Dining"]
-      },
-      {
-        "name": "Paris Seine",
-        "country": "France",
-        "countryCode": "FRA",
-        "rating": 4.9,
-        "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400",
-        "desc": "Crowning destination of love. Candlelit dinners, Seine river cruises, and cozy street cafes.",
-        "tags": ["Art", "Dining", "Romantic"]
-      },
-      {
-        "name": "Kyoto Arashiyama",
-        "country": "Japan",
-        "countryCode": "JPN",
-        "rating": 4.8,
-        "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400",
-        "desc": "Ethereal bamboo paths, peaceful wooden shrines, traditional tea ceremonies, and hot spring ryokans.",
-        "tags": ["Zen", "Culture", "Scenic"]
-      },
-      {
-        "name": "Bora Bora Lagoon",
-        "country": "French Polynesia",
-        "countryCode": "PYF",
-        "rating": 4.9,
-        "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400",
-        "desc": "Overwater bungalows, crystal clear lagoons, and private dinners on white coral beaches.",
-        "tags": ["Private", "Tropical", "Lagoon"]
-      }
-    ],
-    "☀️ Summer Beach": [
-      {
-        "name": "Uluwatu Temple",
-        "country": "Indonesia",
-        "countryCode": "IDN",
-        "rating": 4.8,
-        "image": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400",
-        "desc": "Spectacular sea-cliff temple views, legendary surf breaks, and fiery sunset fire dances.",
-        "tags": ["Tropical", "Surf", "Culture"]
-      },
-      {
-        "name": "Maui Wailea",
-        "country": "Hawaii",
-        "countryCode": "USA",
-        "rating": 4.9,
-        "image": "https://images.unsplash.com/photo-1505872289599-1348b76e6a4d?w=400",
-        "desc": "Stunning resort beaches, volcanic snorkeling trails, and coastal road trip loops.",
-        "tags": ["Volcano", "Snorkel", "Resorts"]
-      },
-      {
-        "name": "Ibiza Old Town",
-        "country": "Spain",
-        "countryCode": "ESP",
-        "rating": 4.7,
-        "image": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=400",
-        "desc": "Pristine sandy coves, legendary sunset cafes, and historical castle walk paths.",
-        "tags": ["Beaches", "Sunset", "Music"]
-      },
-      {
-        "name": "Maldives Atolls",
-        "country": "Maldives",
-        "countryCode": "MDV",
-        "rating": 4.9,
-        "image": "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=400",
-        "desc": "Lush turquoise waters, private islands, diving with manta rays, and white sandbar walks.",
-        "tags": ["Luxury", "Snorkel", "Pristine"]
-      },
-      {
-        "name": "Phuket Kata",
-        "country": "Thailand",
-        "countryCode": "THA",
-        "rating": 4.8,
-        "image": "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=400",
-        "desc": "Beautiful beaches, buzzing street markets, water sports, and beach clubs.",
-        "tags": ["Active", "Food", "Beaches"]
-      }
-    ],
-    "👨‍👩‍👦 Family Fun": [
-      {
-        "name": "Disneyland Tokyo",
-        "country": "Japan",
-        "countryCode": "JPN",
-        "rating": 4.8,
-        "image": "https://images.unsplash.com/photo-1505761671935-60b6a7453620?w=400",
-        "desc": "A magical, high-service theme park featuring classic fairy tales and warm customer care.",
-        "tags": ["Theme Park", "Kids", "Magic"]
-      },
-      {
-        "name": "Surfers Paradise",
-        "country": "Australia",
-        "countryCode": "AUS",
-        "rating": 4.7,
-        "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400",
-        "desc": "Golden sandy beaches, family theme parks, and active surf breaks perfect for kids.",
-        "tags": ["Surf", "Adventure", "Parks"]
-      },
-      {
-        "name": "Orlando Universal",
-        "country": "USA",
-        "countryCode": "USA",
-        "rating": 4.9,
-        "image": "https://images.unsplash.com/photo-1560089000-7433a4ebbd64?w=400",
-        "desc": "The ultimate theme park capital with world-famous rides, movie sets, and family water parks.",
-        "tags": ["Rides", "Coasters", "Movies"]
-      },
-      {
-        "name": "Singapore Sentosa",
-        "country": "Singapore",
-        "countryCode": "SGP",
-        "rating": 4.8,
-        "image": "https://images.unsplash.com/photo-1525625293386-3fb8a40332f3?w=400",
-        "desc": "Incredibly clean, featuring Gardens by the Bay, Universal Studios, and cable cars.",
-        "tags": ["Clean", "Gardens", "Safety"]
-      },
-      {
-        "name": "Vancouver Stanley",
-        "country": "Canada",
-        "countryCode": "CAN",
-        "rating": 4.8,
-        "image": "https://images.unsplash.com/photo-1559511260-66a654ae982a?w=400",
-        "desc": "Huge rainforest city park, public aquariums, and easy, scenic family bike trails.",
-        "tags": ["Forest", "Bikes", "Scenic"]
-      }
-    ]
-  };
-
   @override
   void dispose() {
     super.dispose();
@@ -217,9 +28,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final userProfileState = ref.watch(userProfileProvider);
+    final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628), // Slate 900
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           // 1. Top Decorative Ambient Travel Banner
@@ -230,8 +42,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             height: 240,
             child: ShaderMask(
               shaderCallback: (rect) {
-                return const LinearGradient(
-                  colors: [Colors.black, Colors.black, Colors.transparent],
+                return LinearGradient(
+                  colors: isDark 
+                      ? [Colors.black, Colors.black, Colors.transparent]
+                      : [Colors.white, Colors.white, Colors.transparent],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ).createShader(rect);
@@ -255,9 +69,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF0A1628).withValues(alpha: 0.1),
-                    const Color(0xFF0A1628).withValues(alpha: 0.7),
-                    const Color(0xFF0A1628),
+                    AiraColors.scaffoldBg(isDark).withValues(alpha: 0.1),
+                    AiraColors.scaffoldBg(isDark).withValues(alpha: 0.7),
+                    AiraColors.scaffoldBg(isDark),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -277,7 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 height: 220,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF7B2FF7).withValues(alpha: 0.14), // Violet glow
+                  color: isDark ? const Color(0xFF7B2FF7).withValues(alpha: 0.14) : Colors.transparent, // Violet glow
                 ),
               ),
             ),
@@ -294,7 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 height: 240,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF0EA5E9).withValues(alpha: 0.08), // Teal glow
+                  color: isDark ? const Color(0xFF0EA5E9).withValues(alpha: 0.08) : Colors.transparent, // Teal glow
                 ),
               ),
             ),
@@ -346,6 +160,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildHeader(BuildContext context, WidgetRef ref, UserProfileState userProfileState) {
+    final isDark = ref.read(isDarkProvider);
     final name = userProfileState.profile['fullName'] ?? 'Traveler';
     final firstName = name.split(' ').first;
     final initials = name.split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase();
@@ -353,9 +168,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0x991E293B), // Glassmorphic Slate 800 (60% opacity)
+        color: AiraColors.cardBg(isDark).withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF334155).withValues(alpha: 0.4)),
+        border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.4)),
       ),
       child: Row(
         children: [
@@ -426,8 +241,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 Text(
                   '$firstName 👋',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AiraColors.textPrimary(isDark),
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
                   ),
@@ -458,15 +273,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Color iconColor = Colors.white70,
     bool hasBadge = false,
   }) {
+    final isDark = ref.read(isDarkProvider);
+    final col = iconColor == Colors.white70 ? AiraColors.textSecondary(isDark) : iconColor;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: const Color(0xFF1A2744), // Slate 800
+          color: AiraColors.cardBg(isDark),
           shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFF334155)), // Slate 700
+          border: Border.all(color: AiraColors.border(isDark)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -478,7 +295,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Icon(icon, color: iconColor, size: 18),
+            Icon(icon, color: col, size: 18),
             if (hasBadge)
               Positioned(
                 top: 7,
@@ -550,10 +367,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required Color iconColor,
     required String text,
   }) {
+    final isDark = ref.read(isDarkProvider);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744), // Slate 800
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(100),
         border: Border.all(color: iconColor.withValues(alpha: 0.45), width: 1.2), // Neon border glow
         boxShadow: [
@@ -571,8 +389,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(width: 6),
           Text(
             text,
-            style: const TextStyle(
-              color: Color(0xFFF8FAFC), // White
+            style: TextStyle(
+              color: AiraColors.textPrimary(isDark),
               fontSize: 11.5,
               fontWeight: FontWeight.bold,
             ),
@@ -585,13 +403,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildTripCountdownCard(BuildContext context, WidgetRef ref) {
     final userProfileState = ref.watch(userProfileProvider);
     final upcomingTrip = userProfileState.profile['upcomingTrip'];
+    final isDark = ref.watch(isDarkProvider);
 
     if (upcomingTrip == null) {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: const Color(0xCC1E293B), // Slate 800 80% opacity
+          color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: 0.3), width: 1.2),
           boxShadow: [
@@ -606,19 +425,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             const Icon(Icons.explore_outlined, color: Color(0xFF00B4D8), size: 48),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'No Active Journey',
               style: TextStyle(
-                color: Colors.white,
+                color: AiraColors.textPrimary(isDark),
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Ask Aira to plan your next itinerary or search locations to get started.',
               style: TextStyle(
-                color: Color(0xFF94A3B8),
+                color: AiraColors.textSecondary(isDark),
                 fontSize: 13,
               ),
               textAlign: TextAlign.center,
@@ -839,7 +658,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: const Color(0xCC1E293B), // Slate 800 80% opacity
+        color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: 0.45), width: 1.2), // Indigo glowing border
         boxShadow: [
@@ -872,8 +691,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(width: 8),
                     Text(
                       '$city Adventure',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AiraColors.textPrimary(isDark),
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
@@ -904,8 +723,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               daysRemaining(startDateStr) == 0 ? 'Departing Today!' : 'Departing in ${daysRemaining(startDateStr)} Days',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: AiraColors.textPrimary(isDark),
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
               ),
@@ -919,9 +738,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Container(
                 height: 14,
                 width: 7,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF0A1628),
-                  borderRadius: BorderRadius.horizontal(right: Radius.circular(8)),
+                decoration: BoxDecoration(
+                  color: AiraColors.scaffoldBg(isDark),
+                  borderRadius: const BorderRadius.horizontal(right: Radius.circular(8)),
                 ),
               ),
               Expanded(
@@ -936,7 +755,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           width: 4,
                           height: 1,
                           child: DecoratedBox(
-                            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15)),
+                            decoration: BoxDecoration(color: AiraColors.textMuted(isDark).withValues(alpha: 0.15)),
                           ),
                         ),
                       ),
@@ -947,9 +766,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Container(
                 height: 14,
                 width: 7,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF0A1628),
-                  borderRadius: BorderRadius.horizontal(left: Radius.circular(8)),
+                decoration: BoxDecoration(
+                  color: AiraColors.scaffoldBg(isDark),
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
                 ),
               ),
             ],
@@ -962,9 +781,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF0A1628), // Slate 900
+                color: AiraColors.scaffoldBg(isDark),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF1A2744)),
+                border: Border.all(color: AiraColors.border(isDark)),
               ),
               child: Column(
                 children: [
@@ -977,7 +796,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const SizedBox(width: 6),
                           Text(
                             formatDateRange(startDateStr, endDateStr),
-                            style: const TextStyle(color: Color(0xFFE2E8F0), fontSize: 10.5, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 10.5, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -987,13 +806,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ],
                   ),
-                  const Divider(color: Colors.white10, height: 16),
+                  Divider(color: AiraColors.border(isDark).withValues(alpha: 0.5), height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Flight ${tripDetails['flight'] ?? 'SQ-638'} (${tripDetails['airline'] ?? 'SIA'})',
-                        style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 10.5),
+                        style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10.5),
                       ),
                       Text(
                         'Seat ${tripDetails['seat'] ?? '14A'}',
@@ -1012,10 +831,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Trip Checklist Progress',
                   style: TextStyle(
-                    color: Color(0xFF94A3B8),
+                    color: AiraColors.textSecondary(isDark),
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
@@ -1038,7 +857,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               borderRadius: BorderRadius.circular(10),
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: const Color(0xFF0A1628), // Slate 900
+                backgroundColor: AiraColors.scaffoldBg(isDark),
                 valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
                 minHeight: 5,
               ),
@@ -1062,7 +881,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     width: width,
                     height: double.infinity,
                     margin: EdgeInsets.only(right: space),
-                    color: Colors.white.withValues(alpha: index % 6 == 0 ? 0.04 : 0.2),
+                    color: isDark 
+                        ? Colors.white.withValues(alpha: index % 6 == 0 ? 0.04 : 0.2)
+                        : Colors.black.withValues(alpha: index % 6 == 0 ? 0.04 : 0.2),
                   );
                 },
               ),
@@ -1123,15 +944,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       },
     ];
 
+    final isDark = ref.watch(isDarkProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'QUICK ACTIONS',
           style: TextStyle(
             fontSize: 10.5,
             fontWeight: FontWeight.w900,
-            color: Color(0xFF94A3B8), // Slate 400
+            color: AiraColors.textMuted(isDark),
             letterSpacing: 1.0,
           ),
         ),
@@ -1159,9 +982,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xCC1E293B), // Slate 800 with 80% opacity
+                  color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF334155)), // Slate 700
+                  border: Border.all(color: AiraColors.border(isDark)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.06),
@@ -1200,8 +1023,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: Text(
                         item['title'],
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AiraColors.textPrimary(isDark),
                           fontWeight: FontWeight.bold,
                           fontSize: 10.5,
                         ),
@@ -1220,6 +1043,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildGlobalTravelDesks(BuildContext context, WidgetRef ref) {
     final userProfileState = ref.watch(userProfileProvider);
     final upcomingTrip = userProfileState.profile['upcomingTrip'];
+    final isDark = ref.watch(isDarkProvider);
     final String tripSubtitle;
 
     if (upcomingTrip == null) {
@@ -1249,12 +1073,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             Row(
               children: [
-                const Text(
+                Text(
                   'GLOBAL TRAVEL DESKS',
                   style: TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF94A3B8), // Slate 400
+                    color: AiraColors.textMuted(isDark),
                     letterSpacing: 1.0,
                   ),
                 ),
@@ -1349,14 +1173,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required Color iconColor,
     required VoidCallback onTap,
   }) {
+    final isDark = ref.read(isDarkProvider);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0xCC1E293B), // Slate 800 with 80% opacity
+          color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF334155)), // Slate 700
+          border: Border.all(color: AiraColors.border(isDark)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
@@ -1382,8 +1207,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AiraColors.textPrimary(isDark),
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
@@ -1391,15 +1216,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      color: Color(0xFF94A3B8), // Slate 400
+                    style: TextStyle(
+                      color: AiraColors.textSecondary(isDark),
                       fontSize: 10.5,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Color(0xFF64748B), size: 18),
+            Icon(Icons.chevron_right, color: AiraColors.textMuted(isDark), size: 18),
           ],
         ),
       ),
@@ -1473,17 +1298,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildDiscoverPlaces() {
+    final isDark = ref.watch(isDarkProvider);
     final List<String> categories = [
       "👤 Solo Traveler",
       "👩‍❤️‍👨 Couple / Romantic",
-      "☀️ Summer Beach",
+      "☀️  Summer Beach",
       "👨‍👩‍👦 Family Fun"
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
@@ -1491,7 +1317,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: TextStyle(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF94A3B8), // Slate 400
+                color: AiraColors.textMuted(isDark),
                 letterSpacing: 1.0,
               ),
             ),
@@ -1500,14 +1326,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF64748B),
+                color: AiraColors.textSecondary(isDark),
                 letterSpacing: 0.5,
               ),
             ),
           ],
         ),
         const SizedBox(height: 10),
-        // Choice Chips category list (Dark Styling)
+        // Choice Chips category list (Dark/Light Styling)
         SizedBox(
           height: 36,
           child: ListView.builder(
@@ -1528,10 +1354,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF1A2744), // Slate 800 unselected
+                      color: isSelected ? const Color(0xFF2563EB) : AiraColors.cardBg(isDark),
                       borderRadius: BorderRadius.circular(100),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF334155), // Slate 700 unselected
+                        color: isSelected ? const Color(0xFF2563EB) : AiraColors.border(isDark),
                       ),
                       boxShadow: isSelected
                           ? [
@@ -1548,7 +1374,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         cat,
                         style: TextStyle(
                           fontSize: 11,
-                          color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+                          color: isSelected ? Colors.white : AiraColors.textSecondary(isDark),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1566,7 +1392,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: ref.watch(discoverPlacesProvider(selectedCategory)).when(
             data: (places) {
               return places.isEmpty
-                  ? const Center(child: Text("No destinations found", style: TextStyle(color: Colors.white70)))
+                  ? Center(child: Text("No destinations found", style: TextStyle(color: AiraColors.textSecondary(isDark))))
                   : ListView.builder(
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
@@ -1582,9 +1408,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           width: 200,
                           margin: const EdgeInsets.only(right: 14, bottom: 8, top: 2),
                           decoration: BoxDecoration(
-                            color: const Color(0xCC1E293B), // Slate 800 (80% opacity)
+                            color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: const Color(0xFF334155)), // Slate 700
+                            border: Border.all(color: AiraColors.border(isDark)),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.15),
@@ -1608,8 +1434,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       fit: BoxFit.cover,
                                       errorBuilder: (context, error, stackTrace) => Container(
                                         height: 110,
-                                        color: const Color(0xFF1A2744),
-                                        child: const Icon(Icons.image, color: Colors.white24),
+                                        color: AiraColors.scaffoldBg(isDark),
+                                        child: Icon(Icons.image, color: AiraColors.textMuted(isDark).withValues(alpha: 0.3)),
                                       ),
                                     ),
                                   ),
@@ -1637,9 +1463,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF0A1628).withValues(alpha: 0.8), // Semi-transparent Slate 900
+                                        color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
                                         borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(color: const Color(0xFF334155)),
+                                        border: Border.all(color: AiraColors.border(isDark)),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
@@ -1648,8 +1474,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           const SizedBox(width: 2),
                                           Text(
                                             '${item['rating'] ?? 4.8}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
+                                            style: TextStyle(
+                                              color: AiraColors.textPrimary(isDark),
                                               fontSize: 9,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -1675,13 +1501,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.all(5),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF0A1628).withValues(alpha: 0.8), // Semi-transparent Slate 900
+                                          color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
                                           shape: BoxShape.circle,
-                                          border: Border.all(color: const Color(0xFF334155)),
+                                          border: Border.all(color: AiraColors.border(isDark)),
                                         ),
                                         child: Icon(
                                           isLiked ? Icons.favorite : Icons.favorite_border,
-                                          color: isLiked ? const Color(0xFFEF4444) : const Color(0xFF94A3B8),
+                                          color: isLiked ? const Color(0xFFEF4444) : AiraColors.textMuted(isDark),
                                           size: 13,
                                         ),
                                       ),
@@ -1704,10 +1530,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             name,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 13,
-                                              color: Colors.white,
+                                              color: AiraColors.textPrimary(isDark),
                                             ),
                                           ),
                                           const SizedBox(height: 1),
@@ -1725,8 +1551,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             item['desc'] ?? '',
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              color: Color(0xFF94A3B8), // Slate 400
+                                            style: TextStyle(
+                                              color: AiraColors.textSecondary(isDark),
                                               fontSize: 9.5,
                                               height: 1.3,
                                             ),
@@ -1743,9 +1569,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                               children: tags.take(1).map((tag) => Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                                                 decoration: BoxDecoration(
-                                                  color: const Color(0xFF0A1628), // Slate 900
+                                                  color: AiraColors.scaffoldBg(isDark),
                                                   borderRadius: BorderRadius.circular(6),
-                                                  border: Border.all(color: const Color(0xFF334155)),
+                                                  border: Border.all(color: AiraColors.border(isDark)),
                                                 ),
                                                 child: Text(
                                                   '#$tag',
@@ -1819,9 +1645,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     width: 200,
                     margin: const EdgeInsets.only(right: 14, bottom: 8, top: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0x22FFFFFF),
+                      color: AiraColors.cardBg(isDark).withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: const Color(0xFF334155).withValues(alpha: 0.3)),
+                      border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1904,9 +1730,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showPlaceDetailModal(Map<String, dynamic> item) {
+    final isDark = ref.read(isDarkProvider);
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0A1628), // Slate 900
+      backgroundColor: AiraColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1929,8 +1756,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     height: 160,
-                    color: const Color(0xFF1A2744),
-                    child: const Icon(Icons.image, color: Colors.white24, size: 40),
+                    color: AiraColors.cardBg(isDark),
+                    child: Icon(Icons.image, color: AiraColors.textMuted(isDark).withValues(alpha: 0.3), size: 40),
                   ),
                 ),
               ),
@@ -1940,7 +1767,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   Text(
                     item['name'],
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
                   ),
                   Row(
                     children: [
@@ -1948,7 +1775,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       const SizedBox(width: 4),
                       Text(
                         '${item['rating']}',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
                       ),
                     ],
                   ),
@@ -1957,12 +1784,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 2),
               Text(
                 '$countryCode • ${item['country']}',
-                style: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 13),
+                style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Text(
                 item['desc'],
-                style: const TextStyle(fontSize: 13, height: 1.4, color: Color(0xFFE2E8F0)), // Slate 200
+                style: TextStyle(fontSize: 13, height: 1.4, color: AiraColors.textPrimary(isDark)),
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -1990,9 +1817,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showTravelBuddiesModal() {
+    final isDark = ref.read(isDarkProvider);
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0A1628), // Slate 900
+      backgroundColor: AiraColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -2073,25 +1901,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF334155),
+                        color: AiraColors.border(isDark),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
                   const SizedBox(height: 18),
-                  const Text(
+                  Text(
                     'Travel Buddies Matches',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AiraColors.textPrimary(isDark),
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Matching destination & dates: $tripCity • $dateRangeStr',
-                    style: const TextStyle(
-                      color: Color(0xFF94A3B8),
+                    style: TextStyle(
+                      color: AiraColors.textSecondary(isDark),
                       fontSize: 12,
                     ),
                   ),
@@ -2105,9 +1933,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A2744), // Slate 800
+                          color: AiraColors.cardBg(isDark),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFF334155)), // Slate 700
+                          border: Border.all(color: AiraColors.border(isDark)),
                         ),
                         child: Row(
                           children: [
@@ -2127,7 +1955,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF065F46), // Green 800
                                       borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: const Color(0xFF1A2744), width: 1.5),
+                                      border: Border.all(color: AiraColors.cardBg(isDark), width: 1.5),
                                     ),
                                     child: Text(
                                       buddy['compatibility'],
@@ -2149,8 +1977,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 children: [
                                   Text(
                                     buddy['name'],
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: AiraColors.textPrimary(isDark),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -2166,8 +1994,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   const SizedBox(height: 3),
                                   Text(
                                     buddy['overlap'],
-                                    style: const TextStyle(
-                                      color: Color(0xFF94A3B8), // Slate 400
+                                    style: TextStyle(
+                                      color: AiraColors.textSecondary(isDark),
                                       fontSize: 9.5,
                                     ),
                                   ),
@@ -2180,13 +2008,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       return Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF0A1628),
+                                          color: AiraColors.scaffoldBg(isDark),
                                           borderRadius: BorderRadius.circular(4),
                                         ),
                                         child: Text(
                                           tag,
-                                          style: const TextStyle(
-                                            color: Color(0xFFC7D2FE),
+                                          style: TextStyle(
+                                            color: AiraColors.textSecondary(isDark),
                                             fontSize: 8,
                                           ),
                                         ),
@@ -2206,12 +2034,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   height: 28,
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: isConnected ? const Color(0xFF0A1628) : const Color(0xFF2563EB),
+                                      backgroundColor: isConnected ? AiraColors.scaffoldBg(isDark) : const Color(0xFF2563EB),
                                       padding: EdgeInsets.zero,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      side: isConnected ? const BorderSide(color: Color(0xFF334155)) : null,
+                                      side: isConnected ? BorderSide(color: AiraColors.border(isDark)) : null,
                                     ),
                                     onPressed: () {
                                       SoundSynthesizer.playTone(
@@ -2231,7 +2059,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     child: Text(
                                       isConnected ? 'Pending' : 'Connect',
                                       style: TextStyle(
-                                        color: isConnected ? const Color(0xFF94A3B8) : Colors.white,
+                                        color: isConnected ? AiraColors.textSecondary(isDark) : Colors.white,
                                         fontSize: 10.5,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -2271,15 +2099,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showBuddyItineraryModal(Map<String, dynamic> buddy) {
+    final isDark = ref.read(isDarkProvider);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1A2744), // Slate 800
+          backgroundColor: AiraColors.dialogBg(isDark),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
             '${buddy['name']}\'s Overlapping Itinerary',
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold),
           ),
           content: SizedBox(
             width: double.maxFinite,
@@ -2287,18 +2116,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Activities that match your dates:',
-                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
                 ),
                 const SizedBox(height: 12),
                 Column(
-                  children: (buddy['itinerary'] as List<Map<String, String>>).map((item) {
+                  children: (buddy['itinerary'] as List<Map<String, dynamic>>).map((item) {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0A1628), // Slate 900
+                        color: AiraColors.scaffoldBg(isDark),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -2311,12 +2140,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               children: [
                                 Text(
                                   item['activity']!,
-                                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12, fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   '📍 ${item['location']!}',
-                                  style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+                                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10),
                                 ),
                               ],
                             ),
@@ -2341,17 +2170,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildAiPicksList(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(isDarkProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            const Text(
+            Text(
               'AI PICKS FOR YOU',
               style: TextStyle(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF94A3B8), // Slate 400
+                color: AiraColors.textSecondary(isDark),
                 letterSpacing: 1.0,
               ),
             ),
@@ -2418,9 +2248,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   margin: const EdgeInsets.only(bottom: 10),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xCC1E293B),
+                    color: AiraColors.cardBg(isDark).withValues(alpha: 0.85),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFF334155)),
+                    border: Border.all(color: AiraColors.border(isDark)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.08),
@@ -2443,8 +2273,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               errorBuilder: (context, error, stackTrace) => Container(
                                 width: 72,
                                 height: 72,
-                                color: const Color(0xFF0A1628),
-                                child: const Icon(Icons.explore, color: Colors.white60),
+                                color: AiraColors.scaffoldBg(isDark),
+                                child: Icon(Icons.explore, color: AiraColors.textMuted(isDark)),
                               ),
                             ),
                           ),
@@ -2501,10 +2331,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12.5,
-                                color: Colors.white,
+                                color: AiraColors.textPrimary(isDark),
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -2524,13 +2354,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF0A1628),
+                                    color: AiraColors.scaffoldBg(isDark),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     tagStr,
-                                    style: const TextStyle(
-                                      color: Color(0xFFC7D2FE),
+                                    style: TextStyle(
+                                      color: AiraColors.textSecondary(isDark),
                                       fontSize: 8,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -2539,8 +2369,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 const SizedBox(width: 8),
                                 Text(
                                   'Cost: $costStr',
-                                  style: const TextStyle(
-                                    color: Color(0xFF94A3B8),
+                                  style: TextStyle(
+                                    color: AiraColors.textSecondary(isDark),
                                     fontSize: 10,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -2589,8 +2419,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: CircularProgressIndicator(color: Color(0xFF2563EB)),
             ),
           ),
-          error: (err, stack) => const Center(
-            child: Text('Error loading personalized recommendations', style: TextStyle(color: Colors.white70)),
+          error: (err, stack) => Center(
+            child: Text('Error loading personalized recommendations', style: TextStyle(color: AiraColors.textSecondary(isDark))),
           ),
         ),
       ],
@@ -2603,11 +2433,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userIdVal = profile['id'] ?? profile['email'] ?? '';
     final userId = userIdVal.toString().trim().isEmpty ? 'shreyas' : userIdVal;
     final joinCodeController = TextEditingController();
+    final isDark = ref.read(isDarkProvider);
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF020617), // Slate 950
+      backgroundColor: AiraColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -2617,6 +2448,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
         return StatefulBuilder(
           builder: (modalCtx, setModalState) {
+            final isDark = ref.watch(isDarkProvider);
             if (loading) {
               AiService.getUserSquads(userId).then((list) {
                 if (modalCtx.mounted) {
@@ -2645,7 +2477,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       width: 40,
                       height: 5,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF334155),
+                        color: AiraColors.border(isDark),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -2664,10 +2496,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: const Icon(Icons.groups, color: Colors.white, size: 18),
                       ),
                       const SizedBox(width: 10),
-                      const Text(
+                      Text(
                         'TRAVEL SQUADS',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AiraColors.textPrimary(isDark),
                           fontWeight: FontWeight.w900,
                           fontSize: 16,
                           letterSpacing: 0.5,
@@ -2721,19 +2553,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.1),
+                            color: AiraColors.cardBg(isDark),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                            border: Border.all(color: AiraColors.border(isDark)),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.login, color: Colors.white70, size: 14),
-                              SizedBox(width: 4),
+                              Icon(Icons.login, color: AiraColors.textSecondary(isDark), size: 14),
+                              const SizedBox(width: 4),
                               Text(
                                 'Join',
                                 style: TextStyle(
-                                  color: Colors.white70,
+                                  color: AiraColors.textSecondary(isDark),
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -2764,27 +2596,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A2744).withValues(alpha: 0.5),
+                        color: AiraColors.cardBg(isDark).withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+                        border: Border.all(color: AiraColors.border(isDark)),
                       ),
-                      child: const Column(
+                      child: Column(
                         children: [
-                          Icon(Icons.group_add, color: Color(0xFF2563EB), size: 36),
-                          SizedBox(height: 10),
+                          const Icon(Icons.group_add, color: Color(0xFF2563EB), size: 36),
+                          const SizedBox(height: 10),
                           Text(
                             'No Travel Squads Found',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AiraColors.textPrimary(isDark),
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             'Create a squad or join one with an invite code!',
                             style: TextStyle(
-                              color: Colors.white54,
+                              color: AiraColors.textSecondary(isDark),
                               fontSize: 12,
                             ),
                             textAlign: TextAlign.center,
@@ -2809,15 +2641,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  const Color(0xFF0A1628).withValues(alpha: 0.9),
-                                  const Color(0xFF312E81).withValues(alpha: 0.7),
+                                  AiraColors.cardBg(isDark).withValues(alpha: 0.95),
+                                  AiraColors.scaffoldBg(isDark).withValues(alpha: 0.85),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                                color: AiraColors.border(isDark),
                               ),
                             ),
                             child: Material(
@@ -2828,8 +2660,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                 title: Text(
                                   s['name'] ?? '',
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: AiraColors.textPrimary(isDark),
                                     fontWeight: FontWeight.w800,
                                     fontSize: 14,
                                   ),
@@ -2877,8 +2709,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       const SizedBox(height: 4),
                                       Text(
                                         '${daysAway}d away',
-                                        style: const TextStyle(
-                                          color: Colors.white38,
+                                        style: TextStyle(
+                                          color: AiraColors.textMuted(isDark),
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -2921,11 +2753,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final descCtrl = TextEditingController();
     final startCtrl = TextEditingController();
     final endCtrl = TextEditingController();
+    final isDark = ref.read(isDarkProvider);
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) {
         return Padding(
@@ -2935,17 +2768,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: const Color(0xFF334155), borderRadius: BorderRadius.circular(10)))),
+                Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: AiraColors.border(isDark), borderRadius: BorderRadius.circular(10)))),
                 const SizedBox(height: 16),
-                const Text('CREATE TRAVEL SQUAD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
+                Text('CREATE TRAVEL SQUAD', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
                 const SizedBox(height: 4),
-                const Text('Rally your crew for an epic trip!', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                Text('Rally your crew for an epic trip!', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12)),
                 const SizedBox(height: 16),
-                _squadField('Squad Name', nameCtrl, 'e.g. Tokyo Crew 2026'),
-                _squadField('Destination', destCtrl, 'e.g. Tokyo, Japan'),
-                _squadField('Description', descCtrl, 'Optional: purpose of the trip'),
-                _squadDateField(ctx, 'Start Date', startCtrl),
-                _squadDateField(ctx, 'End Date', endCtrl),
+                _squadField('Squad Name', nameCtrl, 'e.g. Tokyo Crew 2026', isDark),
+                _squadField('Destination', destCtrl, 'e.g. Tokyo, Japan', isDark),
+                _squadField('Description', descCtrl, 'Optional: purpose of the trip', isDark),
+                _squadDateField(ctx, 'Start Date', startCtrl, isDark),
+                _squadDateField(ctx, 'End Date', endCtrl, isDark),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -2993,9 +2826,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showJoinSquadSheet(BuildContext context, WidgetRef ref, TextEditingController joinCodeController, VoidCallback onSquadJoined) {
+    final isDark = ref.read(isDarkProvider);
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) {
         return Padding(
@@ -3004,23 +2838,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: const Color(0xFF334155), borderRadius: BorderRadius.circular(10)))),
+              Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: AiraColors.border(isDark), borderRadius: BorderRadius.circular(10)))),
               const SizedBox(height: 16),
-              const Text('JOIN A SQUAD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
+              Text('JOIN A SQUAD', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
               const SizedBox(height: 4),
-              const Text('Enter the 6-character invite code', style: TextStyle(color: Colors.white54, fontSize: 12)),
+              Text('Enter the 6-character invite code', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12)),
               const SizedBox(height: 16),
               TextField(
                 controller: joinCodeController,
-                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 6),
+                style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 6),
                 textAlign: TextAlign.center,
                 textCapitalization: TextCapitalization.characters,
                 maxLength: 6,
                 decoration: InputDecoration(
                   hintText: 'XXXXXX',
-                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.15), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 6),
+                  hintStyle: TextStyle(color: AiraColors.textMuted(isDark).withValues(alpha: 0.35), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 6),
                   filled: true,
-                  fillColor: const Color(0xFF1A2744),
+                  fillColor: AiraColors.scaffoldBg(isDark),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
                   counterText: '',
                 ),
@@ -3043,13 +2877,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         userId,
                         userName,
                       );
-                      if (ctx.mounted) Navigator.pop(ctx);
+                      if (!ctx.mounted) return;
+                      Navigator.pop(ctx);
                       onSquadJoined();
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Joined the squad! 🎉'), backgroundColor: Color(0xFF06D6A0)),
-                        );
-                      }
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        const SnackBar(content: Text('Joined the squad! 🎉'), backgroundColor: Color(0xFF06D6A0)),
+                      );
                     } catch (e) {
                       if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', '')), backgroundColor: Colors.red));
                     }
@@ -3072,19 +2905,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _squadField(String label, TextEditingController ctrl, String hint) {
+  Widget _squadField(String label, TextEditingController ctrl, String hint, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: TextField(
         controller: ctrl,
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 14),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: Colors.white54, fontSize: 12),
+          labelStyle: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
           hintText: hint,
-          hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
+          hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 13),
           filled: true,
-          fillColor: const Color(0xFF1A2744),
+          fillColor: AiraColors.cardBg(isDark),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),
@@ -3092,7 +2925,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _squadDateField(BuildContext context, String label, TextEditingController ctrl) {
+  Widget _squadDateField(BuildContext context, String label, TextEditingController ctrl, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: TextField(
@@ -3107,25 +2940,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             builder: (context, child) {
               return Theme(
                 data: Theme.of(context).copyWith(
-                  colorScheme: const ColorScheme.dark(
-                    primary: Color(0xFF2563EB), // Royal Blue
+                  colorScheme: ColorScheme.dark(
+                    primary: const Color(0xFF2563EB), // Royal Blue
                     onPrimary: Colors.white,
-                    surface: Color(0xFF1A2744),
-                    onSurface: Colors.white,
+                    surface: AiraColors.cardBg(isDark),
+                    onSurface: AiraColors.textPrimary(isDark),
                   ),
-                  dialogBackgroundColor: const Color(0xFF0A1628),
+                  dialogTheme: DialogThemeData(
+                    backgroundColor: AiraColors.dialogBg(isDark),
+                  ),
                   datePickerTheme: DatePickerThemeData(
-                    backgroundColor: const Color(0xFF0A1628),
-                    headerBackgroundColor: const Color(0xFF1E293B),
-                    headerForegroundColor: Colors.white,
-                    rangePickerHeaderBackgroundColor: const Color(0xFF1E293B),
-                    rangePickerHeaderForegroundColor: Colors.white,
+                    backgroundColor: AiraColors.dialogBg(isDark),
+                    headerBackgroundColor: AiraColors.scaffoldBg(isDark),
+                    headerForegroundColor: AiraColors.textPrimary(isDark),
+                    rangePickerHeaderBackgroundColor: AiraColors.scaffoldBg(isDark),
+                    rangePickerHeaderForegroundColor: AiraColors.textPrimary(isDark),
                     confirmButtonStyle: ButtonStyle(
                       foregroundColor: WidgetStateProperty.all(const Color(0xFF60A5FA)),
                       textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     cancelButtonStyle: ButtonStyle(
-                      foregroundColor: WidgetStateProperty.all(const Color(0xFF94A3B8)),
+                      foregroundColor: WidgetStateProperty.all(AiraColors.textSecondary(isDark)),
                       textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
@@ -3141,15 +2976,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ctrl.text = '$y-$m-$d';
           }
         },
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 14),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: Colors.white54, fontSize: 12),
+          labelStyle: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
           hintText: 'Tap to select date',
-          hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
+          hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 13),
           suffixIcon: const Icon(Icons.calendar_month, color: Color(0xFF2563EB), size: 18),
           filled: true,
-          fillColor: const Color(0xFF1A2744),
+          fillColor: AiraColors.cardBg(isDark),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),

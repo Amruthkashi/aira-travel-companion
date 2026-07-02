@@ -43,6 +43,7 @@ dependencies:
   # API & Storage
   dio: ^5.5.0
   hive_flutter: ^1.1.0
+  http: ^1.2.0
   
   # UI & Animations
   flutter_animate: ^4.5.0

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/models/travel_models.dart';
 import '../core/utils/sound_synthesizer.dart';
@@ -180,6 +182,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
   // Show detailed logs of matching items inside a category bottom drawer
   void _showCategoryLogs(String categoryName, List<TravelExpense> expenses, List<ItineraryDay> itinerary) {
+    final isDark = ref.read(isDarkProvider);
     final matchingExpenses = expenses.where((e) => _normalizeCategory(e.category) == categoryName).toList();
     final matchingActivities = <ActivityItem>[];
     for (var day in itinerary) {
@@ -198,7 +201,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -217,7 +220,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   width: 40,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF334155),
+                    color: AiraColors.border(isDark),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -228,36 +231,38 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 children: [
                   Text(_getCategoryEmoji(categoryName), style: const TextStyle(fontSize: 24)),
                   const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        categoryName.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          categoryName.toUpperCase(),
+                          style: TextStyle(
+                            color: AiraColors.textPrimary(isDark),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      const Text(
-                        'Category Ledger Breakdown & Allocations',
-                        style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        Text(
+                          'Category Ledger Breakdown & Allocations',
+                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-              const Divider(color: Color(0xFF334155), height: 32),
+              Divider(color: AiraColors.border(isDark), height: 32),
               
               // Contents
               Expanded(
                 child: (matchingExpenses.isEmpty && matchingActivities.isEmpty)
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No entries recorded in this category.',
-                          style: TextStyle(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w500),
+                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 13, fontWeight: FontWeight.w500),
                         ),
                       )
                     : ListView(
@@ -300,12 +305,12 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF334155),
+                    backgroundColor: isDark ? const Color(0xFF1A2744) : const Color(0xFFCBD5E1),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Dismiss Ledger', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: Text('Dismiss Ledger', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -322,25 +327,30 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     required bool isItinerary,
     VoidCallback? onDelete,
   }) {
+    final isDark = ref.read(isDarkProvider);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: AiraColors.border(isDark)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: isItinerary ? const Color(0xFF065F46) : const Color(0xFF0A1628),
+              color: isItinerary
+                  ? (isDark ? const Color(0xFF065F46) : const Color(0xFFD1FAE5))
+                  : (isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9)),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               isItinerary ? Icons.calendar_month : Icons.receipt_long,
-              color: isItinerary ? const Color(0xFF34D399) : const Color(0xFFC7D2FE),
+              color: isItinerary
+                  ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857))
+                  : (isDark ? const Color(0xFFC7D2FE) : const Color(0xFFFF6B35)),
               size: 16,
             ),
           ),
@@ -351,19 +361,19 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(color: Colors.white38, fontSize: 10)),
+                Text(subtitle, style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 10)),
               ],
             ),
           ),
           const SizedBox(width: 8),
           Text(
             _formatCurrency(usdAmount),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
+            style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 13),
           ),
           if (onDelete != null) ...[
             const SizedBox(width: 6),
@@ -381,6 +391,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(isDarkProvider);
     var spent = ref.watch(totalSpentProvider);
     final ceiling = ref.watch(budgetCeilingProvider);
     final expenses = ref.watch(expensesProvider);
@@ -404,13 +415,13 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     final taxSavings = _taxFreeReduction ? rawJpy * 0.1 : 0.0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A2744),
+        backgroundColor: AiraColors.cardBg(isDark),
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Intelligent Budget Planner',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
       body: SingleChildScrollView(
@@ -419,14 +430,14 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title Header Intro
-            const Text(
+            Text(
               'Intelligent Budget Planner',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20),
+              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 20),
             ),
             const SizedBox(height: 4),
             Text(
               'Dynamic currency conversions, category target checks, and localized cost suggestions personalized for your travel style.',
-              style: const TextStyle(color: Colors.white70, fontSize: 11.5, height: 1.4),
+              style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11.5, height: 1.4),
             ),
             const SizedBox(height: 18),
 
@@ -461,16 +472,17 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
   // 1. Currency Selector
   Widget _buildCurrencySelectorCard() {
+    final isDark = ref.read(isDarkProvider);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: AiraColors.border(isDark)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -479,10 +491,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'DISPLAY CURRENCY',
             style: TextStyle(
-              color: Color(0xFF94A3B8),
+              color: AiraColors.textSecondary(isDark),
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
@@ -492,7 +504,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: const Color(0xFF0A1628),
+              color: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -509,6 +521,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   }
 
   Widget _buildCurrencyPill(String code, String label) {
+    final isDark = ref.read(isDarkProvider);
     final isSelected = _selectedCurrency == code;
     return Expanded(
       child: GestureDetector(
@@ -526,12 +539,14 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF334155) : Colors.transparent,
+            color: isSelected
+                ? (isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1))
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     )
@@ -542,7 +557,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           child: Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+              color: isSelected ? AiraColors.textPrimary(isDark) : AiraColors.textSecondary(isDark),
               fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
               fontSize: 12.5,
             ),
@@ -554,15 +569,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
   // 2. Overall Spending Card
   Widget _buildOverallSpendingCard(double spent, double ceiling, double leftover, double spentPercentage) {
+    final isDark = ref.read(isDarkProvider);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: AiraColors.border(isDark)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -577,10 +593,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'OVERALL SPENDING RATE',
                     style: TextStyle(
-                      color: Color(0xFF94A3B8),
+                      color: AiraColors.textSecondary(isDark),
                       fontSize: 9.5,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.0,
@@ -589,7 +605,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   const SizedBox(height: 3),
                   Text(
                     'Target Ceiling vs. Expended',
-                    style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 13.5, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AiraColors.textPrimary(isDark).withValues(alpha: 0.95), fontSize: 13.5, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -616,7 +632,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                     child: CircularProgressIndicator(
                       value: spentPercentage.clamp(0.0, 1.0),
                       strokeWidth: 9.5,
-                      backgroundColor: const Color(0xFF334155),
+                      backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         spent > ceiling ? const Color(0xFFEF4444) : const Color(0xFF00B4D8),
                       ),
@@ -625,10 +641,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
+                      Text(
                         'LEFTOVER',
                         style: TextStyle(
-                          color: Color(0xFF94A3B8),
+                          color: AiraColors.textSecondary(isDark),
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
@@ -637,8 +653,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                       const SizedBox(height: 2),
                       Text(
                         _formatCurrency(leftover),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AiraColors.textPrimary(isDark),
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                         ),
@@ -653,10 +669,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'TOTAL EXPENDED',
                       style: TextStyle(
-                        color: Color(0xFF94A3B8),
+                        color: AiraColors.textSecondary(isDark),
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -666,16 +682,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                     Text(
                       _formatCurrency(spent),
                       style: TextStyle(
-                        color: spent > ceiling ? const Color(0xFFEF4444) : Colors.white,
+                        color: spent > ceiling ? const Color(0xFFEF4444) : AiraColors.textPrimary(isDark),
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
                     const SizedBox(height: 14),
-                    const Text(
+                    Text(
                       'TARGET CEILING',
                       style: TextStyle(
-                        color: Color(0xFF94A3B8),
+                        color: AiraColors.textSecondary(isDark),
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -684,8 +700,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                     const SizedBox(height: 2),
                     Text(
                       _formatCurrency(ceiling),
-                      style: const TextStyle(
-                        color: Colors.white70,
+                      style: TextStyle(
+                        color: AiraColors.textSecondary(isDark),
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -702,15 +718,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
   // 3. Category Allocations List Card
   Widget _buildCategoryAllocationsCard(List<TravelExpense> expenses, List<ItineraryDay> itinerary) {
+    final isDark = ref.read(isDarkProvider);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: AiraColors.border(isDark)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -719,10 +736,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'CATEGORY-WISE ALLOCATIONS',
             style: TextStyle(
-              color: Color(0xFF94A3B8),
+              color: AiraColors.textSecondary(isDark),
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
@@ -774,10 +791,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                             const SizedBox(width: 8),
                             Text(
                               cat,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: AiraColors.textPrimary(isDark),
                               ),
                             ),
                             if (isOver) ...[
@@ -815,7 +832,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                             fontWeight: FontWeight.bold,
                             color: isOver
                                 ? const Color(0xFFEF4444)
-                                : (isNear ? const Color(0xFFF97316) : const Color(0xFF94A3B8)),
+                                : (isNear ? const Color(0xFFF97316) : AiraColors.textSecondary(isDark)),
                           ),
                         ),
                       ],
@@ -825,7 +842,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                       borderRadius: BorderRadius.circular(6),
                       child: LinearProgressIndicator(
                         value: ratio,
-                        backgroundColor: const Color(0xFF0A1628),
+                        backgroundColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFE2E8F0),
                         color: barColor,
                         minHeight: 7.5,
                       ),
@@ -842,15 +859,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
   // 4. Add Custom Entry Ledger Form
   Widget _buildAddCustomEntryCard() {
+    final isDark = ref.read(isDarkProvider);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: AiraColors.border(isDark)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -859,10 +877,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'ADD CUSTOM ENTRY',
             style: TextStyle(
-              color: Color(0xFF94A3B8),
+              color: AiraColors.textSecondary(isDark),
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
@@ -879,16 +897,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   height: 44,
                   child: TextField(
                     controller: _descCtrl,
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
                     decoration: InputDecoration(
                       isDense: true,
                       hintText: 'Souvenir description...',
-                      hintStyle: const TextStyle(color: Colors.white38, fontSize: 12.5),
+                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12.5),
                       filled: true,
-                      fillColor: const Color(0xFF0A1628),
+                      fillColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xFF334155)),
+                        borderSide: BorderSide(color: AiraColors.border(isDark)),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -907,18 +925,18 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   child: TextField(
                     controller: _amountCtrl,
                     keyboardType: TextInputType.number,
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
                     decoration: InputDecoration(
                       isDense: true,
                       prefixText: '$_currencySymbol ',
                       prefixStyle: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF00B4D8)),
                       hintText: 'Amount',
-                      hintStyle: const TextStyle(color: Colors.white38, fontSize: 12.5),
+                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12.5),
                       filled: true,
-                      fillColor: const Color(0xFF0A1628),
+                      fillColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xFF334155)),
+                        borderSide: BorderSide(color: AiraColors.border(isDark)),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -934,10 +952,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           const SizedBox(height: 12),
 
           // Horizontal Category Pickers (Pills)
-          const Text(
+          Text(
             'SELECT LEDGER CATEGORY',
             style: TextStyle(
-              color: Color(0xFF94A3B8),
+              color: AiraColors.textSecondary(isDark),
               fontSize: 8.5,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
@@ -960,10 +978,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF0A1628),
+                        color: isSelected ? const Color(0xFF2563EB) : (isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9)),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF334155),
+                          color: isSelected ? const Color(0xFF2563EB) : AiraColors.border(isDark),
                         ),
                       ),
                       child: Row(
@@ -973,7 +991,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                           Text(
                             cat,
                             style: TextStyle(
-                              color: isSelected ? Colors.white : const Color(0xFF00B4D8),
+                              color: isSelected ? Colors.white : (isDark ? const Color(0xFF00B4D8) : const Color(0xFF0284C7)),
                               fontWeight: FontWeight.w900,
                               fontSize: 10.5,
                             ),
@@ -1051,15 +1069,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
   // 5. Aira Smart Savings Section
   Widget _buildSmartSavingsCard() {
+    final isDark = ref.read(isDarkProvider);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A1628), // Indigo 950
+        color: isDark ? const Color(0xFF0A1628) : const Color(0xFFEEF2F6),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF312E81)),
+        border: Border.all(color: isDark ? const Color(0xFF312E81) : const Color(0xFFC7D2FE)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2563EB).withOpacity(0.1),
+            color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.1 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -1076,18 +1095,18 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 child: const Icon(Icons.star, color: Color(0xFFFCD34D), size: 16),
               ),
               const SizedBox(width: 10),
-              const Text(
+              Text(
                 'Aira Smart Savings',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15),
+                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 15),
               ),
             ],
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Because you are a Solo Traveler opting for a Mid-range scale:',
-            style: TextStyle(color: Color(0xFFC7D2FE), fontSize: 11, fontWeight: FontWeight.bold),
+            style: TextStyle(color: isDark ? const Color(0xFFC7D2FE) : const Color(0xFF312E81), fontSize: 11, fontWeight: FontWeight.bold),
           ),
-          const Divider(color: Color(0xFF312E81), height: 20),
+          Divider(color: isDark ? const Color(0xFF312E81) : const Color(0xFFC7D2FE), height: 20),
 
           // Tip 1: Commute
           _buildSavingTipRow(
@@ -1102,7 +1121,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               });
             },
           ),
-          const Divider(color: Color(0xFF312E81), height: 16),
+          Divider(color: isDark ? const Color(0xFF312E81) : const Color(0xFFC7D2FE), height: 16),
 
           // Tip 2: Attractions
           _buildSavingTipRow(
@@ -1124,7 +1143,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               });
             },
           ),
-          const Divider(color: Color(0xFF312E81), height: 16),
+          Divider(color: isDark ? const Color(0xFF312E81) : const Color(0xFFC7D2FE), height: 16),
 
           // Tip 3: Dine
           _buildSavingTipRow(
@@ -1153,6 +1172,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     VoidCallback? onAction,
     VoidCallback? onOptimize,
   }) {
+    final isDark = ref.read(isDarkProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1162,7 +1182,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             const SizedBox(width: 8),
             Text(
               title,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
             ),
             const Spacer(),
             // Optimization toggle
@@ -1193,9 +1213,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0A1628),
+                    color: isDark ? const Color(0xFF0A1628) : const Color(0xFFE2E8F0),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF312E81)),
+                    border: Border.all(color: isDark ? const Color(0xFF312E81) : const Color(0xFFC7D2FE)),
                   ),
                   child: Text(
                     actionLabel,
@@ -1211,7 +1231,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           padding: const EdgeInsets.only(left: 26.0),
           child: Text(
             description,
-            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10.5, height: 1.35),
+            style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10.5, height: 1.35),
           ),
         ),
       ],
@@ -1220,15 +1240,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
   // 6. Smart Currency Converter (Legacy Card Integration)
   Widget _buildLegacyConverterCard(double jpyOutput, double taxSavings) {
+    final isDark = ref.read(isDarkProvider);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744),
+        color: AiraColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: AiraColors.border(isDark)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -1237,10 +1258,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'SMART CURRENCY CONVERTER',
             style: TextStyle(
-              color: Color(0xFF94A3B8),
+              color: AiraColors.textSecondary(isDark),
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
@@ -1255,16 +1276,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   child: TextField(
                     controller: _convInputCtrl,
                     keyboardType: TextInputType.number,
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
                     decoration: InputDecoration(
                       isDense: true,
                       labelText: 'Amount',
-                      labelStyle: const TextStyle(color: Colors.white54, fontSize: 11),
+                      labelStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 11),
                       filled: true,
-                      fillColor: const Color(0xFF0A1628),
+                      fillColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xFF334155)),
+                        borderSide: BorderSide(color: AiraColors.border(isDark)),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -1280,23 +1301,23 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0A1628),
+                  color: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF334155)),
+                  border: Border.all(color: AiraColors.border(isDark)),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: _fromCurrency,
-                    dropdownColor: const Color(0xFF1A2744),
-                    iconEnabledColor: Colors.white,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                    dropdownColor: AiraColors.cardBg(isDark),
+                    iconEnabledColor: AiraColors.textPrimary(isDark),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AiraColors.textPrimary(isDark)),
                     onChanged: (v) {
                       setState(() => _fromCurrency = v!);
                     },
                     items: ['USD', 'EUR', 'INR', 'GBP'].map((str) {
                       return DropdownMenuItem(
                         value: str,
-                        child: Text(str),
+                        child: Text(str, style: TextStyle(color: AiraColors.textPrimary(isDark))),
                       );
                     }).toList(),
                   ),
@@ -1310,9 +1331,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           Material(
             color: Colors.transparent,
             child: CheckboxListTile(
-              title: const Text(
+              title: Text(
                 'Include JPY Tax-Free Shopping (10% discount)',
-                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)),
+                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AiraColors.textSecondary(isDark)),
               ),
               value: _taxFreeReduction,
               activeColor: const Color(0xFF2563EB),
@@ -1329,15 +1350,15 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF0A1628),
+              color: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'JAPANESE YEN (JPY) VALUE',
-                  style: TextStyle(fontSize: 8.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                  style: TextStyle(fontSize: 8.5, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.w900, letterSpacing: 0.5),
                 ),
                 const SizedBox(height: 4),
                 Text(

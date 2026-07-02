@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -19,14 +18,23 @@ class AiService {
       }
     } catch (_) {}
 
-    if (kIsWeb) return 'https://aira-travel-companian.onrender.com';
+    if (kDebugMode) {
+      try {
+        if (!kIsWeb && Platform.isAndroid) {
+          return 'http://10.0.2.2:3005';
+        }
+      } catch (_) {}
+      return 'http://localhost:3005';
+    }
+
+    if (kIsWeb) return 'https://aira-backend-m6vn.onrender.com';
     try {
       if (Platform.isAndroid) {
-        return 'https://aira-travel-companian.onrender.com'; // Deployed Render Server
+        return 'https://aira-backend-m6vn.onrender.com'; // Deployed Render Server
       }
-      return 'https://aira-travel-companian.onrender.com'; // Deployed Render Server
+      return 'https://aira-backend-m6vn.onrender.com'; // Deployed Render Server
     } catch (_) {
-      return 'https://aira-travel-companian.onrender.com';
+      return 'https://aira-backend-m6vn.onrender.com';
     }
   }
 
@@ -86,7 +94,7 @@ class AiService {
       }
       return _getBackupPlaces(category);
     } catch (e) {
-      print('Error getting discover places from backend: $e');
+      debugPrint('Error getting discover places from backend: $e');
       return _getBackupPlaces(category);
     }
   }
@@ -116,7 +124,7 @@ class AiService {
       }
       return "I'm having trouble connecting to my servers right now. Let's try again in a moment! 🗺️";
     } catch (e) {
-      print('Error in Aira Chat backend call: $e');
+      debugPrint('Error in Aira Chat backend call: $e');
       return "I'm having trouble connecting to my servers right now. Let's try again in a moment! 🗺️";
     }
   }
@@ -132,7 +140,7 @@ class AiService {
         'query': query,
         'userId': profile['email'],
         'profile': profile,
-        if (days != null) 'days': days,
+        'days': days,
       });
 
       if (response.statusCode == 200) {
@@ -160,7 +168,7 @@ class AiService {
       }
       throw Exception("Backend return error");
     } catch (e) {
-      print('Error generating itinerary from backend: $e');
+      debugPrint('Error generating itinerary from backend: $e');
       final destination = profile['city'] ?? 'Tokyo';
       final cleanDest = destination.toString().trim();
       final capitalized = cleanDest.isNotEmpty 
@@ -278,7 +286,7 @@ class AiService {
       }
       return [];
     } catch (e) {
-      print('Error getting saved itinerary from backend: $e');
+      debugPrint('Error getting saved itinerary from backend: $e');
       return [];
     }
   }
@@ -309,7 +317,7 @@ class AiService {
       });
       return response.statusCode == 200;
     } catch (e) {
-      print('Error saving itinerary to backend: $e');
+      debugPrint('Error saving itinerary to backend: $e');
       return false;
     }
   }
@@ -330,7 +338,7 @@ class AiService {
       }
       throw Exception("Backend return error");
     } catch (e) {
-      print('Error generating packing list from backend: $e');
+      debugPrint('Error generating packing list from backend: $e');
       return [
         'Passport & travel visas',
         'Local currency cash & credit cards',
@@ -480,7 +488,7 @@ class AiService {
       }
       return [];
     } catch (e) {
-      print('Error fetching squads: $e');
+      debugPrint('Error fetching squads: $e');
       return [];
     }
   }
@@ -518,7 +526,7 @@ class AiService {
       }
       return null;
     } catch (e) {
-      print('Error sending squad message: $e');
+      debugPrint('Error sending squad message: $e');
       return null;
     }
   }
@@ -586,7 +594,7 @@ class AiService {
       }
       return [];
     } catch (e) {
-      print('Error getting squad AI suggestions: $e');
+      debugPrint('Error getting squad AI suggestions: $e');
       return [];
     }
   }

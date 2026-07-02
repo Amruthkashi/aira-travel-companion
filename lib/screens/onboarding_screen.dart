@@ -1,14 +1,17 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -43,8 +46,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(isDarkProvider);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628), // Slate 900
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -59,15 +64,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w900,
-                      color: Theme.of(context).primaryColor,
+                      color: const Color(0xFF2563EB),
                       letterSpacing: 1.5,
                     ),
                   ),
                   TextButton(
                     onPressed: () => context.go('/login'),
-                    child: const Text(
+                    child: Text(
                       'Skip',
-                      style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: isDark ? Colors.white54 : const Color(0xFF64748B),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -92,7 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             color: const Color(0xFF2563EB).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: const Color(0xFF2563EB).withValues(alpha: 0.25),
+                              color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.25 : 0.15),
                               width: 1.5,
                             ),
                           ),
@@ -111,11 +119,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         // Slide Title
                         Text(
                           slide['title']!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.w900,
                             letterSpacing: -1.2,
-                            color: Colors.white,
+                            color: isDark ? Colors.white : const Color(0xFF0A1628),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -123,9 +131,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         // Slide Description
                         Text(
                           slide['desc']!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
-                            color: Colors.white70,
+                            color: isDark ? Colors.white70 : const Color(0xFF475569),
                             height: 1.6,
                           ),
                         ),
@@ -147,8 +155,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     height: 10,
                     decoration: BoxDecoration(
                       color: _currentPage == idx
-                          ? Theme.of(context).primaryColor
-                          : Colors.white24,
+                          ? const Color(0xFF2563EB)
+                          : (isDark ? Colors.white24 : const Color(0xFFE2E8F0)),
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
@@ -162,7 +170,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 height: 54,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
+                    backgroundColor: const Color(0xFF2563EB),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -199,3 +207,4 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+

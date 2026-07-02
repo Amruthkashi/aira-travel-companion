@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/providers/theme_provider.dart';
+import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/utils/sound_synthesizer.dart';
 
@@ -10,11 +12,12 @@ class PastTripsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pastTrips = ref.watch(pastTripsProvider);
+    final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A1628), // Premium Dark Blue background
+      backgroundColor: AiraColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A2744),
+        backgroundColor: AiraColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: Padding(
@@ -23,13 +26,13 @@ class PastTripsScreen extends ConsumerWidget {
             child: Container(
               width: 36,
               height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFF0A1628),
+              decoration: BoxDecoration(
+                color: AiraColors.scaffoldBg(isDark),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 18),
+                icon: Icon(Icons.arrow_back, color: AiraColors.textPrimary(isDark), size: 18),
                 onPressed: () {
                   SoundSynthesizer.playTone(
                     frequency: 600,
@@ -42,10 +45,10 @@ class PastTripsScreen extends ConsumerWidget {
             ),
           ),
         ),
-        title: const Text(
+        title: Text(
           'PAST JOURNEYS',
           style: TextStyle(
-            color: Colors.white,
+            color: AiraColors.textPrimary(isDark),
             fontWeight: FontWeight.w900,
             fontSize: 14,
             letterSpacing: 1.5,
@@ -79,19 +82,19 @@ class PastTripsScreen extends ConsumerWidget {
         ],
       ),
       body: pastTrips.isEmpty
-          ? _buildEmptyState(context)
+          ? _buildEmptyState(context, isDark)
           : ListView.builder(
               padding: const EdgeInsets.all(16.0),
               itemCount: pastTrips.length,
               itemBuilder: (context, index) {
                 final trip = pastTrips[index];
-                return _buildTripCard(context, ref, trip);
+                return _buildTripCard(context, ref, trip, isDark);
               },
             ),
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, bool isDark) {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(32.0),
@@ -102,10 +105,10 @@ class PastTripsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A2744).withOpacity(0.4),
+                color: AiraColors.cardBg(isDark).withValues(alpha: 0.4),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color(0xFF2563EB).withOpacity(0.2),
+                  color: const Color(0xFF2563EB).withValues(alpha: 0.2),
                   width: 2,
                 ),
               ),
@@ -116,22 +119,22 @@ class PastTripsScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Not Yet Travelled',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
-                color: Colors.white,
+                color: AiraColors.textPrimary(isDark),
                 letterSpacing: 0.5,
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               'You haven\'t completed any past journeys yet. Once you finish an itinerary or archive past bookings, they will show up here as travel history.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                color: Color(0xFF94A3B8),
+                color: AiraColors.textSecondary(isDark),
                 height: 1.45,
               ),
             ),
@@ -141,7 +144,7 @@ class PastTripsScreen extends ConsumerWidget {
                 backgroundColor: const Color(0xFF2563EB),
                 foregroundColor: Colors.white,
                 elevation: 4,
-                shadowColor: const Color(0xFF2563EB).withOpacity(0.4),
+                shadowColor: const Color(0xFF2563EB).withValues(alpha: 0.4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -164,16 +167,16 @@ class PastTripsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTripCard(BuildContext context, WidgetRef ref, PastTrip trip) {
+  Widget _buildTripCard(BuildContext context, WidgetRef ref, PastTrip trip, bool isDark) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2744), // Card background
+        color: AiraColors.cardBg(isDark), // Card background
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF334155), width: 1.2),
+        border: Border.all(color: AiraColors.border(isDark), width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -193,7 +196,7 @@ class PastTripsScreen extends ConsumerWidget {
                   trip.image,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
-                    color: const Color(0xFF0F172A),
+                    color: const Color(0xFF0A1628),
                     child: const Icon(Icons.image_not_supported, color: Colors.white30, size: 40),
                   ),
                 ),
@@ -202,7 +205,7 @@ class PastTripsScreen extends ConsumerWidget {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+                        colors: [Colors.transparent, Colors.black.withValues(alpha: 0.6)],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
@@ -230,7 +233,7 @@ class PastTripsScreen extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF00B4D8).withOpacity(0.85),
+                      color: const Color(0xFF00B4D8).withValues(alpha: 0.85),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
@@ -266,8 +269,8 @@ class PastTripsScreen extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Text(
                       trip.dates,
-                      style: const TextStyle(
-                        color: Color(0xFFE2E8F0),
+                      style: TextStyle(
+                        color: AiraColors.textPrimary(isDark),
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -280,9 +283,9 @@ class PastTripsScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0A1628),
+                    color: AiraColors.scaffoldBg(isDark),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF334155)),
+                    border: Border.all(color: AiraColors.border(isDark)),
                   ),
                   child: Row(
                     children: [
@@ -291,8 +294,8 @@ class PastTripsScreen extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           'Theme: ${trip.theme}',
-                          style: const TextStyle(
-                            color: Color(0xFF94A3B8),
+                          style: TextStyle(
+                            color: AiraColors.textSecondary(isDark),
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
@@ -306,15 +309,15 @@ class PastTripsScreen extends ConsumerWidget {
                 // Highlight / Journal notes
                 Text(
                   trip.highlight,
-                  style: const TextStyle(
-                    color: Color(0xFFCBD5E1),
+                  style: TextStyle(
+                    color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                     fontSize: 12,
                     height: 1.45,
                   ),
                 ),
                 
                 const SizedBox(height: 12),
-                const Divider(color: Color(0xFF334155), height: 1),
+                Divider(color: AiraColors.border(isDark), height: 1),
                 const SizedBox(height: 12),
                 
                 // Card Actions (Delete & View Details)
@@ -322,7 +325,7 @@ class PastTripsScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton.icon(
-                      style: TextButton.styleFrom(foregroundColor: Colors.redAccent.withOpacity(0.85)),
+                      style: TextButton.styleFrom(foregroundColor: Colors.redAccent.withValues(alpha: 0.85)),
                       onPressed: () {
                         SoundSynthesizer.playTone(
                           frequency: 300,
@@ -336,12 +339,12 @@ class PastTripsScreen extends ConsumerWidget {
                     ),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0A1628),
+                        backgroundColor: AiraColors.scaffoldBg(isDark),
                         foregroundColor: const Color(0xFF00B4D8),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(color: Color(0xFF334155)),
+                          side: BorderSide(color: AiraColors.border(isDark)),
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
@@ -367,3 +370,4 @@ class PastTripsScreen extends ConsumerWidget {
     );
   }
 }
+

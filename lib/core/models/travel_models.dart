@@ -379,8 +379,8 @@ class ExplorePlaceItem {
     this.address = '',
     int durationMinutes = 60,
     this.isSelected = false,
-  }) : this.durationMinutes = _calculateDuration(genre, name),
-       this.estimatedDuration = _calculateDurationStr(genre, name);
+  }) : durationMinutes = _calculateDuration(genre, name),
+       estimatedDuration = _calculateDurationStr(genre, name);
 
   static int _calculateDuration(String genre, String name) {
     final g = genre.toLowerCase();

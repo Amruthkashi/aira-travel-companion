@@ -1,8 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../core/providers/travel_providers.dart';
+import '../core/providers/theme_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -48,7 +49,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
             context.go('/home');
           }
         } catch (e) {
-          print('Restoration of login session failed: $e');
+          debugPrint('Restoration of login session failed: $e');
           if (mounted) {
             setState(() {
               _isCheckingSession = false;
@@ -67,17 +68,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(isDarkProvider);
+
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF0A1628), // Slate 900
-              Color(0xFF020617), // Slate 950
-              Color(0xFF03001C), // Deep Indigo-black
-            ],
+            colors: isDark
+                ? const [
+                    Color(0xFF0A1628), // Slate 900
+                    Color(0xFF020617), // Slate 950
+                    Color(0xFF03001C), // Deep Indigo-black
+                  ]
+                : const [
+                    Color(0xFFF8FAFC), // Slate 50
+                    Color(0xFFEFF6FF), // Blue 50
+                    Color(0xFFDBEAFE), // Blue 100
+                  ],
           ),
         ),
         padding: const EdgeInsets.all(24.0),
@@ -114,13 +123,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
             const SizedBox(height: 28),
             
             // Brand Title
-            const Text(
+            Text(
               'Aira',
               style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.w900,
                 letterSpacing: -1.2,
-                color: Colors.white,
+                color: isDark ? Colors.white : const Color(0xFF0A1628),
               ),
             ),
             const SizedBox(height: 8),
@@ -131,7 +140,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: Colors.indigo.shade300,
+                color: isDark ? Colors.indigo.shade300 : Colors.indigo.shade600,
                 letterSpacing: 4.0,
               ),
             ),
@@ -150,10 +159,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
                 ),
               ),
               const SizedBox(height: 18),
-              const Center(
+              Center(
                 child: Text(
                   'Resuming secure travel session...',
-                  style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : const Color(0xFF475569),
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -164,8 +177,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
                 height: 54,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF0A1628),
+                    backgroundColor: isDark ? Colors.white : const Color(0xFF2563EB),
+                    foregroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
                     elevation: 4,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -193,15 +206,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
                 height: 52,
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white24, width: 1.5),
+                    side: BorderSide(
+                      color: isDark ? Colors.white24 : const Color(0xFFCBD5E1),
+                      width: 1.5,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   onPressed: () => context.go('/login'),
-                  child: const Text(
+                  child: Text(
                     'Quick Log In',
-                    style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : const Color(0xFF475569),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -213,3 +232,4 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
     );
   }
 }
+
