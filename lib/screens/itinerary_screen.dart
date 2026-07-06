@@ -308,54 +308,180 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 backgroundColor: const Color(0xFF0E7C86),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              onPressed: () {
+              onPressed: () async {
                 if (kIsWeb) {
                   try {
                     downloadHtmlFile(htmlContent, 'aira_itinerary.html');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('HTML file download started!')),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('HTML file download started!')),
+                      );
+                    }
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error downloading: $e')),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error downloading: $e')),
+                      );
+                    }
+                  }
+                  if (context.mounted) {
+                    Navigator.pop(context);
                   }
                 } else {
-                  Clipboard.setData(ClipboardData(text: htmlContent));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Itinerary HTML copied to clipboard (Downloads are web-only).')),
+                  if (context.mounted) {
+                    Navigator.pop(context); // close export dialog first
+                  }
+                  _showMobileOptionsDialog(
+                    context: context,
+                    title: 'HTML Export Options',
+                    saveOptionLabel: 'Save HTML to Downloads folder',
+                    shareOptionLabel: 'Share HTML file',
+                    onSave: () async {
+                      try {
+                        await downloadHtmlFile(htmlContent, 'aira_itinerary.html');
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('HTML saved to Downloads!')),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error saving HTML: $e')),
+                          );
+                        }
+                      }
+                    },
+                    onShare: () async {
+                      try {
+                        await shareHtmlFile(htmlContent, 'aira_itinerary.html');
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error sharing HTML: $e')),
+                          );
+                        }
+                      }
+                    },
                   );
                 }
-                Navigator.pop(context);
               },
-              icon: const Icon(Icons.download_rounded, size: 16, color: Colors.white),
-              label: const Text('Download HTML', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              icon: Icon(kIsWeb ? Icons.download_rounded : Icons.share_rounded, size: 16, color: Colors.white),
+              label: Text(kIsWeb ? 'Download HTML' : 'Share/Save HTML', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFEF4444),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              onPressed: () {
+              onPressed: () async {
                 if (kIsWeb) {
                   try {
                     openPrintWindow(htmlContent);
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error opening print preview: $e')),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error opening print preview: $e')),
+                      );
+                    }
+                  }
+                  if (context.mounted) {
+                    Navigator.pop(context);
                   }
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Print preview is only supported in web mode.')),
+                  if (context.mounted) {
+                    Navigator.pop(context); // close export dialog first
+                  }
+                  _showMobileOptionsDialog(
+                    context: context,
+                    title: 'PDF Export Options',
+                    saveOptionLabel: 'Save PDF to Downloads folder',
+                    shareOptionLabel: 'Share PDF file',
+                    onSave: () async {
+                      try {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Generating and saving PDF...'), duration: Duration(seconds: 1)),
+                          );
+                        }
+                        await savePdfFile(htmlContent, 'aira_itinerary.pdf');
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('PDF saved to Downloads!')),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error saving PDF: $e')),
+                          );
+                        }
+                      }
+                    },
+                    onShare: () async {
+                      try {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Preparing PDF document...'), duration: Duration(seconds: 1)),
+                          );
+                        }
+                        await sharePdfFile(htmlContent, 'aira_itinerary.pdf');
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error sharing PDF: $e')),
+                          );
+                        }
+                      }
+                    },
                   );
                 }
-                Navigator.pop(context);
               },
-              icon: const Icon(Icons.picture_as_pdf_rounded, size: 16, color: Colors.white),
-              label: const Text('Save as PDF', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              icon: Icon(kIsWeb ? Icons.picture_as_pdf_rounded : Icons.share_rounded, size: 16, color: Colors.white),
+              label: Text(kIsWeb ? 'Save as PDF' : 'Share/Save PDF', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _showMobileOptionsDialog({
+    required BuildContext context,
+    required String title,
+    required String saveOptionLabel,
+    required String shareOptionLabel,
+    required VoidCallback onSave,
+    required VoidCallback onShare,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF0A1628),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.download_rounded, color: Color(0xFF00B4D8)),
+                title: Text(saveOptionLabel, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                onTap: () {
+                  Navigator.pop(context);
+                  onSave();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share_rounded, color: Color(0xFF00B4D8)),
+                title: Text(shareOptionLabel, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                onTap: () {
+                  Navigator.pop(context);
+                  onShare();
+                },
+              ),
+            ],
+          ),
         );
       },
     );

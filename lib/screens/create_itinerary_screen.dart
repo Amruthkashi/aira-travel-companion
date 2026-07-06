@@ -13,7 +13,8 @@ class CreateItineraryScreen extends ConsumerStatefulWidget {
   const CreateItineraryScreen({super.key});
 
   @override
-  ConsumerState<CreateItineraryScreen> createState() => _CreateItineraryScreenState();
+  ConsumerState<CreateItineraryScreen> createState() =>
+      _CreateItineraryScreenState();
 }
 
 class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
@@ -80,7 +81,10 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
       setState(() {
         if (_scanProgress < 1.0) {
           _scanProgress += 0.17;
-          final idx = (_scanProgress * stages.length).floor().clamp(0, stages.length - 1);
+          final idx = (_scanProgress * stages.length).floor().clamp(
+            0,
+            stages.length - 1,
+          );
           _scanStatus = stages[idx];
         } else {
           _scanTimer?.cancel();
@@ -95,7 +99,8 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
           _datesCtrl.text = '2026-06-15 to 2026-06-20';
           _travelersCtrl.text = '2';
           _budgetCtrl.text = '\$1,500';
-          _preferencesCtrl.text = 'Anime Shopping, Local Food Stalls, Temples, Tech Gadgets';
+          _preferencesCtrl.text =
+              'Anime Shopping, Local Food Stalls, Temples, Tech Gadgets';
 
           SoundSynthesizer.playTone(
             frequency: 880,
@@ -110,7 +115,11 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
   void _startHourlyCompileSimulation() {
     if (_destCtrl.text.isEmpty || _datesCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please scan a ticket or enter Destination and Dates to plan your itinerary.')),
+        const SnackBar(
+          content: Text(
+            'Please scan a ticket or enter Destination and Dates to plan your itinerary.',
+          ),
+        ),
       );
       return;
     }
@@ -143,7 +152,10 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
       setState(() {
         if (_compileProgress < 1.0) {
           _compileProgress += 0.12;
-          final idx = (_compileProgress * stages.length).floor().clamp(0, stages.length - 1);
+          final idx = (_compileProgress * stages.length).floor().clamp(
+            0,
+            stages.length - 1,
+          );
           _compileStatus = stages[idx];
         } else {
           _compileTimer?.cancel();
@@ -155,13 +167,18 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
 
   void _executeCompilationCompletion() async {
     final userProfileState = ref.read(userProfileProvider);
-    final email = userProfileState.profile['email'] ?? 'shreyas.tokyo@gmail.com';
-    
+    final email =
+        userProfileState.profile['email'] ?? 'shreyas.tokyo@gmail.com';
+
     // Parse travel dates parameters
     final datesText = _datesCtrl.text.trim();
     final datesParts = datesText.split(' to ');
-    final startDateStr = datesParts.isNotEmpty && datesParts[0].isNotEmpty ? datesParts[0] : '2026-06-15';
-    final endDateStr = datesParts.length > 1 && datesParts[1].isNotEmpty ? datesParts[1] : '2026-06-20';
+    final startDateStr = datesParts.isNotEmpty && datesParts[0].isNotEmpty
+        ? datesParts[0]
+        : '2026-06-15';
+    final endDateStr = datesParts.length > 1 && datesParts[1].isNotEmpty
+        ? datesParts[1]
+        : '2026-06-20';
     final city = _destCtrl.text.replaceAll(', Japan', '').trim();
     final budget = _budgetCtrl.text.trim();
     final prefs = _preferencesCtrl.text.trim();
@@ -176,8 +193,8 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
       debugPrint('Error parsing dates for itinerary: $e');
     }
 
-    final List<String> prefList = prefs.isNotEmpty 
-        ? prefs.split(',').map((e) => e.trim()).toList() 
+    final List<String> prefList = prefs.isNotEmpty
+        ? prefs.split(',').map((e) => e.trim()).toList()
         : ['sightseeing'];
 
     // 1. Sync updated profile with backend
@@ -189,10 +206,12 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
         'city': city,
         'startDate': startDateStr,
         'endDate': endDateStr,
-      }
+      },
     });
 
-    final profileMap = Map<String, dynamic>.from(ref.read(userProfileProvider).profile);
+    final profileMap = Map<String, dynamic>.from(
+      ref.read(userProfileProvider).profile,
+    );
     profileMap['dnaFoodie'] = userProfileState.dnaFoodie;
     profileMap['dnaHeritage'] = userProfileState.dnaHeritage;
     profileMap['dnaTech'] = userProfileState.dnaTech;
@@ -228,7 +247,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
       setState(() {
         _isCompiling = false;
       });
-      
+
       // Go back to Home and switch to Trips tab (index 2)
       ref.read(currentTabProvider.notifier).state = 2; // Trips
       context.go('/home');
@@ -238,89 +257,107 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
   List<ItineraryDay> _generateFallbackItinerary(String destination, int days) {
     final List<ItineraryDay> list = [];
     final cleanDest = destination.trim();
-    final capitalized = cleanDest.isNotEmpty 
+    final capitalized = cleanDest.isNotEmpty
         ? cleanDest[0].toUpperCase() + cleanDest.substring(1)
         : 'Destination';
 
     for (int d = 1; d <= days; d++) {
-      list.add(ItineraryDay(
-        day: d,
-        theme: 'Culture & Local Flavors of $capitalized - Day $d',
-        activities: [
-          ActivityItem(
-            time: '08:30 AM',
-            activity: 'Healthy Local Breakfast',
-            description: 'Start your morning with freshly brewed artisanal coffee and a selection of freshly baked local pastries or a traditional breakfast set at a highly-rated neighborhood cafe.',
-            cost: '\$8',
-            locationName: '$capitalized Morning Bistro',
-            suggestedAttire: 'Casual day wear',
-            transport: 'Short 5-minute walk from hotel',
-            ticketInfo: 'No reservation required',
-            placeDetails: 'A cozy local spot loved by residents for its warm hospitality and freshly ground coffee beans.',
-            checked: false,
-          ),
-          ActivityItem(
-            time: '10:00 AM',
-            activity: 'Iconic Central Landmark Tour',
-            description: 'Stroll around the central historic plazas, view majestic architectural monuments, and capture beautiful morning photos of the city\'s most defining civic landmarks.',
-            cost: 'Free',
-            locationName: '$capitalized Heritage Plaza',
-            suggestedAttire: 'Comfortable walking shoes & light layers',
-            transport: 'Board local commuter rail to Central Station, walk 3 mins',
-            ticketInfo: 'Open public area access',
-            placeDetails: 'Established in the early historical era, this prominent plaza represents the rich cultural heart of the city.',
-            checked: false,
-          ),
-          ActivityItem(
-            time: '01:00 PM',
-            activity: 'Gastronomy & Local Food Tour',
-            description: 'Explore a vibrant open-air market filled with diverse food stalls. Sample unique regional street food delicacies, local specialties, and freshly prepared bites.',
-            cost: '\$25',
-            locationName: '$capitalized City Market Hall',
-            suggestedAttire: 'Casual streetwear',
-            transport: 'Short taxi ride or walk (10 mins)',
-            ticketInfo: 'Cash highly recommended at individual stalls',
-            placeDetails: 'A bustling commercial market featuring family-owned food stalls passing down authentic recipes for generations.',
-            checked: false,
-          ),
-          ActivityItem(
-            time: '03:30 PM',
-            activity: 'Art & History Museum Visit',
-            description: 'Immerse yourself in history and artistic expression. View collections of historical artifacts, fine art, and contemporary exhibitions depicting local history.',
-            cost: '\$15',
-            locationName: '$capitalized Museum of Art & History',
-            suggestedAttire: 'Smart casual / Modest for indoor exhibits',
-            transport: 'Walk 5 minutes north from City Market Hall',
-            ticketInfo: 'Purchase entry ticket at the reception desk',
-            placeDetails: 'A world-class civic institution housing important national treasures and temporary modern art galleries.',
-            checked: false,
-          ),
-          ActivityItem(
-            time: '06:30 PM',
-            activity: 'Sunset Scenic Viewpoint',
-            description: 'Climb to an elevated observation deck or scenic hilltop park just in time to watch the setting sun paint the city skyline. Perfect for panoramic photography.',
-            cost: '\$18',
-            locationName: '$capitalized Skyline Observation Tower',
-            suggestedAttire: 'Light jacket (it gets breezy at high elevations)',
-            transport: 'Take local subway Line 4 to Heights Station, follow exit signs',
-            ticketInfo: 'Online pre-booked ticket voucher recommended for sunset slots',
-            placeDetails: 'Standing tall over the cityscape, this observation deck offers breathtaking 360-degree views of the horizon.',
-            checked: false,
-          ),
-          ActivityItem(
-            time: '08:00 PM',
-            activity: 'Signature Local Dinner',
-            description: 'Dine in a highly-rated traditional restaurant situated in an atmospheric neighborhood. Enjoy a multi-course dinner of classic regional recipes and local specialties.',
-            cost: '\$35',
-            locationName: 'Traditional Dining District',
-            suggestedAttire: 'Smart casual',
-            transport: 'Short taxi ride or walk',
-            ticketInfo: 'Reservation confirmed under travel profile',
-            placeDetails: 'A highly praised dining spot famous for its authentic cooking techniques and welcoming, cozy atmosphere.',
-            checked: false,
-          ),
-        ],
-      ));
+      list.add(
+        ItineraryDay(
+          day: d,
+          theme: 'Culture & Local Flavors of $capitalized - Day $d',
+          activities: [
+            ActivityItem(
+              time: '08:30 AM',
+              activity: 'Healthy Local Breakfast',
+              description:
+                  'Start your morning with freshly brewed artisanal coffee and a selection of freshly baked local pastries or a traditional breakfast set at a highly-rated neighborhood cafe.',
+              cost: '\$8',
+              locationName: '$capitalized Morning Bistro',
+              suggestedAttire: 'Casual day wear',
+              transport: 'Short 5-minute walk from hotel',
+              ticketInfo: 'No reservation required',
+              placeDetails:
+                  'A cozy local spot loved by residents for its warm hospitality and freshly ground coffee beans.',
+              checked: false,
+            ),
+            ActivityItem(
+              time: '10:00 AM',
+              activity: 'Iconic Central Landmark Tour',
+              description:
+                  'Stroll around the central historic plazas, view majestic architectural monuments, and capture beautiful morning photos of the city\'s most defining civic landmarks.',
+              cost: 'Free',
+              locationName: '$capitalized Heritage Plaza',
+              suggestedAttire: 'Comfortable walking shoes & light layers',
+              transport:
+                  'Board local commuter rail to Central Station, walk 3 mins',
+              ticketInfo: 'Open public area access',
+              placeDetails:
+                  'Established in the early historical era, this prominent plaza represents the rich cultural heart of the city.',
+              checked: false,
+            ),
+            ActivityItem(
+              time: '01:00 PM',
+              activity: 'Gastronomy & Local Food Tour',
+              description:
+                  'Explore a vibrant open-air market filled with diverse food stalls. Sample unique regional street food delicacies, local specialties, and freshly prepared bites.',
+              cost: '\$25',
+              locationName: '$capitalized City Market Hall',
+              suggestedAttire: 'Casual streetwear',
+              transport: 'Short taxi ride or walk (10 mins)',
+              ticketInfo: 'Cash highly recommended at individual stalls',
+              placeDetails:
+                  'A bustling commercial market featuring family-owned food stalls passing down authentic recipes for generations.',
+              checked: false,
+            ),
+            ActivityItem(
+              time: '03:30 PM',
+              activity: 'Art & History Museum Visit',
+              description:
+                  'Immerse yourself in history and artistic expression. View collections of historical artifacts, fine art, and contemporary exhibitions depicting local history.',
+              cost: '\$15',
+              locationName: '$capitalized Museum of Art & History',
+              suggestedAttire: 'Smart casual / Modest for indoor exhibits',
+              transport: 'Walk 5 minutes north from City Market Hall',
+              ticketInfo: 'Purchase entry ticket at the reception desk',
+              placeDetails:
+                  'A world-class civic institution housing important national treasures and temporary modern art galleries.',
+              checked: false,
+            ),
+            ActivityItem(
+              time: '06:30 PM',
+              activity: 'Sunset Scenic Viewpoint',
+              description:
+                  'Climb to an elevated observation deck or scenic hilltop park just in time to watch the setting sun paint the city skyline. Perfect for panoramic photography.',
+              cost: '\$18',
+              locationName: '$capitalized Skyline Observation Tower',
+              suggestedAttire:
+                  'Light jacket (it gets breezy at high elevations)',
+              transport:
+                  'Take local subway Line 4 to Heights Station, follow exit signs',
+              ticketInfo:
+                  'Online pre-booked ticket voucher recommended for sunset slots',
+              placeDetails:
+                  'Standing tall over the cityscape, this observation deck offers breathtaking 360-degree views of the horizon.',
+              checked: false,
+            ),
+            ActivityItem(
+              time: '08:00 PM',
+              activity: 'Signature Local Dinner',
+              description:
+                  'Dine in a highly-rated traditional restaurant situated in an atmospheric neighborhood. Enjoy a multi-course dinner of classic regional recipes and local specialties.',
+              cost: '\$35',
+              locationName: 'Traditional Dining District',
+              suggestedAttire: 'Smart casual',
+              transport: 'Short taxi ride or walk',
+              ticketInfo: 'Reservation confirmed under travel profile',
+              placeDetails:
+                  'A highly praised dining spot famous for its authentic cooking techniques and welcoming, cozy atmosphere.',
+              checked: false,
+            ),
+          ],
+        ),
+      );
     }
     return list;
   }
@@ -343,11 +380,20 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
           children: [
             Text(
               'Create Itinerary',
-              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 18),
+              style: TextStyle(
+                color: AiraColors.textPrimary(isDark),
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
             const Text(
               'CONTINUOUS COMPILATION',
-              style: TextStyle(color: Color(0xFF00B4D8), fontWeight: FontWeight.w800, fontSize: 9, letterSpacing: 0.5),
+              style: TextStyle(
+                color: Color(0xFF00B4D8),
+                fontWeight: FontWeight.w800,
+                fontSize: 9,
+                letterSpacing: 0.5,
+              ),
             ),
           ],
         ),
@@ -373,10 +419,18 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF312E81).withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
+                          color: isDark
+                              ? const Color(0xFF312E81).withValues(alpha: 0.5)
+                              : const Color(0xFFE2E8F0),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.confirmation_number, color: isDark ? const Color(0xFFC7D2FE) : const Color(0xFFFF6B35), size: 24),
+                        child: Icon(
+                          Icons.confirmation_number,
+                          color: isDark
+                              ? const Color(0xFFC7D2FE)
+                              : const Color(0xFFFF6B35),
+                          size: 24,
+                        ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -385,12 +439,20 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                           children: [
                             Text(
                               'Smart Ticket Sync',
-                              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13.5),
+                              style: TextStyle(
+                                color: AiraColors.textPrimary(isDark),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.5,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Scan your boarding pass or booking voucher with your device camera for instant form auto-fill!',
-                              style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10.5, height: 1.3),
+                              style: TextStyle(
+                                color: AiraColors.textSecondary(isDark),
+                                fontSize: 10.5,
+                                height: 1.3,
+                              ),
                             ),
                           ],
                         ),
@@ -400,12 +462,28 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF2563EB),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
                         ),
                         onPressed: _startCameraScanSimulation,
-                        icon: const Icon(Icons.camera_alt, color: Colors.white, size: 14),
-                        label: const Text('SCAN', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 10.5)),
+                        icon: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: 14,
+                        ),
+                        label: const Text(
+                          'SCAN',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 10.5,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -415,21 +493,43 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                 // 2. Title Section
                 Text(
                   'Custom Traveler Flight & Dates Parameters',
-                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14.5),
+                  style: TextStyle(
+                    color: AiraColors.textPrimary(isDark),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.5,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'Set your custom flight details, budget caps, and specific travel themes. Our compiler loads fully grounded itineraries in seconds.',
-                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, height: 1.4),
+                  style: TextStyle(
+                    color: AiraColors.textSecondary(isDark),
+                    fontSize: 11,
+                    height: 1.4,
+                  ),
                 ),
                 const SizedBox(height: 20),
 
                 // 3. Form Fields
                 Row(
                   children: [
-                    Expanded(child: _buildFormField('SOURCE LOCATION', _sourceCtrl, 'e.g. Bangalore, India', isDark)),
+                    Expanded(
+                      child: _buildFormField(
+                        'SOURCE LOCATION',
+                        _sourceCtrl,
+                        'e.g. Bangalore, India',
+                        isDark,
+                      ),
+                    ),
                     const SizedBox(width: 14),
-                    Expanded(child: _buildFormField('DESTINATION', _destCtrl, 'e.g. Tokyo, Japan', isDark)),
+                    Expanded(
+                      child: _buildFormField(
+                        'DESTINATION',
+                        _destCtrl,
+                        'e.g. Tokyo, Japan',
+                        isDark,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -442,7 +542,12 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                         children: [
                           Text(
                             'MODE OF TRANSPORT',
-                            style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
+                            style: TextStyle(
+                              color: AiraColors.textSecondary(isDark),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9.5,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                           const SizedBox(height: 6),
                           Container(
@@ -450,16 +555,27 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                             decoration: BoxDecoration(
                               color: AiraColors.cardBg(isDark),
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: AiraColors.border(isDark)),
+                              border: Border.all(
+                                color: AiraColors.border(isDark),
+                              ),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: _transportMode,
                                 dropdownColor: AiraColors.cardBg(isDark),
                                 isExpanded: true,
-                                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
-                                icon: Icon(Icons.keyboard_arrow_down, color: AiraColors.textSecondary(isDark)),
-                                items: <String>['Flight', 'Train', 'Car'].map((String val) {
+                                style: TextStyle(
+                                  color: AiraColors.textPrimary(isDark),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12.5,
+                                ),
+                                icon: Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: AiraColors.textSecondary(isDark),
+                                ),
+                                items: <String>['Flight', 'Train', 'Car'].map((
+                                  String val,
+                                ) {
                                   return DropdownMenuItem<String>(
                                     value: val,
                                     child: Row(
@@ -467,12 +583,21 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                                         Icon(
                                           val == 'Flight'
                                               ? Icons.flight
-                                              : (val == 'Train' ? Icons.train : Icons.directions_car),
+                                              : (val == 'Train'
+                                                    ? Icons.train
+                                                    : Icons.directions_car),
                                           color: const Color(0xFF00B4D8),
                                           size: 14,
                                         ),
                                         const SizedBox(width: 8),
-                                        Text(val, style: TextStyle(color: AiraColors.textPrimary(isDark))),
+                                        Text(
+                                          val,
+                                          style: TextStyle(
+                                            color: AiraColors.textPrimary(
+                                              isDark,
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   );
@@ -491,33 +616,79 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                       ),
                     ),
                     const SizedBox(width: 14),
-                    Expanded(child: _buildFormField('TRAVEL PROVIDER', _providerCtrl, 'e.g. Direct Airline', isDark)),
+                    Expanded(
+                      child: _buildFormField(
+                        'TRAVEL PROVIDER',
+                        _providerCtrl,
+                        'e.g. Direct Airline',
+                        isDark,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 14),
 
                 Row(
                   children: [
-                    Expanded(child: _buildFormField('FLIGHT PNR CODE', _pnrCtrl, 'e.g. NH-782Y9W', isDark)),
+                    Expanded(
+                      child: _buildFormField(
+                        'FLIGHT PNR CODE',
+                        _pnrCtrl,
+                        'e.g. NH-782Y9W',
+                        isDark,
+                      ),
+                    ),
                     const SizedBox(width: 14),
-                    Expanded(child: _buildFormField('TRAIN NUMBER (OPTIONAL)', _trainCtrl, 'e.g. JR East', isDark)),
+                    Expanded(
+                      child: _buildFormField(
+                        'TRAIN NUMBER (OPTIONAL)',
+                        _trainCtrl,
+                        'e.g. JR East',
+                        isDark,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 14),
 
                 Row(
                   children: [
-                    Expanded(child: _buildDateRangeField('TRAVEL DATES', _datesCtrl, isDark)),
+                    Expanded(
+                      child: _buildDateRangeField(
+                        'TRAVEL DATES',
+                        _datesCtrl,
+                        isDark,
+                      ),
+                    ),
                     const SizedBox(width: 14),
-                    Expanded(child: _buildFormField('TRAVELERS', _travelersCtrl, '1', isDark, isNumeric: true)),
+                    Expanded(
+                      child: _buildFormField(
+                        'TRAVELERS',
+                        _travelersCtrl,
+                        '1',
+                        isDark,
+                        isNumeric: true,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 14),
 
-                _buildFormField('TOTAL ALLOCATED BUDGET', _budgetCtrl, 'e.g. \$1,500', isDark),
+                _buildFormField(
+                  'TOTAL ALLOCATED BUDGET',
+                  _budgetCtrl,
+                  'e.g. \$1,500',
+                  isDark,
+                ),
                 const SizedBox(height: 14),
 
-                _buildFormField('TRAVEL STYLE & PREFERENCES', _preferencesCtrl, 'e.g. Anime Shopping, Food Stalls, Temples', isDark, maxLines: 2),
+                _buildFormField(
+                  'TRAVEL STYLE & PREFERENCES',
+                  _preferencesCtrl,
+                  'e.g. Anime Shopping, Food Stalls, Temples',
+                  isDark,
+                  maxLines: 2,
+                ),
                 const SizedBox(height: 32),
 
                 // Full Wizard Button (Primary CTA)
@@ -527,29 +698,49 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF10B981),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       elevation: 6,
                     ),
                     onPressed: () {
                       // Pass form data to wizard providers
                       if (_destCtrl.text.isNotEmpty) {
-                        ref.read(tripBookingsProvider.notifier).setDestination(_destCtrl.text);
+                        ref
+                            .read(tripBookingsProvider.notifier)
+                            .setDestination(_destCtrl.text);
                       }
                       // Pre-fill flight if source/dest provided
-                      if (_sourceCtrl.text.isNotEmpty && _destCtrl.text.isNotEmpty) {
-                        ref.read(tripBookingsProvider.notifier).addFlight(FlightBooking(
-                          id: 'flt-prefill-${DateTime.now().millisecondsSinceEpoch}',
-                          airline: _providerCtrl.text.isNotEmpty ? _providerCtrl.text : 'Airline',
-                          flightNumber: _pnrCtrl.text.isNotEmpty ? _pnrCtrl.text.split('-').first : '',
-                          pnr: _pnrCtrl.text,
-                          departureCity: _sourceCtrl.text,
-                          arrivalCity: _destCtrl.text,
-                          departureDate: _datesCtrl.text.split(' to ').isNotEmpty ? _datesCtrl.text.split(' to ').first : '',
-                          arrivalDate: _datesCtrl.text.split(' to ').length > 1 ? _datesCtrl.text.split(' to ').last : '',
-                          seatClass: 'Economy',
-                          passengers: int.tryParse(_travelersCtrl.text) ?? 1,
-                          flightType: 'going',
-                        ));
+                      if (_sourceCtrl.text.isNotEmpty &&
+                          _destCtrl.text.isNotEmpty) {
+                        ref
+                            .read(tripBookingsProvider.notifier)
+                            .addFlight(
+                              FlightBooking(
+                                id: 'flt-prefill-${DateTime.now().millisecondsSinceEpoch}',
+                                airline: _providerCtrl.text.isNotEmpty
+                                    ? _providerCtrl.text
+                                    : 'Airline',
+                                flightNumber: _pnrCtrl.text.isNotEmpty
+                                    ? _pnrCtrl.text.split('-').first
+                                    : '',
+                                pnr: _pnrCtrl.text,
+                                departureCity: _sourceCtrl.text,
+                                arrivalCity: _destCtrl.text,
+                                departureDate:
+                                    _datesCtrl.text.split(' to ').isNotEmpty
+                                    ? _datesCtrl.text.split(' to ').first
+                                    : '',
+                                arrivalDate:
+                                    _datesCtrl.text.split(' to ').length > 1
+                                    ? _datesCtrl.text.split(' to ').last
+                                    : '',
+                                seatClass: 'Economy',
+                                passengers:
+                                    int.tryParse(_travelersCtrl.text) ?? 1,
+                                flightType: 'going',
+                              ),
+                            );
                       }
                       context.push('/itinerary-wizard/bookings');
                     },
@@ -559,11 +750,20 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                         Icon(Icons.auto_awesome, color: Colors.white, size: 20),
                         SizedBox(width: 10),
                         Text(
-                          'FULL ITINERARY WIZARD',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+                          'COMPLETE ITINERARY WIZARD',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                         SizedBox(width: 8),
-                        Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                       ],
                     ),
                   ),
@@ -577,8 +777,12 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFF2563EB)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      foregroundColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      foregroundColor: isDark
+                          ? const Color(0xFF60A5FA)
+                          : const Color(0xFF2563EB),
                     ),
                     onPressed: _startHourlyCompileSimulation,
                     child: const Row(
@@ -588,14 +792,17 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                         SizedBox(width: 8),
                         Text(
                           'QUICK COMPILE (AI ONLY)',
-                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 0.5),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 12,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-
               ],
             ),
           ),
@@ -610,24 +817,43 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
     );
   }
 
-  Widget _buildFormField(String label, TextEditingController ctrl, String hint, bool isDark, {int maxLines = 1, bool isNumeric = false}) {
+  Widget _buildFormField(
+    String label,
+    TextEditingController ctrl,
+    String hint,
+    bool isDark, {
+    int maxLines = 1,
+    bool isNumeric = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
+          style: TextStyle(
+            color: AiraColors.textSecondary(isDark),
+            fontWeight: FontWeight.bold,
+            fontSize: 9.5,
+            letterSpacing: 0.5,
+          ),
         ),
         const SizedBox(height: 6),
         TextField(
           controller: ctrl,
           maxLines: maxLines,
           keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
+          style: TextStyle(
+            color: AiraColors.textPrimary(isDark),
+            fontWeight: FontWeight.bold,
+            fontSize: 12.5,
+          ),
           decoration: InputDecoration(
             isDense: true,
             hintText: hint,
-            hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
+            hintStyle: TextStyle(
+              color: AiraColors.textMuted(isDark),
+              fontSize: 12,
+            ),
             filled: true,
             fillColor: AiraColors.cardBg(isDark),
             contentPadding: const EdgeInsets.all(12),
@@ -645,13 +871,22 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
     );
   }
 
-  Widget _buildDateRangeField(String label, TextEditingController ctrl, bool isDark) {
+  Widget _buildDateRangeField(
+    String label,
+    TextEditingController ctrl,
+    bool isDark,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 9.5, letterSpacing: 0.5),
+          style: TextStyle(
+            color: AiraColors.textSecondary(isDark),
+            fontWeight: FontWeight.bold,
+            fontSize: 9.5,
+            letterSpacing: 0.5,
+          ),
         ),
         const SizedBox(height: 6),
         TextField(
@@ -682,7 +917,9 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                             onSurface: Colors.white,
                             secondary: Color(0xFF00B4D8),
                           ),
-                          dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF0A1628),),
+                          dialogTheme: DialogThemeData(
+                            backgroundColor: const Color(0xFF0A1628),
+                          ),
                           datePickerTheme: const DatePickerThemeData(
                             backgroundColor: Color(0xFF0A1628),
                             headerBackgroundColor: Color(0xFF1A2744),
@@ -693,7 +930,9 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                           textButtonTheme: TextButtonThemeData(
                             style: TextButton.styleFrom(
                               foregroundColor: const Color(0xFF60A5FA),
-                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         )
@@ -710,7 +949,9 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                             onSurface: Colors.black87,
                             secondary: Color(0xFF00B4D8),
                           ),
-                          dialogTheme: DialogThemeData(backgroundColor: Colors.white,),
+                          dialogTheme: DialogThemeData(
+                            backgroundColor: Colors.white,
+                          ),
                           datePickerTheme: const DatePickerThemeData(
                             backgroundColor: Colors.white,
                             headerBackgroundColor: Color(0xFFE2E8F0),
@@ -721,7 +962,9 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                           textButtonTheme: TextButtonThemeData(
                             style: TextButton.styleFrom(
                               foregroundColor: const Color(0xFF2563EB),
-                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -733,20 +976,31 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
               final startY = picked.start.year;
               final startM = picked.start.month.toString().padLeft(2, '0');
               final startD = picked.start.day.toString().padLeft(2, '0');
-              
+
               final endY = picked.end.year;
               final endM = picked.end.month.toString().padLeft(2, '0');
               final endD = picked.end.day.toString().padLeft(2, '0');
-              
+
               ctrl.text = '$startY-$startM-$startD to $endY-$endM-$endD';
             }
           },
-          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
+          style: TextStyle(
+            color: AiraColors.textPrimary(isDark),
+            fontWeight: FontWeight.bold,
+            fontSize: 12.5,
+          ),
           decoration: InputDecoration(
             isDense: true,
             hintText: 'Tap to select date range',
-            hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
-            suffixIcon: const Icon(Icons.calendar_month, color: Color(0xFF2563EB), size: 16),
+            hintStyle: TextStyle(
+              color: AiraColors.textMuted(isDark),
+              fontSize: 12,
+            ),
+            suffixIcon: const Icon(
+              Icons.calendar_month,
+              color: Color(0xFF2563EB),
+              size: 16,
+            ),
             filled: true,
             fillColor: AiraColors.cardBg(isDark),
             contentPadding: const EdgeInsets.all(12),
@@ -795,7 +1049,11 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                           decoration: const BoxDecoration(
                             color: Colors.redAccent,
                             boxShadow: [
-                              BoxShadow(color: Colors.redAccent, blurRadius: 8, spreadRadius: 1),
+                              BoxShadow(
+                                color: Colors.redAccent,
+                                blurRadius: 8,
+                                spreadRadius: 1,
+                              ),
                             ],
                           ),
                         ),
@@ -808,12 +1066,21 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
             const SizedBox(height: 32),
             const Text(
               'SMART TICKET SYNCING',
-              style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+              style: TextStyle(
+                color: Colors.white54,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               _scanStatus,
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -823,7 +1090,9 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                 child: LinearProgressIndicator(
                   value: _scanProgress,
                   backgroundColor: const Color(0xFF1A2744),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    Color(0xFF2563EB),
+                  ),
                   minHeight: 4,
                 ),
               ),
@@ -847,12 +1116,21 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
             const SizedBox(height: 32),
             const Text(
               'CONCIERGE COMPILATION RUNNING',
-              style: TextStyle(color: Color(0xFF00B4D8), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+              style: TextStyle(
+                color: Color(0xFF00B4D8),
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               _compileStatus,
-              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 14, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: AiraColors.textPrimary(isDark),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -862,7 +1140,9 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                 child: LinearProgressIndicator(
                   value: _compileProgress,
                   backgroundColor: AiraColors.scaffoldBg(isDark),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    Color(0xFF2563EB),
+                  ),
                   minHeight: 6,
                 ),
               ),
@@ -873,4 +1153,3 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
     );
   }
 }
-

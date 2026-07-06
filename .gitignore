@@ -11,3 +11,4 @@ coverage/
 build/
 android/.kotlin/
 *.apk
+.flutter-plugins-dependencies
