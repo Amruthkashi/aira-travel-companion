@@ -7,6 +7,7 @@ import '../core/theme/app_theme.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/utils/sound_synthesizer.dart';
 import '../core/services/ai_service.dart';
+import '../core/models/travel_models.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -69,9 +70,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AiraColors.scaffoldBg(isDark).withValues(alpha: 0.1),
-                    AiraColors.scaffoldBg(isDark).withValues(alpha: 0.7),
-                    AiraColors.scaffoldBg(isDark),
+                    TriaColors.scaffoldBg(isDark).withValues(alpha: 0.1),
+                    TriaColors.scaffoldBg(isDark).withValues(alpha: 0.7),
+                    TriaColors.scaffoldBg(isDark),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -131,16 +132,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     _buildMetricsPills(userProfileState),
                     const SizedBox(height: 22),
 
-                    // Trip Countdown Boarding Pass Card
-                    _buildTripCountdownCard(context, ref),
-                    const SizedBox(height: 24),
+                    // Upcoming Trip Summary Box
+                    _buildUpcomingTripSummaryBox(context, ref),
+                    const SizedBox(height: 20),
+
+                    // Portal Buttons (Create Itinerary & Previous Itinerary)
+                    _buildPortalButtons(context, ref),
+                    const SizedBox(height: 26),
 
                     // Quick Actions Bento Grid
                     _buildQuickActionsGrid(context, ref),
-                    const SizedBox(height: 26),
-
-                    // My Global Travel Desks (CORE PORTAL)
-                    _buildGlobalTravelDesks(context, ref),
                     const SizedBox(height: 26),
 
                     // Discover Places
@@ -168,12 +169,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark).withValues(alpha: 0.6),
+        color: TriaColors.cardBg(isDark).withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.4)),
+        border: Border.all(color: TriaColors.border(isDark).withValues(alpha: 0.4)),
       ),
       child: Row(
         children: [
+          // Back arrow button to satisfy the request
+          IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: Icon(Icons.arrow_back_rounded, color: TriaColors.textPrimary(isDark), size: 20),
+            onPressed: () {
+              // Switches to the last slide (Profile tab) as a dynamic back navigation
+              ref.read(currentTabProvider.notifier).state = 4;
+            },
+          ),
+          const SizedBox(width: 8),
           // Compass Explorer branding logo badge
           Container(
             width: 32,
@@ -188,37 +200,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           
           // Avatar with gradient & glow
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF2563EB).withValues(alpha: 0.35),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-              border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1.5),
-            ),
+          GestureDetector(
+            onTap: () {
+              ref.read(currentTabProvider.notifier).state = 4; // Switch to Profile tab
+            },
             child: Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [Color(0xFF2563EB), Color(0xFF7B2FF7), Color(0xFFFF477E)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+                border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1.5),
               ),
-              child: Center(
-                child: Text(
-                  initials.isNotEmpty ? initials : 'TR',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                    letterSpacing: 0.5,
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF2563EB), Color(0xFF7B2FF7), Color(0xFFFF477E)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    initials.isNotEmpty ? initials : 'TR',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
               ),
@@ -227,27 +244,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(width: 10),
           // Greeting text
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'WELCOME BACK',
-                  style: TextStyle(
-                    color: Color(0xFF00B4D8), // Indigo 400
-                    fontSize: 8,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.0,
+            child: GestureDetector(
+              onTap: () {
+                ref.read(currentTabProvider.notifier).state = 4; // Switch to Profile tab
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'WELCOME BACK',
+                    style: TextStyle(
+                      color: Color(0xFF00B4D8), // Indigo 400
+                      fontSize: 8,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                    ),
                   ),
-                ),
-                Text(
-                  '$firstName 👋',
-                  style: TextStyle(
-                    color: AiraColors.textPrimary(isDark),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
+                  Text(
+                    '$firstName 👋',
+                    style: TextStyle(
+                      color: TriaColors.textPrimary(isDark),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           // Action buttons (Dark Theme styling)
@@ -274,16 +296,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     bool hasBadge = false,
   }) {
     final isDark = ref.read(isDarkProvider);
-    final col = iconColor == Colors.white70 ? AiraColors.textSecondary(isDark) : iconColor;
+    final col = iconColor == Colors.white70 ? TriaColors.textSecondary(isDark) : iconColor;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: AiraColors.cardBg(isDark),
+          color: TriaColors.cardBg(isDark),
           shape: BoxShape.circle,
-          border: Border.all(color: AiraColors.border(isDark)),
+          border: Border.all(color: TriaColors.border(isDark)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -371,7 +393,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
+        color: TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(100),
         border: Border.all(color: iconColor.withValues(alpha: 0.45), width: 1.2), // Neon border glow
         boxShadow: [
@@ -390,7 +412,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Text(
             text,
             style: TextStyle(
-              color: AiraColors.textPrimary(isDark),
+              color: TriaColors.textPrimary(isDark),
               fontSize: 11.5,
               fontWeight: FontWeight.bold,
             ),
@@ -410,7 +432,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
+          color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: 0.3), width: 1.2),
           boxShadow: [
@@ -428,16 +450,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Text(
               'No Active Journey',
               style: TextStyle(
-                color: AiraColors.textPrimary(isDark),
+                color: TriaColors.textPrimary(isDark),
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Ask Aira to plan your next itinerary or search locations to get started.',
+              'Ask Tria to plan your next itinerary or search locations to get started.',
               style: TextStyle(
-                color: AiraColors.textSecondary(isDark),
+                color: TriaColors.textSecondary(isDark),
                 fontSize: 13,
               ),
               textAlign: TextAlign.center,
@@ -457,7 +479,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               },
               icon: const Icon(Icons.chat_bubble_outline, size: 16),
               label: const Text(
-                'Ask Aira to Plan',
+                'Ask Tria to Plan',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
             ),
@@ -658,7 +680,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
+        color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: 0.45), width: 1.2), // Indigo glowing border
         boxShadow: [
@@ -692,7 +714,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Text(
                       '$city Adventure',
                       style: TextStyle(
-                        color: AiraColors.textPrimary(isDark),
+                        color: TriaColors.textPrimary(isDark),
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
@@ -724,7 +746,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Text(
               daysRemaining(startDateStr) == 0 ? 'Departing Today!' : 'Departing in ${daysRemaining(startDateStr)} Days',
               style: TextStyle(
-                color: AiraColors.textPrimary(isDark),
+                color: TriaColors.textPrimary(isDark),
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
               ),
@@ -739,7 +761,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 height: 14,
                 width: 7,
                 decoration: BoxDecoration(
-                  color: AiraColors.scaffoldBg(isDark),
+                  color: TriaColors.scaffoldBg(isDark),
                   borderRadius: const BorderRadius.horizontal(right: Radius.circular(8)),
                 ),
               ),
@@ -755,7 +777,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           width: 4,
                           height: 1,
                           child: DecoratedBox(
-                            decoration: BoxDecoration(color: AiraColors.textMuted(isDark).withValues(alpha: 0.15)),
+                            decoration: BoxDecoration(color: TriaColors.textMuted(isDark).withValues(alpha: 0.15)),
                           ),
                         ),
                       ),
@@ -767,7 +789,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 height: 14,
                 width: 7,
                 decoration: BoxDecoration(
-                  color: AiraColors.scaffoldBg(isDark),
+                  color: TriaColors.scaffoldBg(isDark),
                   borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
                 ),
               ),
@@ -781,9 +803,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AiraColors.scaffoldBg(isDark),
+                color: TriaColors.scaffoldBg(isDark),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AiraColors.border(isDark)),
+                border: Border.all(color: TriaColors.border(isDark)),
               ),
               child: Column(
                 children: [
@@ -796,7 +818,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const SizedBox(width: 6),
                           Text(
                             formatDateRange(startDateStr, endDateStr),
-                            style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 10.5, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 10.5, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -806,13 +828,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ],
                   ),
-                  Divider(color: AiraColors.border(isDark).withValues(alpha: 0.5), height: 16),
+                  Divider(color: TriaColors.border(isDark).withValues(alpha: 0.5), height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Flight ${tripDetails['flight'] ?? 'SQ-638'} (${tripDetails['airline'] ?? 'SIA'})',
-                        style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10.5),
+                        style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 10.5),
                       ),
                       Text(
                         'Seat ${tripDetails['seat'] ?? '14A'}',
@@ -834,7 +856,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Text(
                   'Trip Checklist Progress',
                   style: TextStyle(
-                    color: AiraColors.textSecondary(isDark),
+                    color: TriaColors.textSecondary(isDark),
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
@@ -857,7 +879,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               borderRadius: BorderRadius.circular(10),
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: AiraColors.scaffoldBg(isDark),
+                backgroundColor: TriaColors.scaffoldBg(isDark),
                 valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
                 minHeight: 5,
               ),
@@ -954,7 +976,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           style: TextStyle(
             fontSize: 10.5,
             fontWeight: FontWeight.w900,
-            color: AiraColors.textMuted(isDark),
+            color: TriaColors.textMuted(isDark),
             letterSpacing: 1.0,
           ),
         ),
@@ -982,9 +1004,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
+                  color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AiraColors.border(isDark)),
+                  border: Border.all(color: TriaColors.border(isDark)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.06),
@@ -1024,7 +1046,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         item['title'],
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: AiraColors.textPrimary(isDark),
+                          color: TriaColors.textPrimary(isDark),
                           fontWeight: FontWeight.bold,
                           fontSize: 10.5,
                         ),
@@ -1040,30 +1062,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildGlobalTravelDesks(BuildContext context, WidgetRef ref) {
-    final userProfileState = ref.watch(userProfileProvider);
-    final upcomingTrip = userProfileState.profile['upcomingTrip'];
+  Widget _buildUpcomingTripSummaryBox(BuildContext context, WidgetRef ref) {
+    final rawTrips = ref.watch(upcomingTripsProvider);
     final isDark = ref.watch(isDarkProvider);
-    final String tripSubtitle;
 
-    if (upcomingTrip == null) {
-      tripSubtitle = 'No active journey. Plan one with Aira!';
-    } else {
-      final city = upcomingTrip['city'] ?? 'Tokyo';
-      final startDate = upcomingTrip['startDate'];
-      int days = 13;
+    // Sort to show the nearest upcoming trip chronologically
+    final trips = List<UpcomingTrip>.from(rawTrips);
+    trips.sort((a, b) {
       try {
-        if (startDate != null) {
-          final sDate = DateTime.parse(startDate);
-          final now = DateTime.now();
-          final diff = sDate.difference(DateTime(now.year, now.month, now.day)).inDays;
-          days = diff < 0 ? 0 : diff;
-        }
-      } catch (e) {
-        // ignore
+        final dateA = DateTime.parse(a.startDate);
+        final dateB = DateTime.parse(b.startDate);
+        return dateA.compareTo(dateB);
+      } catch (_) {
+        return a.startDate.compareTo(b.startDate);
       }
-      tripSubtitle = days == 0 ? '$city Adventure starts today!' : '$city starts in $days days';
-    }
+    });
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1071,78 +1084,657 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Text(
-                  'GLOBAL TRAVEL DESKS',
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w900,
-                    color: AiraColors.textMuted(isDark),
-                    letterSpacing: 1.0,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF312E81), // Indigo 900
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    'CORE PORTAL',
-                    style: TextStyle(
-                      color: Color(0xFFC7D2FE), // Indigo 200
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
+            Text(
+              'UPCOMING TRIP',
+              style: TextStyle(
+                color: isDark ? Colors.white30 : const Color(0xFF64748B),
+                fontSize: 10.5,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.0,
+              ),
+            ),
+            if (trips.isNotEmpty)
+              GestureDetector(
+                onTap: () => context.push('/upcoming-trips'),
+                child: const Row(
+                  children: [
+                    Text(
+                      'View All',
+                      style: TextStyle(
+                        color: Color(0xFF2563EB),
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
+                    Icon(Icons.chevron_right, size: 14, color: Color(0xFF2563EB)),
+                  ],
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        GestureDetector(
+          onTap: () {
+            if (trips.isNotEmpty) {
+              context.push('/itinerary-detail/${trips.first.tripId}');
+            } else {
+              context.push('/upcoming-trips');
+            }
+          },
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.25 : 0.12),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
-            // Floating Safe Zone Badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF065F46), // Emerald 800
-                borderRadius: BorderRadius.circular(100),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF047857).withValues(alpha: 0.25),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.verified_user, color: Color(0xFF34D399), size: 11),
-                  SizedBox(width: 4),
-                  Text(
-                    'SAFE ZONE',
-                    style: TextStyle(
-                      color: Color(0xFF34D399),
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
+            child: trips.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.calendar_today_outlined,
+                            color: Color(0xFF2563EB),
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'No Upcoming Journeys',
+                                style: TextStyle(
+                                  color: TriaColors.textPrimary(isDark),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                'Tap to plan your next adventure with Tria AI.',
+                                style: TextStyle(
+                                  color: TriaColors.textMuted(isDark),
+                                  fontSize: 11.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
+                      ],
                     ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Elegant Trip Details Header
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2563EB).withValues(alpha: isDark ? 0.08 : 0.04),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(24),
+                            topRight: Radius.circular(24),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF2563EB).withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: const Icon(Icons.card_membership_outlined, color: Color(0xFF2563EB), size: 13),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${trips.first.itinerary.length} DAYS JOURNEY',
+                                  style: TextStyle(
+                                    color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF),
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Text(
+                                _formatTripDates(trips.first.startDate, trips.first.endDate),
+                                style: const TextStyle(
+                                  color: Color(0xFF10B981),
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Source and Destination abbreviations
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        trips.first.source.toUpperCase().substring(0, trips.first.source.length >= 3 ? 3 : trips.first.source.length),
+                                        style: TextStyle(
+                                          color: TriaColors.textPrimary(isDark),
+                                          fontSize: 26,
+                                          fontFamily: 'Outfit',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        trips.first.source,
+                                        style: TextStyle(
+                                          color: TriaColors.textMuted(isDark),
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                
+                                // Plane Line Icon separator
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              height: 1.5,
+                                              color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                                            ),
+                                          ),
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 6),
+                                            child: Icon(Icons.flight_takeoff, color: Color(0xFF2563EB), size: 18),
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              height: 1.5,
+                                              color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'TRIP ID: ${trips.first.tripId}',
+                                        style: TextStyle(
+                                          color: TriaColors.textMuted(isDark),
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        trips.first.destination.toUpperCase().substring(0, trips.first.destination.length >= 3 ? 3 : trips.first.destination.length),
+                                        style: TextStyle(
+                                          color: TriaColors.textPrimary(isDark),
+                                          fontSize: 26,
+                                          fontFamily: 'Outfit',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        trips.first.destination,
+                                        style: TextStyle(
+                                          color: TriaColors.textMuted(isDark),
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            
+                            // Dotted Divider
+                            const SizedBox(height: 18),
+                            Row(
+                              children: List.generate(
+                                30,
+                                (index) => Expanded(
+                                  child: Container(
+                                    color: index % 2 == 0 ? Colors.transparent : TriaColors.border(isDark),
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            
+                            // 2x2 Details Bento Grid
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Left details column (Airline & budget)
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      // Airline carrier
+                                      _buildTripDetailItem(
+                                        icon: Icons.flight,
+                                        iconColor: const Color(0xFF00B4D8),
+                                        title: 'FLIGHTS & TRANSIT',
+                                        value: _getAirline(trips.first),
+                                        isDark: isDark,
+                                      ),
+                                      const SizedBox(height: 14),
+                                      // Estimated Budget
+                                      _buildTripDetailItem(
+                                        icon: Icons.monetization_on_outlined,
+                                        iconColor: const Color(0xFF10B981),
+                                        title: 'ESTIMATED BUDGET',
+                                        value: _getEstimatedBudget(trips.first),
+                                        isDark: isDark,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                // Right details column (Hotel & activities count)
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      // Accommodation
+                                      _buildTripDetailItem(
+                                        icon: Icons.hotel_class_outlined,
+                                        iconColor: const Color(0xFFF59E0B),
+                                        title: 'STAY / HOTEL',
+                                        value: _getHotel(trips.first),
+                                        isDark: isDark,
+                                      ),
+                                      const SizedBox(height: 14),
+                                      // Activities Count
+                                      _buildTripDetailItem(
+                                        icon: Icons.event_available_outlined,
+                                        iconColor: const Color(0xFF8B5CF6),
+                                        title: 'PLANNED EVENTS',
+                                        value: '${_getTotalActivities(trips.first)} Activities scheduled',
+                                        isDark: isDark,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            
+                            // Places visiting bottom section
+                            const SizedBox(height: 18),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEF4444).withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(Icons.pin_drop_outlined, color: Color(0xFFEF4444), size: 16),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'HIGHLIGHTS & KEY SPOTS',
+                                        style: TextStyle(
+                                          color: TriaColors.textMuted(isDark),
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Wrap(
+                                        spacing: 6,
+                                        runSpacing: 6,
+                                        children: _getMainPlaces(trips.first).map((place) {
+                                          return Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.04),
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: (isDark ? Colors.white24 : Colors.black12),
+                                                width: 0.8,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              place,
+                                              style: TextStyle(
+                                                color: TriaColors.textSecondary(isDark),
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTripDetailItem({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String value,
+    required bool isDark,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: iconColor.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: iconColor, size: 16),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: TriaColors.textMuted(isDark),
+                  fontSize: 7.5,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                  color: TriaColors.textPrimary(isDark),
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 12),
-        // Previously Travelled stays
-        _buildPortalCard(
-          title: 'Previously Travelled',
-          subtitle: 'Completed stays & travel memories',
-          icon: Icons.history,
-          iconColor: const Color(0xFF94A3B8),
-          onTap: () => context.push('/past-trips'),
-        ),
-        const SizedBox(height: 10),
-        // Create new Itinerary (indigo highlight gradient)
+      ],
+    );
+  }
+
+  String _getAirline(UpcomingTrip trip) {
+    for (var day in trip.itinerary) {
+      for (var act in day.activities) {
+        final activity = act.activity;
+        final desc = act.description;
+        final transport = act.transport;
+        final ticket = act.ticketInfo;
+
+        final isFlight = transport.toLowerCase() == 'flight' ||
+            activity.contains('✈️') ||
+            ticket.toLowerCase().contains('pnr') ||
+            activity.toLowerCase().contains('flight') ||
+            desc.toLowerCase().contains('flight') ||
+            desc.toLowerCase().contains('airline') ||
+            desc.toLowerCase().contains('flying');
+
+        if (isFlight) {
+          final descLower = desc.toLowerCase();
+          final landsIndex = descLower.indexOf(' lands at');
+          if (landsIndex != -1) {
+            final possibleAirline = desc.substring(0, landsIndex).trim();
+            if (possibleAirline.isNotEmpty) return possibleAirline;
+          }
+          final departsIndex = descLower.indexOf(' departs from');
+          if (departsIndex != -1) {
+            final possibleAirline = desc.substring(0, departsIndex).trim();
+            if (possibleAirline.isNotEmpty) return possibleAirline;
+          }
+
+          // Search in hardcoded list
+          final airlines = ['emirates', 'singapore', 'qatar', 'ana', 'jal', 'indigo', 'delta', 'united', 'lufthansa', 'british airways', 'air france', 'air india', 'klm', 'cathay', 'etihad', 'qantas', 'ryanair', 'easyjet', 'spicejet', 'akasa', 'vistara'];
+          for (var airline in airlines) {
+            if (descLower.contains(airline) || activity.toLowerCase().contains(airline)) {
+              return airline == 'ana' || airline == 'jal' || airline == 'klm'
+                  ? airline.toUpperCase()
+                  : airline.split(' ').map((word) => word[0].toUpperCase() + word.substring(1)).join(' ');
+            }
+          }
+
+          if (ticket.isNotEmpty) {
+            final cleanedPnr = ticket.replaceAll('PNR:', '').trim();
+            if (cleanedPnr.isNotEmpty) {
+              return 'Scheduled Flight ($cleanedPnr)';
+            }
+          }
+          return 'Scheduled Flight';
+        }
+      }
+    }
+    return 'No Flights Booked';
+  }
+
+  String _getHotel(UpcomingTrip trip) {
+    for (var day in trip.itinerary) {
+      for (var act in day.activities) {
+        final title = act.activity;
+        final desc = act.description;
+        final loc = act.locationName;
+        final text = '$title $desc $loc'.toLowerCase();
+        if (text.contains('hotel') || text.contains('resort') || text.contains('stay') || text.contains('check-in') || text.contains('check in') || text.contains('hostel') || text.contains('airbnb') || text.contains('lodging')) {
+          if (loc.isNotEmpty && (loc.toLowerCase().contains('hotel') || loc.toLowerCase().contains('resort') || loc.toLowerCase().contains('stay') || loc.toLowerCase().contains('inn') || loc.toLowerCase().contains('hostel') || loc.toLowerCase().contains('suites') || loc.toLowerCase().contains('villa') || loc.toLowerCase().contains('lodge'))) {
+            return loc;
+          }
+          if (title.toLowerCase().contains('hotel') || title.toLowerCase().contains('resort') || title.toLowerCase().contains('hostel') || title.toLowerCase().contains('stay at') || title.toLowerCase().contains('stay in')) {
+            return title.replaceAll(RegExp(r'check-in\s+(?:at|to|in)\s+|stay\s+(?:at|in)\s+|check\s+in\s+(?:at|to|in)\s+', caseSensitive: false), '').trim();
+          }
+          if (loc.isNotEmpty) return loc;
+          return title;
+        }
+      }
+    }
+    return 'No Hotel Booked';
+  }
+
+  String _getEstimatedBudget(UpcomingTrip trip) {
+    double total = 0;
+    for (var day in trip.itinerary) {
+      for (var act in day.activities) {
+        final costStr = act.cost.replaceAll(RegExp(r'[^0-9.]'), '');
+        if (costStr.isNotEmpty) {
+          try {
+            total += double.parse(costStr);
+          } catch (_) {}
+        }
+      }
+    }
+    return total > 0 ? '\$${total.toStringAsFixed(0)} Est.' : 'TBA / Free';
+  }
+
+  int _getTotalActivities(UpcomingTrip trip) {
+    int count = 0;
+    for (var day in trip.itinerary) {
+      count += day.activities.length;
+    }
+    return count;
+  }
+
+  List<String> _getMainPlaces(UpcomingTrip trip) {
+    final List<String> places = [];
+    
+    // First pass: try to get actual tourist/important attractions (highly filtered)
+    for (var day in trip.itinerary) {
+      for (var act in day.activities) {
+        final title = act.activity;
+        final titleLower = title.toLowerCase();
+        
+        final isGeneric = titleLower.contains('flight') ||
+            titleLower.contains('hotel') ||
+            titleLower.contains('check-in') ||
+            titleLower.contains('check in') ||
+            titleLower.contains('checkout') ||
+            titleLower.contains('check out') ||
+            titleLower.contains('airport') ||
+            titleLower.contains('dinner') ||
+            titleLower.contains('breakfast') ||
+            titleLower.contains('lunch') ||
+            titleLower.contains('rest') ||
+            titleLower.contains('arrive') ||
+            titleLower.contains('depart') ||
+            titleLower.contains('preparation') ||
+            titleLower.contains('prep') ||
+            titleLower.contains('transfer') ||
+            titleLower.contains('transit') ||
+            titleLower.contains('taxi') ||
+            titleLower.contains('cab') ||
+            titleLower.contains('shuttle') ||
+            titleLower.contains('ride') ||
+            titleLower.contains('drive') ||
+            titleLower.contains('wake up') ||
+            titleLower.contains('leisure') ||
+            titleLower.contains('free time') ||
+            titleLower.contains('packing') ||
+            titleLower.contains('travel to') ||
+            titleLower.contains('walk to') ||
+            titleLower.contains('heading to') ||
+            titleLower.contains('stay at') ||
+            titleLower.contains('inn') ||
+            titleLower.contains('suites') ||
+            titleLower.contains('resort') ||
+            titleLower.contains('lodging');
+
+        if (!isGeneric && !places.contains(title) && title.length < 32 && title.isNotEmpty) {
+          places.add(title);
+          if (places.length >= 3) break;
+        }
+      }
+      if (places.length >= 3) break;
+    }
+    
+    // Second pass: if we have fewer than 3, add other non-transit/non-airport activities
+    if (places.length < 3) {
+      for (var day in trip.itinerary) {
+        for (var act in day.activities) {
+          final title = act.activity;
+          final titleLower = title.toLowerCase();
+          
+          final isTransit = titleLower.contains('flight') ||
+              titleLower.contains('transfer') ||
+              titleLower.contains('transit') ||
+              titleLower.contains('airport') ||
+              titleLower.contains('arrive') ||
+              titleLower.contains('depart') ||
+              titleLower.contains('taxi') ||
+              titleLower.contains('cab') ||
+              titleLower.contains('shuttle') ||
+              titleLower.contains('ride') ||
+              titleLower.contains('drive') ||
+              titleLower.contains('travel to');
+              
+          if (!isTransit && !places.contains(title) && title.length < 32 && title.isNotEmpty) {
+            places.add(title);
+            if (places.length >= 3) break;
+          }
+        }
+        if (places.length >= 3) break;
+      }
+    }
+    
+    // Third pass fallback: just fill up with any activity titles that aren't empty
+    if (places.length < 3) {
+      for (var day in trip.itinerary) {
+        for (var act in day.activities) {
+          final title = act.activity;
+          if (!places.contains(title) && title.length < 32 && title.isNotEmpty) {
+            places.add(title);
+            if (places.length >= 3) break;
+          }
+        }
+        if (places.length >= 3) break;
+      }
+    }
+
+    if (places.isEmpty) {
+      return ['Sightseeing & Explore'];
+    }
+    return places;
+  }
+
+  Widget _buildPortalButtons(BuildContext context, WidgetRef ref) {
+    return Column(
+      children: [
         _buildGradientPortalCard(
           title: 'Create New Itinerary',
           subtitle: 'AI-assisted custom route planner',
@@ -1152,18 +1744,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
         ),
         const SizedBox(height: 10),
-        // Upcoming Trips
         _buildPortalCard(
-          title: 'Upcoming Trips',
-          subtitle: tripSubtitle,
-          icon: Icons.calendar_today_outlined,
-          iconColor: const Color(0xFF00B4D8),
-          onTap: () {
-            ref.read(currentTabProvider.notifier).state = 2;
-          },
+          title: 'Previously Travelled',
+          subtitle: 'Completed stays & travel memories',
+          icon: Icons.history,
+          iconColor: const Color(0xFF94A3B8),
+          onTap: () => context.push('/past-trips'),
         ),
       ],
     );
+  }
+
+  String _formatTripDates(String startStr, String endStr) {
+    try {
+      final start = DateTime.parse(startStr);
+      final end = DateTime.parse(endStr);
+      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return '${months[start.month - 1]} ${start.day} - ${months[end.month - 1]} ${end.day}';
+    } catch (_) {
+      return '$startStr to $endStr';
+    }
   }
 
   Widget _buildPortalCard({
@@ -1179,9 +1779,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
+          color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AiraColors.border(isDark)),
+          border: Border.all(color: TriaColors.border(isDark)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
@@ -1208,7 +1808,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Text(
                     title,
                     style: TextStyle(
-                      color: AiraColors.textPrimary(isDark),
+                      color: TriaColors.textPrimary(isDark),
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
@@ -1217,14 +1817,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: AiraColors.textSecondary(isDark),
+                      color: TriaColors.textSecondary(isDark),
                       fontSize: 10.5,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: AiraColors.textMuted(isDark), size: 18),
+            Icon(Icons.chevron_right, color: TriaColors.textMuted(isDark), size: 18),
           ],
         ),
       ),
@@ -1317,7 +1917,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: TextStyle(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w900,
-                color: AiraColors.textMuted(isDark),
+                color: TriaColors.textMuted(isDark),
                 letterSpacing: 1.0,
               ),
             ),
@@ -1326,7 +1926,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
-                color: AiraColors.textSecondary(isDark),
+                color: TriaColors.textSecondary(isDark),
                 letterSpacing: 0.5,
               ),
             ),
@@ -1354,10 +1954,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF2563EB) : AiraColors.cardBg(isDark),
+                      color: isSelected ? const Color(0xFF2563EB) : TriaColors.cardBg(isDark),
                       borderRadius: BorderRadius.circular(100),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF2563EB) : AiraColors.border(isDark),
+                        color: isSelected ? const Color(0xFF2563EB) : TriaColors.border(isDark),
                       ),
                       boxShadow: isSelected
                           ? [
@@ -1374,7 +1974,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         cat,
                         style: TextStyle(
                           fontSize: 11,
-                          color: isSelected ? Colors.white : AiraColors.textSecondary(isDark),
+                          color: isSelected ? Colors.white : TriaColors.textSecondary(isDark),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1392,7 +1992,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: ref.watch(discoverPlacesProvider(selectedCategory)).when(
             data: (places) {
               return places.isEmpty
-                  ? Center(child: Text("No destinations found", style: TextStyle(color: AiraColors.textSecondary(isDark))))
+                  ? Center(child: Text("No destinations found", style: TextStyle(color: TriaColors.textSecondary(isDark))))
                   : ListView.builder(
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
@@ -1408,9 +2008,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           width: 200,
                           margin: const EdgeInsets.only(right: 14, bottom: 8, top: 2),
                           decoration: BoxDecoration(
-                            color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
+                            color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: AiraColors.border(isDark)),
+                            border: Border.all(color: TriaColors.border(isDark)),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.15),
@@ -1434,8 +2034,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       fit: BoxFit.cover,
                                       errorBuilder: (context, error, stackTrace) => Container(
                                         height: 110,
-                                        color: AiraColors.scaffoldBg(isDark),
-                                        child: Icon(Icons.image, color: AiraColors.textMuted(isDark).withValues(alpha: 0.3)),
+                                        color: TriaColors.scaffoldBg(isDark),
+                                        child: Icon(Icons.image, color: TriaColors.textMuted(isDark).withValues(alpha: 0.3)),
                                       ),
                                     ),
                                   ),
@@ -1463,9 +2063,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                                       decoration: BoxDecoration(
-                                        color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
+                                        color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
                                         borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(color: AiraColors.border(isDark)),
+                                        border: Border.all(color: TriaColors.border(isDark)),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
@@ -1475,7 +2075,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           Text(
                                             '${item['rating'] ?? 4.8}',
                                             style: TextStyle(
-                                              color: AiraColors.textPrimary(isDark),
+                                              color: TriaColors.textPrimary(isDark),
                                               fontSize: 9,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -1501,13 +2101,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.all(5),
                                         decoration: BoxDecoration(
-                                          color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
+                                          color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
                                           shape: BoxShape.circle,
-                                          border: Border.all(color: AiraColors.border(isDark)),
+                                          border: Border.all(color: TriaColors.border(isDark)),
                                         ),
                                         child: Icon(
                                           isLiked ? Icons.favorite : Icons.favorite_border,
-                                          color: isLiked ? const Color(0xFFEF4444) : AiraColors.textMuted(isDark),
+                                          color: isLiked ? const Color(0xFFEF4444) : TriaColors.textMuted(isDark),
                                           size: 13,
                                         ),
                                       ),
@@ -1533,7 +2133,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 13,
-                                              color: AiraColors.textPrimary(isDark),
+                                              color: TriaColors.textPrimary(isDark),
                                             ),
                                           ),
                                           const SizedBox(height: 1),
@@ -1552,7 +2152,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
-                                              color: AiraColors.textSecondary(isDark),
+                                              color: TriaColors.textSecondary(isDark),
                                               fontSize: 9.5,
                                               height: 1.3,
                                             ),
@@ -1569,9 +2169,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                               children: tags.take(1).map((tag) => Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                                                 decoration: BoxDecoration(
-                                                  color: AiraColors.scaffoldBg(isDark),
+                                                  color: TriaColors.scaffoldBg(isDark),
                                                   borderRadius: BorderRadius.circular(6),
-                                                  border: Border.all(color: AiraColors.border(isDark)),
+                                                  border: Border.all(color: TriaColors.border(isDark)),
                                                 ),
                                                 child: Text(
                                                   '#$tag',
@@ -1645,9 +2245,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     width: 200,
                     margin: const EdgeInsets.only(right: 14, bottom: 8, top: 2),
                     decoration: BoxDecoration(
-                      color: AiraColors.cardBg(isDark).withValues(alpha: 0.5),
+                      color: TriaColors.cardBg(isDark).withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.3)),
+                      border: Border.all(color: TriaColors.border(isDark).withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1733,7 +2333,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isDark = ref.read(isDarkProvider);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1756,8 +2356,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     height: 160,
-                    color: AiraColors.cardBg(isDark),
-                    child: Icon(Icons.image, color: AiraColors.textMuted(isDark).withValues(alpha: 0.3), size: 40),
+                    color: TriaColors.cardBg(isDark),
+                    child: Icon(Icons.image, color: TriaColors.textMuted(isDark).withValues(alpha: 0.3), size: 40),
                   ),
                 ),
               ),
@@ -1767,7 +2367,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   Text(
                     item['name'],
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: TriaColors.textPrimary(isDark)),
                   ),
                   Row(
                     children: [
@@ -1775,7 +2375,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       const SizedBox(width: 4),
                       Text(
                         '${item['rating']}',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: TriaColors.textPrimary(isDark)),
                       ),
                     ],
                   ),
@@ -1784,12 +2384,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 2),
               Text(
                 '$countryCode • ${item['country']}',
-                style: TextStyle(color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 13),
+                style: TextStyle(color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.bold, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Text(
                 item['desc'],
-                style: TextStyle(fontSize: 13, height: 1.4, color: AiraColors.textPrimary(isDark)),
+                style: TextStyle(fontSize: 13, height: 1.4, color: TriaColors.textPrimary(isDark)),
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -1820,7 +2420,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isDark = ref.read(isDarkProvider);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1901,7 +2501,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AiraColors.border(isDark),
+                        color: TriaColors.border(isDark),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -1912,14 +2512,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AiraColors.textPrimary(isDark),
+                      color: TriaColors.textPrimary(isDark),
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Matching destination & dates: $tripCity • $dateRangeStr',
                     style: TextStyle(
-                      color: AiraColors.textSecondary(isDark),
+                      color: TriaColors.textSecondary(isDark),
                       fontSize: 12,
                     ),
                   ),
@@ -1933,9 +2533,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AiraColors.cardBg(isDark),
+                          color: TriaColors.cardBg(isDark),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AiraColors.border(isDark)),
+                          border: Border.all(color: TriaColors.border(isDark)),
                         ),
                         child: Row(
                           children: [
@@ -1955,7 +2555,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF065F46), // Green 800
                                       borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: AiraColors.cardBg(isDark), width: 1.5),
+                                      border: Border.all(color: TriaColors.cardBg(isDark), width: 1.5),
                                     ),
                                     child: Text(
                                       buddy['compatibility'],
@@ -1978,7 +2578,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   Text(
                                     buddy['name'],
                                     style: TextStyle(
-                                      color: AiraColors.textPrimary(isDark),
+                                      color: TriaColors.textPrimary(isDark),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -1995,7 +2595,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   Text(
                                     buddy['overlap'],
                                     style: TextStyle(
-                                      color: AiraColors.textSecondary(isDark),
+                                      color: TriaColors.textSecondary(isDark),
                                       fontSize: 9.5,
                                     ),
                                   ),
@@ -2008,13 +2608,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       return Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: AiraColors.scaffoldBg(isDark),
+                                          color: TriaColors.scaffoldBg(isDark),
                                           borderRadius: BorderRadius.circular(4),
                                         ),
                                         child: Text(
                                           tag,
                                           style: TextStyle(
-                                            color: AiraColors.textSecondary(isDark),
+                                            color: TriaColors.textSecondary(isDark),
                                             fontSize: 8,
                                           ),
                                         ),
@@ -2034,12 +2634,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   height: 28,
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: isConnected ? AiraColors.scaffoldBg(isDark) : const Color(0xFF2563EB),
+                                      backgroundColor: isConnected ? TriaColors.scaffoldBg(isDark) : const Color(0xFF2563EB),
                                       padding: EdgeInsets.zero,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      side: isConnected ? BorderSide(color: AiraColors.border(isDark)) : null,
+                                      side: isConnected ? BorderSide(color: TriaColors.border(isDark)) : null,
                                     ),
                                     onPressed: () {
                                       SoundSynthesizer.playTone(
@@ -2059,7 +2659,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     child: Text(
                                       isConnected ? 'Pending' : 'Connect',
                                       style: TextStyle(
-                                        color: isConnected ? AiraColors.textSecondary(isDark) : Colors.white,
+                                        color: isConnected ? TriaColors.textSecondary(isDark) : Colors.white,
                                         fontSize: 10.5,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -2104,11 +2704,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: AiraColors.dialogBg(isDark),
+          backgroundColor: TriaColors.dialogBg(isDark),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
             '${buddy['name']}\'s Overlapping Itinerary',
-            style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold),
           ),
           content: SizedBox(
             width: double.maxFinite,
@@ -2118,7 +2718,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               children: [
                 Text(
                   'Activities that match your dates:',
-                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+                  style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
                 ),
                 const SizedBox(height: 12),
                 Column(
@@ -2127,7 +2727,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AiraColors.scaffoldBg(isDark),
+                        color: TriaColors.scaffoldBg(isDark),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -2140,12 +2740,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               children: [
                                 Text(
                                   item['activity']!,
-                                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 12, fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   '📍 ${item['location']!}',
-                                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10),
+                                  style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 10),
                                 ),
                               ],
                             ),
@@ -2181,7 +2781,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: TextStyle(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w900,
-                color: AiraColors.textSecondary(isDark),
+                color: TriaColors.textSecondary(isDark),
                 letterSpacing: 1.0,
               ),
             ),
@@ -2248,9 +2848,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   margin: const EdgeInsets.only(bottom: 10),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AiraColors.cardBg(isDark).withValues(alpha: 0.85),
+                    color: TriaColors.cardBg(isDark).withValues(alpha: 0.85),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AiraColors.border(isDark)),
+                    border: Border.all(color: TriaColors.border(isDark)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.08),
@@ -2273,8 +2873,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               errorBuilder: (context, error, stackTrace) => Container(
                                 width: 72,
                                 height: 72,
-                                color: AiraColors.scaffoldBg(isDark),
-                                child: Icon(Icons.explore, color: AiraColors.textMuted(isDark)),
+                                color: TriaColors.scaffoldBg(isDark),
+                                child: Icon(Icons.explore, color: TriaColors.textMuted(isDark)),
                               ),
                             ),
                           ),
@@ -2334,7 +2934,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12.5,
-                                color: AiraColors.textPrimary(isDark),
+                                color: TriaColors.textPrimary(isDark),
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -2354,13 +2954,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: AiraColors.scaffoldBg(isDark),
+                                    color: TriaColors.scaffoldBg(isDark),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     tagStr,
                                     style: TextStyle(
-                                      color: AiraColors.textSecondary(isDark),
+                                      color: TriaColors.textSecondary(isDark),
                                       fontSize: 8,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -2370,7 +2970,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 Text(
                                   'Cost: $costStr',
                                   style: TextStyle(
-                                    color: AiraColors.textSecondary(isDark),
+                                    color: TriaColors.textSecondary(isDark),
                                     fontSize: 10,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -2420,7 +3020,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           error: (err, stack) => Center(
-            child: Text('Error loading personalized recommendations', style: TextStyle(color: AiraColors.textSecondary(isDark))),
+            child: Text('Error loading personalized recommendations', style: TextStyle(color: TriaColors.textSecondary(isDark))),
           ),
         ),
       ],
@@ -2438,7 +3038,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -2477,7 +3077,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       width: 40,
                       height: 5,
                       decoration: BoxDecoration(
-                        color: AiraColors.border(isDark),
+                        color: TriaColors.border(isDark),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -2499,7 +3099,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Text(
                         'TRAVEL SQUADS',
                         style: TextStyle(
-                          color: AiraColors.textPrimary(isDark),
+                          color: TriaColors.textPrimary(isDark),
                           fontWeight: FontWeight.w900,
                           fontSize: 16,
                           letterSpacing: 0.5,
@@ -2553,19 +3153,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: AiraColors.cardBg(isDark),
+                            color: TriaColors.cardBg(isDark),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AiraColors.border(isDark)),
+                            border: Border.all(color: TriaColors.border(isDark)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.login, color: AiraColors.textSecondary(isDark), size: 14),
+                              Icon(Icons.login, color: TriaColors.textSecondary(isDark), size: 14),
                               const SizedBox(width: 4),
                               Text(
                                 'Join',
                                 style: TextStyle(
-                                  color: AiraColors.textSecondary(isDark),
+                                  color: TriaColors.textSecondary(isDark),
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -2596,9 +3196,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: AiraColors.cardBg(isDark).withValues(alpha: 0.5),
+                        color: TriaColors.cardBg(isDark).withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AiraColors.border(isDark)),
+                        border: Border.all(color: TriaColors.border(isDark)),
                       ),
                       child: Column(
                         children: [
@@ -2607,7 +3207,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           Text(
                             'No Travel Squads Found',
                             style: TextStyle(
-                              color: AiraColors.textPrimary(isDark),
+                              color: TriaColors.textPrimary(isDark),
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
@@ -2616,7 +3216,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           Text(
                             'Create a squad or join one with an invite code!',
                             style: TextStyle(
-                              color: AiraColors.textSecondary(isDark),
+                              color: TriaColors.textSecondary(isDark),
                               fontSize: 12,
                             ),
                             textAlign: TextAlign.center,
@@ -2641,15 +3241,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  AiraColors.cardBg(isDark).withValues(alpha: 0.95),
-                                  AiraColors.scaffoldBg(isDark).withValues(alpha: 0.85),
+                                  TriaColors.cardBg(isDark).withValues(alpha: 0.95),
+                                  TriaColors.scaffoldBg(isDark).withValues(alpha: 0.85),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: AiraColors.border(isDark),
+                                color: TriaColors.border(isDark),
                               ),
                             ),
                             child: Material(
@@ -2661,7 +3261,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 title: Text(
                                   s['name'] ?? '',
                                   style: TextStyle(
-                                    color: AiraColors.textPrimary(isDark),
+                                    color: TriaColors.textPrimary(isDark),
                                     fontWeight: FontWeight.w800,
                                     fontSize: 14,
                                   ),
@@ -2710,7 +3310,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       Text(
                                         '${daysAway}d away',
                                         style: TextStyle(
-                                          color: AiraColors.textMuted(isDark),
+                                          color: TriaColors.textMuted(isDark),
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -2758,7 +3358,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) {
         return Padding(
@@ -2768,11 +3368,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: AiraColors.border(isDark), borderRadius: BorderRadius.circular(10)))),
+                Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: TriaColors.border(isDark), borderRadius: BorderRadius.circular(10)))),
                 const SizedBox(height: 16),
-                Text('CREATE TRAVEL SQUAD', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
+                Text('CREATE TRAVEL SQUAD', style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
                 const SizedBox(height: 4),
-                Text('Rally your crew for an epic trip!', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12)),
+                Text('Rally your crew for an epic trip!', style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12)),
                 const SizedBox(height: 16),
                 _squadField('Squad Name', nameCtrl, 'e.g. Tokyo Crew 2026', isDark),
                 _squadField('Destination', destCtrl, 'e.g. Tokyo, Japan', isDark),
@@ -2829,7 +3429,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isDark = ref.read(isDarkProvider);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) {
         return Padding(
@@ -2838,23 +3438,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: AiraColors.border(isDark), borderRadius: BorderRadius.circular(10)))),
+              Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: TriaColors.border(isDark), borderRadius: BorderRadius.circular(10)))),
               const SizedBox(height: 16),
-              Text('JOIN A SQUAD', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
+              Text('JOIN A SQUAD', style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
               const SizedBox(height: 4),
-              Text('Enter the 6-character invite code', style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12)),
+              Text('Enter the 6-character invite code', style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12)),
               const SizedBox(height: 16),
               TextField(
                 controller: joinCodeController,
-                style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 6),
+                style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 6),
                 textAlign: TextAlign.center,
                 textCapitalization: TextCapitalization.characters,
                 maxLength: 6,
                 decoration: InputDecoration(
                   hintText: 'XXXXXX',
-                  hintStyle: TextStyle(color: AiraColors.textMuted(isDark).withValues(alpha: 0.35), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 6),
+                  hintStyle: TextStyle(color: TriaColors.textMuted(isDark).withValues(alpha: 0.35), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 6),
                   filled: true,
-                  fillColor: AiraColors.scaffoldBg(isDark),
+                  fillColor: TriaColors.scaffoldBg(isDark),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
                   counterText: '',
                 ),
@@ -2910,14 +3510,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       padding: const EdgeInsets.only(bottom: 10),
       child: TextField(
         controller: ctrl,
-        style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 14),
+        style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 14),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+          labelStyle: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
           hintText: hint,
-          hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 13),
+          hintStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 13),
           filled: true,
-          fillColor: AiraColors.cardBg(isDark),
+          fillColor: TriaColors.cardBg(isDark),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),
@@ -2943,24 +3543,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   colorScheme: ColorScheme.dark(
                     primary: const Color(0xFF2563EB), // Royal Blue
                     onPrimary: Colors.white,
-                    surface: AiraColors.cardBg(isDark),
-                    onSurface: AiraColors.textPrimary(isDark),
+                    surface: TriaColors.cardBg(isDark),
+                    onSurface: TriaColors.textPrimary(isDark),
                   ),
                   dialogTheme: DialogThemeData(
-                    backgroundColor: AiraColors.dialogBg(isDark),
+                    backgroundColor: TriaColors.dialogBg(isDark),
                   ),
                   datePickerTheme: DatePickerThemeData(
-                    backgroundColor: AiraColors.dialogBg(isDark),
-                    headerBackgroundColor: AiraColors.scaffoldBg(isDark),
-                    headerForegroundColor: AiraColors.textPrimary(isDark),
-                    rangePickerHeaderBackgroundColor: AiraColors.scaffoldBg(isDark),
-                    rangePickerHeaderForegroundColor: AiraColors.textPrimary(isDark),
+                    backgroundColor: TriaColors.dialogBg(isDark),
+                    headerBackgroundColor: TriaColors.scaffoldBg(isDark),
+                    headerForegroundColor: TriaColors.textPrimary(isDark),
+                    rangePickerHeaderBackgroundColor: TriaColors.scaffoldBg(isDark),
+                    rangePickerHeaderForegroundColor: TriaColors.textPrimary(isDark),
                     confirmButtonStyle: ButtonStyle(
                       foregroundColor: WidgetStateProperty.all(const Color(0xFF60A5FA)),
                       textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     cancelButtonStyle: ButtonStyle(
-                      foregroundColor: WidgetStateProperty.all(AiraColors.textSecondary(isDark)),
+                      foregroundColor: WidgetStateProperty.all(TriaColors.textSecondary(isDark)),
                       textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
@@ -2976,15 +3576,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ctrl.text = '$y-$m-$d';
           }
         },
-        style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 14),
+        style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 14),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+          labelStyle: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
           hintText: 'Tap to select date',
-          hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 13),
+          hintStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 13),
           suffixIcon: const Icon(Icons.calendar_month, color: Color(0xFF2563EB), size: 18),
           filled: true,
-          fillColor: AiraColors.cardBg(isDark),
+          fillColor: TriaColors.cardBg(isDark),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),

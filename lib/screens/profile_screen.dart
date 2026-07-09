@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../core/providers/travel_providers.dart';
 import '../core/providers/theme_provider.dart';
 import '../core/theme/app_theme.dart';
@@ -27,12 +31,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Timer? _suicaScanTimer;
 
   // NFC Key state
-  bool _nfcScanning = false;
   bool _nfcUnlocked = false;
-  Timer? _nfcTimer;
-
-  // Expanded Apple Wallet pass
-  String? _expandedPass; // 'flight', 'hotel', null
 
   @override
   void initState() {
@@ -45,7 +44,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _topUpCtrl.dispose();
     _serverUrlCtrl.dispose();
     _suicaScanTimer?.cancel();
-    _nfcTimer?.cancel();
     super.dispose();
   }
 
@@ -70,35 +68,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     });
   }
 
-  void _triggerNfcUnlock() {
-    setState(() {
-      _nfcScanning = true;
-      _nfcUnlocked = false;
-    });
-
-    _nfcTimer = Timer(const Duration(milliseconds: 1200), () async {
-      await SoundSynthesizer.playUnlockChime();
-      setState(() {
-        _nfcScanning = false;
-        _nfcUnlocked = true;
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final userProfileState = ref.watch(userProfileProvider);
     final suicaState = ref.watch(suicaProvider);
-    final connectionStatus = ref.watch(serverConnectionProvider);
-    final serverUrl = ref.watch(serverUrlProvider);
 
     final isDark = ref.watch(isDarkProvider);
-    final textColor = AiraColors.textPrimary(isDark);
+    final textColor = TriaColors.textPrimary(isDark);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark),
+        backgroundColor: TriaColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
         leadingWidth: 56,
@@ -109,25 +91,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AiraColors.scaffoldBg(isDark),
+                color: TriaColors.scaffoldBg(isDark),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
                 icon: Icon(Icons.arrow_back, color: textColor, size: 18),
                 onPressed: () {
-                  if (Navigator.of(context).canPop()) {
-                    Navigator.of(context).pop();
-                  } else {
-                    ref.read(currentTabProvider.notifier).state = 0; // go back to Home
-                  }
+                  ref.read(currentTabProvider.notifier).state = 0; // go back to Home
                 },
               ),
             ),
           ),
         ),
         title: Text(
-          'TRAVELER PASSPORT',
+          'TRAVEL PROFILE',
           style: TextStyle(
             color: textColor,
             fontWeight: FontWeight.w900,
@@ -145,7 +123,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AiraColors.scaffoldBg(isDark),
+                color: TriaColors.scaffoldBg(isDark),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
@@ -175,14 +153,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AiraColors.scaffoldBg(isDark),
+                color: TriaColors.scaffoldBg(isDark),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                icon: Icon(Icons.settings, color: textColor, size: 18),
+                icon: Icon(Icons.logout_rounded, color: textColor, size: 18),
+                tooltip: 'Sign Out',
                 onPressed: () {
-                  _showSettingsModal(context, connectionStatus, serverUrl, isDark);
+                  _showSignOutConfirmation(context);
                 },
               ),
             ),
@@ -194,66 +173,68 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile Header Card
-            _buildProfileHeader(userProfileState),
+            // Profile Header Card (Editable name & bio, no email/username)
+            _buildProfileHeader(userProfileState, isDark),
+            const SizedBox(height: 12),
             
-            // Prepaid transit card Section
-            _buildSectionHeader('Prepaid transit card', tagText: 'NFC SIMULATED', tagColor: const Color(0xFF10B981)),
-            _buildSuicaCardWidget(suicaState),
-            
-            // Hotel Key Section
-            _buildSectionHeader('HOTEL NFC DIGITAL KEY', tagText: 'BLUETOOTH ACTIVE', tagColor: const Color(0xFF00B4D8)),
-            _buildNfcKeyWidget(),
-            
-            // Passport Stamp Book Section
-            _buildSectionHeader('PASSPORT STAMP BOOK'),
-            Stack(
-              clipBehavior: Clip.none,
+            // Shortcut Action Bento Grid
+            Row(
               children: [
-                _buildPassportStampsWidget(isDark),
-                Positioned(
-                  top: -50,
-                  right: 4,
-                  child: GestureDetector(
+                Expanded(
+                  child: _buildQuickActionCard(
+                    isDark: isDark,
+                    icon: Icons.card_membership_outlined,
+                    label: 'My Bookings',
+                    color: const Color(0xFFF59E0B),
+                    onTap: () => _showBookingsListDialog(context),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildQuickActionCard(
+                    isDark: isDark,
+                    icon: Icons.wallet,
+                    label: 'Tria Wallet',
+                    color: const Color(0xFF10B981),
+                    onTap: () => _showTriaWalletPaymentSheet(context),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildQuickActionCard(
+                    isDark: isDark,
+                    icon: Icons.support_agent,
+                    label: 'Need Help?',
+                    color: const Color(0xFF818CF8),
                     onTap: () {
-                      SoundSynthesizer.playTone(
-                        frequency: 520,
-                        durationSeconds: 0.08,
-                        name: 'sos_tap.wav',
-                      );
-                      _showEmergencySheetFromProfile(context, isDark);
+                      ref.read(currentTabProvider.notifier).state = 1; // Swapping to Chat Concierge
                     },
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFFEF4444),
-                        border: Border.all(color: AiraColors.scaffoldBg(isDark), width: 3),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFEF4444).withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.emergency_share, color: Colors.white, size: 18),
-                      ),
-                    ),
                   ),
                 ),
               ],
             ),
             
-            // DNA Archetype Section
-            _buildSectionHeader('INTERACTIVE AI TRAVEL DNA PROFILE', tagText: 'TWEAK SLIDERS TO MORPH ARCHETYPE', tagColor: const Color(0xFF94A3B8)),
-            _buildDnaSlidersWidget(userProfileState, isDark),
+            // Visa Details Section
+            _buildSectionHeader('TRAVELER VISA DETAILS', tagText: 'CLICK TO EDIT', tagColor: const Color(0xFFD4AF37)),
+            _buildVisaDetailsWidget(userProfileState, isDark),
             
-            // Bookings Section
-            _buildSectionHeader('MY ACTIVE BOOKINGS'),
-            _buildAppleWalletPassesWidget(isDark),
+            // Digital Passes & Keys Section
+            _buildSectionHeader('DIGITAL PASSES & KEYS', tagText: 'ACTIVE NFC', tagColor: const Color(0xFF10B981)),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _buildSuicaCardWidget(suicaState)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildNfcKeyWidget()),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
+            // App settings section
+            _buildSectionHeader('TRIA APP PREFERENCES'),
+            _buildPreferencesAndSettingsCard(isDark),
+            const SizedBox(height: 12),
+            _buildServerConnectionWidget(ref.watch(serverConnectionProvider), ref.watch(serverUrlProvider), isDark),
             const SizedBox(height: 32),
           ],
         ),
@@ -274,7 +255,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               fontSize: 11,
               fontWeight: FontWeight.w900,
               letterSpacing: 1.2,
-              color: AiraColors.textSecondary(isDark),
+              color: TriaColors.textSecondary(isDark),
               fontFamily: 'monospace',
             ),
           ),
@@ -305,89 +286,202 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileHeader(UserProfileState userProfileState) {
-    final isDark = ref.watch(isDarkProvider);
-    final name = userProfileState.profile['fullName'] ?? 'Shreyas Aswini';
-    final user = userProfileState.profile['username'] ?? 'shreyas';
-    final archetype = userProfileState.travelArchetype;
+  Widget _buildProfileHeader(UserProfileState userProfileState, bool isDark) {
+    final profile = userProfileState.profile;
+    final photoUrl = profile['photoUrl'] as String? ?? '';
+    final name = profile['fullName'] ?? profile['name'] ?? 'Adventurer';
+    final bio = profile['bio'] as String? ?? 'Exploring the world one custom route at a time.';
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: AiraColors.headerGradient(isDark),
+          colors: TriaColors.headerGradient(isDark),
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.06),
+            color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF59E0B),
-              shape: BoxShape.circle,
-            ),
-            child: const Center(
-              child: Icon(Icons.person, color: Colors.white, size: 32),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              CircleAvatar(
+                radius: 46,
+                backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+                backgroundImage: _getAvatarImageProvider(photoUrl),
+                child: photoUrl.isEmpty
+                    ? Text(
+                        name.isNotEmpty ? name[0].toUpperCase() : 'T',
+                        style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: TriaColors.textPrimary(isDark)),
+                      )
+                    : null,
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: AiraColors.textPrimary(isDark),
+                    GestureDetector(
+                      onTap: () => _showAddPhotoDialog(context, ServerConnectionStatus.connected, '', isDark),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF2563EB),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.camera_alt, color: Colors.white, size: 14),
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18),
+                    if (photoUrl.isNotEmpty) ...[
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: () {
+                          ref.read(userProfileProvider.notifier).updateUserProfile({'photoUrl': ''});
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Profile photo removed.')),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: Colors.redAccent,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.delete, color: Colors.white, size: 14),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
-                const SizedBox(height: 4),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          GestureDetector(
+            onTap: () => _showEditNameDialog(context),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
                 Text(
-                  '@$user • $archetype',
+                  name,
                   style: TextStyle(
-                    fontSize: 12,
-                    color: AiraColors.textSecondary(isDark),
-                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: TriaColors.textPrimary(isDark),
                   ),
                 ),
+                const SizedBox(width: 6),
+                const Icon(Icons.edit, size: 14, color: Color(0xFF2563EB)),
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFF59E0B), width: 1.5),
-            ),
-            child: const Text(
-              'AIRA',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFF59E0B),
-                letterSpacing: 0.5,
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () => _showEditBioDialog(context),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                bio,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: TriaColors.textSecondary(isDark),
+                  fontWeight: FontWeight.w500,
+                  height: 1.4,
+                ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPreferencesAndSettingsCard(bool isDark) {
+    final profile = ref.watch(userProfileProvider).profile;
+    final ecoFriendly = profile['ecoFriendly'] as bool? ?? false;
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TriaColors.cardBg(isDark),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: TriaColors.border(isDark)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'APPEARANCE & UTILITIES',
+            style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, letterSpacing: 0.5, color: Colors.grey),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Dark Mode', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold)),
+              Switch(
+                value: isDark,
+                activeTrackColor: const Color(0xFF2563EB),
+                onChanged: (val) {
+                  ref.read(themeModeProvider.notifier).toggle();
+                },
+              ),
+            ],
+          ),
+          _buildDivider(isDark),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Prefer Eco-Friendly Routes', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold)),
+              Switch(
+                value: ecoFriendly,
+                activeTrackColor: const Color(0xFF10B981),
+                onChanged: (val) {
+                  ref.read(userProfileProvider.notifier).updateUserProfile({'ecoFriendly': val});
+                },
+              ),
+            ],
+          ),
+          _buildDivider(isDark),
+          _buildSettingsListTile(
+            isDark: isDark,
+            icon: Icons.lock_outline,
+            title: 'Change Account Password',
+            onTap: () => _showChangePasswordDialog(context),
+          ),
+          _buildDivider(isDark),
+          _buildSettingsListTile(
+            isDark: isDark,
+            icon: Icons.notifications_none,
+            title: 'Manage Contact & Alert Preferences',
+            onTap: () => _showContactPreferencesDialog(context),
+          ),
+          _buildDivider(isDark),
+          _buildSettingsListTile(
+            isDark: isDark,
+            icon: Icons.location_on_outlined,
+            title: 'Edit Saved Home Base Address',
+            onTap: () => _showEditHomeBaseDialog(context),
+          ),
+          _buildDivider(isDark),
+          _buildSettingsListTile(
+            isDark: isDark,
+            icon: Icons.airplanemode_active,
+            title: 'Loyalty & Reward Programs',
+            onTap: () => _showLoyaltyProgramsDialog(context),
           ),
         ],
       ),
@@ -401,20 +495,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0F9D58), Color(0xFF0B8043)],
+          colors: [Color(0xFF15803D), Color(0xFF166534)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F9D58).withValues(alpha: 0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 6),
+            color: const Color(0xFF15803D).withValues(alpha: 0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -426,157 +519,123 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 32,
-                    height: 22,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5B041),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Center(
-                      child: Icon(Icons.credit_card, size: 14, color: Colors.white24),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      'Prepaid Transit Pass',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 11,
-                        letterSpacing: 1.0,
-                      ),
+                  const Icon(Icons.subway_outlined, color: Colors.white, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    'SUICA PASS',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontWeight: FontWeight.w900,
+                      fontSize: 10,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
               ),
-              const Text(
-                '🐧',
-                style: TextStyle(fontSize: 22),
-              ),
+              const Text('🐧', style: TextStyle(fontSize: 14)),
             ],
           ),
-          const SizedBox(height: 24),
-          const Text(
-            'NFC CARD BALANCE',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 9,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 20),
           Text(
             '¥$formattedBalance JPY',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 32,
+              fontSize: 22,
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 20),
+          const Text(
+            'PREPAID BALANCE',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Action Buttons
           Row(
             children: [
               Expanded(
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF085A2E),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                child: GestureDetector(
+                  onTap: () => setState(() => _topUpOpen = !_topUpOpen),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                  onPressed: () => setState(() => _topUpOpen = !_topUpOpen),
-                  icon: const Icon(Icons.add_card, size: 16),
-                  label: const Text(
-                    'Top Up (Yen)',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
+                    child: const Center(
+                      child: Icon(Icons.add_card, size: 14, color: Colors.white),
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF0F9D58),
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                flex: 2,
+                child: GestureDetector(
+                  onTap: _suicaScanState == 'scanning' ? null : () => _triggerSuicaScan(),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: _suicaScanState == 'scanning'
+                          ? const SizedBox(
+                              width: 10,
+                              height: 10,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Color(0xFF15803D),
+                              ),
+                            )
+                          : Text(
+                              _suicaScanState == 'success' ? 'OPENED!' : 'TAP GATE',
+                              style: const TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF15803D),
+                              ),
+                            ),
                     ),
                   ),
-                  onPressed: _suicaScanState == 'scanning' ? null : () => _triggerSuicaScan(),
-                  child: _suicaScanState == 'scanning'
-                      ? const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: Color(0xFF0F9D58),
-                          ),
-                        )
-                      : Text(
-                          _suicaScanState == 'success' ? 'Gate Opened!' : 'Tap Gate at Station',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFF0F9D58),
-                          ),
-                        ),
                 ),
               ),
             ],
           ),
           if (_topUpOpen) ...[
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 40,
-                    child: TextField(
-                      controller: _topUpCtrl,
-                      keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        labelText: 'Top-Up amount (¥)',
-                        labelStyle: TextStyle(color: Colors.white70, fontSize: 11),
-                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white54)),
-                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-                      ),
-                    ),
-                  ),
+            const SizedBox(height: 12),
+            Container(
+              height: 34,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: TextField(
+                controller: _topUpCtrl,
+                keyboardType: TextInputType.number,
+                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                decoration: const InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  hintText: 'Yen amount',
+                  hintStyle: TextStyle(color: Colors.white70, fontSize: 10),
+                  border: InputBorder.none,
                 ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF0F9D58),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: () {
-                    final amt = double.tryParse(_topUpCtrl.text) ?? 0.0;
-                    if (amt > 0) {
-                      ref.read(suicaProvider.notifier).topUpSuica(amt);
-                      setState(() => _topUpOpen = false);
-                    }
-                  },
-                  child: const Text('Add Cash', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            )
-          ]
+                onSubmitted: (val) {
+                  final amt = double.tryParse(val) ?? 0.0;
+                  if (amt > 0) {
+                    ref.read(suicaProvider.notifier).topUpSuica(amt);
+                    setState(() => _topUpOpen = false);
+                  }
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -585,15 +644,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget _buildNfcKeyWidget() {
     final isDark = ref.watch(isDarkProvider);
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AiraColors.border(isDark), width: 1),
+        color: TriaColors.cardBg(isDark),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: TriaColors.border(isDark)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -602,490 +660,325 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: AiraColors.scaffoldBg(isDark),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AiraColors.border(isDark), width: 1.5),
-                ),
-                child: Center(
-                  child: Icon(
-                    _nfcUnlocked ? Icons.lock_open_rounded : Icons.lock_rounded,
-                    color: const Color(0xFFF59E0B),
-                    size: 24,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'ROOM KEY • GRACERY HOTEL',
-                      style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w900,
-                        color: AiraColors.textSecondary(isDark),
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _nfcUnlocked ? 'Room 1402 • Stay Active' : 'Room 1402 • Stay ID 78229',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: AiraColors.textPrimary(isDark),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AiraColors.scaffoldBg(isDark),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AiraColors.border(isDark)),
-                ),
-                child: Text(
-                  'Tokyo',
-                  style: TextStyle(
-                    color: AiraColors.textSecondary(isDark),
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 children: [
-                  Text(
-                    'STATUS STATE',
-                    style: TextStyle(
-                      fontSize: 8,
-                      fontWeight: FontWeight.w900,
-                      color: AiraColors.textSecondary(isDark),
-                      letterSpacing: 0.5,
-                    ),
+                  Icon(
+                    _nfcUnlocked ? Icons.lock_open_rounded : Icons.lock_rounded,
+                    color: const Color(0xFFF59E0B),
+                    size: 14,
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(width: 4),
                   Text(
-                    _nfcUnlocked ? 'Key Unlocked (NFC Active)' : 'Key Locked (NFC Ready)',
+                    'ROOM KEY',
                     style: TextStyle(
-                      color: _nfcUnlocked ? const Color(0xFF10B981) : const Color(0xFF00B4D8),
-                      fontSize: 11,
+                      color: TriaColors.textSecondary(isDark),
                       fontWeight: FontWeight.w900,
+                      fontSize: 10,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF6B35),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: _nfcScanning ? null : () => _triggerNfcUnlock(),
-                child: _nfcScanning
-                    ? const SizedBox(
-                        width: 12,
-                        height: 12,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text(
-                        'Hold near Door Lock',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      ),
+              Icon(
+                Icons.wifi_tethering,
+                size: 14,
+                color: _nfcUnlocked ? const Color(0xFF00B4D8) : Colors.grey,
               ),
             ],
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Room 1402',
+            style: TextStyle(
+              color: TriaColors.textPrimary(isDark),
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          Text(
+            'GRACERY HOTEL TOKYO',
+            style: TextStyle(
+              color: TriaColors.textMuted(isDark),
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Tap Lock Button
+          GestureDetector(
+            onTap: () {
+              SoundSynthesizer.playSuicaBeep();
+              setState(() => _nfcUnlocked = !_nfcUnlocked);
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: _nfcUnlocked 
+                    ? const Color(0xFF00B4D8).withValues(alpha: 0.15)
+                    : TriaColors.cardBgAlt(isDark),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: _nfcUnlocked ? const Color(0xFF00B4D8) : TriaColors.border(isDark),
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  _nfcUnlocked ? 'UNLOCKED' : 'TAP TO UNLOCK',
+                  style: TextStyle(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w900,
+                    color: _nfcUnlocked ? const Color(0xFF00B4D8) : TriaColors.textPrimary(isDark),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPassportStampsWidget(bool isDark) {
-    final stamps = [
-      {
-        'code': 'TYO',
-        'city': r"Tokyo \'26",
-        'emoji': '🌸',
-        'borderColor': const Color(0xFFC084FC),
-        'badgeColor': const Color(0xFF9333EA),
-        'fullName': 'Tokyo Narita Int\'l',
-        'date': '2026-06-02',
-        'flight': 'SQ-638'
-      },
-      {
-        'code': 'KYO',
-        'city': r"Kyoto \'25",
-        'emoji': '⛩️',
-        'borderColor': const Color(0xFFF87171),
-        'badgeColor': const Color(0xFFDC2626),
-        'fullName': 'Kansai Int\'l Airport',
-        'date': '2025-10-12',
-        'flight': 'JL-52'
-      },
-      {
-        'code': 'ROM',
-        'city': r"Rome \'24",
-        'emoji': '🏛️',
-        'borderColor': const Color(0xFFFDBA74),
-        'badgeColor': const Color(0xFFD97706),
-        'fullName': 'Rome Fiumicino Airport',
-        'date': '2024-05-18',
-        'flight': 'AZ-201'
-      },
-      {
-        'code': 'PAR',
-        'city': r"Paris \'23",
-        'emoji': '🗼',
-        'borderColor': const Color(0xFF2DD4BF),
-        'badgeColor': const Color(0xFF0D9488),
-        'fullName': 'Paris Charles de Gaulle',
-        'date': '2023-09-04',
-        'flight': 'AF-274'
-      },
-      {
-        'code': 'EDI',
-        'city': r"Edin. \'22",
-        'emoji': '🏰',
-        'borderColor': const Color(0xFF94A3B8),
-        'badgeColor': const Color(0xFF475569),
-        'fullName': 'Edinburgh Airport',
-        'date': '2022-08-14',
-        'flight': 'BA-143'
-      },
-    ];
+  Widget _buildVisaDetailsWidget(UserProfileState userProfileState, bool isDark) {
+    final profile = userProfileState.profile;
+    final visaNumber = profile['visaNumber'] as String? ?? 'Not Set';
+    final visaExpiry = profile['visaExpiry'] as String? ?? '';
+    final visaCountry = profile['visaCountry'] as String? ?? 'Not Set';
+    final visaType = profile['visaType'] as String? ?? 'Tourist';
+    
+    // Check expiry
+    String? expiryWarning;
+    int? daysRemaining;
+    bool isExpired = false;
+    if (visaExpiry.isNotEmpty) {
+      try {
+        final expiryDate = DateTime.parse(visaExpiry);
+        final today = DateTime(2026, 7, 8); // matching system clock reference
+        final difference = expiryDate.difference(today).inDays;
+        daysRemaining = difference;
+        if (difference <= 0) {
+          isExpired = true;
+          expiryWarning = '🚨 EXPIRED: Renew Visa immediately!';
+        } else if (difference <= 21) {
+          expiryWarning = '⚠️ WARNING: Visa Expires in $difference days!';
+        }
+      } catch (_) {}
+    }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AiraColors.border(isDark), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: stamps.map((s) {
-            return GestureDetector(
-              onTap: () => _showStampDetailsModal({
-                'code': s['code'] as String,
-                'city': s['fullName'] as String,
-                'date': s['date'] as String,
-                'airline': s['flight'] as String,
-              }, isDark),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 20.0),
-                child: Column(
+    return GestureDetector(
+      onTap: () => _showEditVisaDialog(context, isDark),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: TriaColors.cardBg(isDark),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: TriaColors.border(isDark)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header: Title & Edit
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
                   children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            color: (s['borderColor'] as Color).withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: s['borderColor'] as Color, width: 2),
-                          ),
-                          child: Center(
-                            child: Text(
-                              s['emoji'] as String,
-                              style: const TextStyle(fontSize: 28),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: -8,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: s['badgeColor'] as Color,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              s['code'] as String,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
+                    Icon(Icons.assignment_ind_outlined, color: const Color(0xFF6366F1), size: 20),
+                    const SizedBox(width: 8),
                     Text(
-                      s['city'] as String,
+                      'ACTIVE TRAVEL VISA',
                       style: TextStyle(
-                        fontSize: 10,
+                        color: TriaColors.textPrimary(isDark),
                         fontWeight: FontWeight.bold,
-                        color: AiraColors.textSecondary(isDark),
+                        fontSize: 13,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ],
                 ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  void _showStampDetailsModal(Map<String, String> s, bool isDark) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.verified_outlined, color: Color(0xFF2563EB), size: 24),
-                  const SizedBox(width: 8),
-                  Text('PASSPORT ENTRY LOG: ${s['code']}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark))),
-                ],
-              ),
-              Divider(height: 24, color: AiraColors.border(isDark)),
-              _stampDetailLine('Custom Port Station', s['city']!, isDark),
-              _stampDetailLine('Entry Clear Date', s['date']!, isDark),
-              _stampDetailLine('Validated Flight PNR', s['airline']!, isDark),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 46,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2563EB),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isExpired
+                        ? Colors.red.withValues(alpha: 0.15)
+                        : (daysRemaining != null && daysRemaining <= 21)
+                            ? Colors.orange.withValues(alpha: 0.15)
+                            : Colors.green.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Back to Stamps Book', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-              )
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _stampDetailLine(String label, String val, bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12)),
-          Text(val, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AiraColors.textPrimary(isDark))),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDnaSlidersWidget(UserProfileState userProfileState, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AiraColors.border(isDark), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _dnaSlider(
-            emoji: '🍜',
-            title: 'Foodie Vibe',
-            val: userProfileState.dnaFoodie,
-            key: 'foodie',
-            activeColor: const Color(0xFF0D9488),
-            isDark: isDark,
-          ),
-          _dnaSlider(
-            emoji: '⛩️',
-            title: 'Heritage Path',
-            val: userProfileState.dnaHeritage,
-            key: 'heritage',
-            activeColor: const Color(0xFFFF6B35),
-            isDark: isDark,
-          ),
-          _dnaSlider(
-            emoji: '🧳',
-            title: 'Otaku & Tech',
-            val: userProfileState.dnaTech,
-            key: 'tech',
-            activeColor: const Color(0xFF7C3AED),
-            isDark: isDark,
-          ),
-          _dnaSlider(
-            emoji: '🌿',
-            title: 'Active Nature',
-            val: userProfileState.dnaAdventure,
-            key: 'adventure',
-            activeColor: const Color(0xFF10B981),
-            isDark: isDark,
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: AiraColors.cardBgAlt(isDark),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AiraColors.border(isDark), width: 1),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.auto_awesome_rounded, color: Color(0xFF00B4D8), size: 18),
-                const SizedBox(width: 10),
-                Expanded(
                   child: Text(
-                    'Aira dynamically structures routes to prioritize traditional tavern food crawls & Michelin ramen spots based on your DNA profile metrics.',
+                    isExpired
+                        ? 'EXPIRED'
+                        : (daysRemaining != null && daysRemaining <= 21)
+                            ? 'EXPIRING'
+                            : 'VALID',
                     style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: AiraColors.textSecondary(isDark),
-                      height: 1.4,
+                      color: isExpired
+                          ? Colors.redAccent
+                          : (daysRemaining != null && daysRemaining <= 21)
+                              ? Colors.orangeAccent
+                              : Colors.green,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 9.5,
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            
+            // Clean details list in a 2x2 grid
+            Row(
+              children: [
+                Expanded(
+                  child: _buildProfessionalVisaField(
+                    label: 'Destination',
+                    value: visaCountry,
+                    icon: Icons.public,
+                    isDark: isDark,
+                  ),
+                ),
+                Expanded(
+                  child: _buildProfessionalVisaField(
+                    label: 'Visa Type',
+                    value: visaType,
+                    icon: Icons.class_outlined,
+                    isDark: isDark,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildProfessionalVisaField(
+                    label: 'Visa Number',
+                    value: visaNumber,
+                    icon: Icons.numbers,
+                    isDark: isDark,
+                  ),
+                ),
+                Expanded(
+                  child: _buildProfessionalVisaField(
+                    label: 'Expiry Date',
+                    value: visaExpiry.isNotEmpty ? visaExpiry : 'Not Set',
+                    icon: Icons.calendar_today_outlined,
+                    isDark: isDark,
+                    valueColor: daysRemaining != null && daysRemaining <= 21 ? Colors.redAccent : null,
+                  ),
+                ),
+              ],
+            ),
+            if (expiryWarning != null) ...[
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isExpired
+                      ? const Color(0xFF7F1D1D).withValues(alpha: 0.12)
+                      : const Color(0xFF7C2D12).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isExpired
+                        ? Colors.redAccent.withValues(alpha: 0.3)
+                        : Colors.orangeAccent.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isExpired ? Icons.error_outline : Icons.warning_amber_rounded,
+                      color: isExpired ? Colors.redAccent : Colors.orangeAccent,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        expiryWarning,
+                        style: TextStyle(
+                          color: isExpired ? Colors.redAccent : Colors.orangeAccent,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _dnaSlider({
-    required String emoji,
-    required String title,
-    required double val,
-    required String key,
-    required Color activeColor,
+  Widget _buildProfessionalVisaField({
+    required String label,
+    required String value,
+    required IconData icon,
     required bool isDark,
+    Color? valueColor,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: TriaColors.textMuted(isDark)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Text(emoji, style: const TextStyle(fontSize: 14)),
-                  const SizedBox(width: 8),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: AiraColors.textPrimary(isDark),
-                    ),
-                  ),
-                ],
-              ),
               Text(
-                '${val.toInt()}%',
+                label.toUpperCase(),
                 style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  color: activeColor,
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.bold,
+                  color: TriaColors.textMuted(isDark),
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.bold,
+                  color: valueColor ?? TriaColors.textPrimary(isDark),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          SliderTheme(
-            data: SliderThemeData(
-              trackHeight: 6,
-              activeTrackColor: activeColor,
-              inactiveTrackColor: AiraColors.cardBgAlt(isDark),
-              thumbColor: activeColor,
-              overlayColor: activeColor.withValues(alpha: 0.1),
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-              trackShape: const RoundedRectSliderTrackShape(),
-            ),
-            child: Slider(
-              value: val,
-              min: 0,
-              max: 100,
-              onChanged: (newVal) {
-                ref.read(userProfileProvider.notifier).updateDNA(key, newVal);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppleWalletPassesWidget(bool isDark) {
-    return Column(
-      children: [
-        _buildFlightPassCard(isDark),
-        const SizedBox(height: 12),
-        _buildHotelPassCard(isDark),
+        ),
       ],
     );
   }
 
-  Widget _buildFlightPassCard(bool isDark) {
-    final expanded = _expandedPass == 'flight';
+
+
+
+
+
+  Widget _buildFlightPassCard(bool isDark, {required String? expandedPass, required void Function(String? newPass) onToggle}) {
+    final expanded = expandedPass == 'flight';
     return Container(
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
+        color: TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AiraColors.border(isDark), width: 1),
+        border: Border.all(color: TriaColors.border(isDark), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -1099,7 +992,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         child: Column(
           children: [
             GestureDetector(
-              onTap: () => setState(() => _expandedPass = expanded ? null : 'flight'),
+              onTap: () => onToggle(expanded ? null : 'flight'),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: const BoxDecoration(
@@ -1145,9 +1038,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('FROM', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
-                          Text('SFO', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark))),
-                          Text('San Francisco', style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
+                          Text('FROM', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
+                          Text('SFO', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: TriaColors.textPrimary(isDark))),
+                          Text('San Francisco', style: TextStyle(fontSize: 10, color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
                         ],
                       ),
                       Expanded(
@@ -1155,12 +1048,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           children: [
                             Text(
                               'Skyline Airlines • SQ-638',
-                              style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark)),
+                              style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark)),
                             ),
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                Expanded(child: Divider(color: AiraColors.border(isDark), thickness: 1)),
+                                Expanded(child: Divider(color: TriaColors.border(isDark), thickness: 1)),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                   child: Transform.rotate(
@@ -1168,14 +1061,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     child: const Icon(Icons.flight, color: Color(0xFF00B4D8), size: 16),
                                   ),
                                 ),
-                                Expanded(child: Divider(color: AiraColors.border(isDark), thickness: 1)),
+                                Expanded(child: Divider(color: TriaColors.border(isDark), thickness: 1)),
                               ],
                             ),
                             const SizedBox(height: 4),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: AiraColors.cardBgAlt(isDark),
+                                color: TriaColors.cardBgAlt(isDark),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text(
@@ -1193,9 +1086,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text('TO', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
-                          Text('NRT', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark))),
-                          Text('Tokyo Narita', style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
+                          Text('TO', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
+                          Text('NRT', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: TriaColors.textPrimary(isDark))),
+                          Text('Tokyo Narita', style: TextStyle(fontSize: 10, color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ],
@@ -1203,7 +1096,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(height: 16),
                   CustomPaint(
                     size: const Size(double.infinity, 1),
-                    painter: DashedLinePainter(color: AiraColors.border(isDark)),
+                    painter: DashedLinePainter(color: TriaColors.border(isDark)),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -1212,30 +1105,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('SEAT', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('SEAT', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
                           const SizedBox(height: 2),
-                          Text('14A', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('14A', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('CLASS', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('CLASS', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
                           const SizedBox(height: 2),
-                          Text('Premium Econ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('Premium Econ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text('PNR CODE', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('PNR CODE', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
                           const SizedBox(height: 2),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AiraColors.cardBgAlt(isDark),
+                              color: TriaColors.cardBgAlt(isDark),
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: AiraColors.border(isDark)),
+                              border: Border.all(color: TriaColors.border(isDark)),
                             ),
                             child: const Text(
                               'NH-782Y9W',
@@ -1253,7 +1146,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: 16),
                     CustomPaint(
                       size: const Size(double.infinity, 1),
-                      painter: DashedLinePainter(color: AiraColors.border(isDark)),
+                      painter: DashedLinePainter(color: TriaColors.border(isDark)),
                     ),
                     const SizedBox(height: 16),
                     Container(
@@ -1268,13 +1161,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: 6),
                     Text(
                       '*NH-782Y9W*',
-                      style: TextStyle(color: AiraColors.textSecondary(isDark), fontFamily: 'monospace', fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: TriaColors.textSecondary(isDark), fontFamily: 'monospace', fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AiraColors.cardBgAlt(isDark),
-                        foregroundColor: AiraColors.textPrimary(isDark),
+                        backgroundColor: TriaColors.cardBgAlt(isDark),
+                        foregroundColor: TriaColors.textPrimary(isDark),
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
@@ -1292,13 +1185,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildHotelPassCard(bool isDark) {
-    final expanded = _expandedPass == 'hotel';
+  Widget _buildHotelPassCard(bool isDark, {required String? expandedPass, required void Function(String? newPass) onToggle}) {
+    final expanded = expandedPass == 'hotel';
     return Container(
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
+        color: TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AiraColors.border(isDark), width: 1),
+        border: Border.all(color: TriaColors.border(isDark), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -1312,7 +1205,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         child: Column(
           children: [
             GestureDetector(
-              onTap: () => setState(() => _expandedPass = expanded ? null : 'hotel'),
+              onTap: () => onToggle(expanded ? null : 'hotel'),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: const BoxDecoration(
@@ -1365,17 +1258,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('HOTEL', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
-                          Text('Skyline Godzilla Hotel Tokyo', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark))),
-                          Text('West Central Tokyo, Tokyo', style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
+                          Text('HOTEL', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
+                          Text('Skyline Godzilla Hotel Tokyo', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: TriaColors.textPrimary(isDark))),
+                          Text('West Central Tokyo, Tokyo', style: TextStyle(fontSize: 10, color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text('ROOM', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
-                          Text('Room 1402', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AiraColors.textPrimary(isDark))),
-                          Text('Stay ID 78229', style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
+                          Text('ROOM', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
+                          Text('Room 1402', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: TriaColors.textPrimary(isDark))),
+                          Text('Stay ID 78229', style: TextStyle(fontSize: 10, color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ],
@@ -1383,7 +1276,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(height: 16),
                   CustomPaint(
                     size: const Size(double.infinity, 1),
-                    painter: DashedLinePainter(color: AiraColors.border(isDark)),
+                    painter: DashedLinePainter(color: TriaColors.border(isDark)),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -1392,17 +1285,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('CHECK-IN', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('CHECK-IN', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
                           const SizedBox(height: 2),
-                          Text('Jun 16 • 3:00 PM', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('Jun 16 • 3:00 PM', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
                         ],
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text('DURATION', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('DURATION', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
                           const SizedBox(height: 2),
-                          Text('5 Nights Stay', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AiraColors.textSecondary(isDark))),
+                          Text('5 Nights Stay', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: TriaColors.textSecondary(isDark))),
                         ],
                       ),
                     ],
@@ -1411,7 +1304,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: 16),
                     CustomPaint(
                       size: const Size(double.infinity, 1),
-                      painter: DashedLinePainter(color: AiraColors.border(isDark)),
+                      painter: DashedLinePainter(color: TriaColors.border(isDark)),
                     ),
                     const SizedBox(height: 16),
                     Container(
@@ -1426,12 +1319,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: 6),
                     Text(
                       '*ST-78229*',
-                      style: TextStyle(color: AiraColors.textSecondary(isDark), fontFamily: 'monospace', fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: TriaColors.textSecondary(isDark), fontFamily: 'monospace', fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AiraColors.cardBgAlt(isDark),
+                        backgroundColor: TriaColors.cardBgAlt(isDark),
                         foregroundColor: const Color(0xFF10B981),
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1450,65 +1343,75 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  void _showSettingsModal(BuildContext context, ServerConnectionStatus status, String serverUrl, bool isDark) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      isScrollControlled: true,
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            top: 24,
-            left: 24,
-            right: 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 5,
-                  decoration: BoxDecoration(color: AiraColors.border(isDark), borderRadius: BorderRadius.circular(10)),
-                ),
+  Widget _buildQuickActionCard({
+    required bool isDark,
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+        decoration: BoxDecoration(
+          color: TriaColors.cardBg(isDark),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: TriaColors.border(isDark)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            )
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Icon(Icons.settings, color: Color(0xFF2563EB), size: 22),
-                  const SizedBox(width: 8),
-                  Text('SYSTEM SETTINGS', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark))),
-                ],
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: TriaColors.textPrimary(isDark),
+                fontSize: 11.5,
+                fontWeight: FontWeight.bold,
               ),
-              Divider(height: 24, color: AiraColors.border(isDark)),
-              _buildServerConnectionWidget(status, serverUrl, isDark),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 46,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFEF4444),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    ref.read(userProfileProvider.notifier).logout();
-                    context.go('/login');
-                  },
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                  label: const Text('Sign Out & Clear Session', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        );
-      },
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  Widget _buildSettingsListTile({
+    required bool isDark,
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: TriaColors.textSecondary(isDark), size: 18),
+      title: Text(
+        title,
+        style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 12.5, fontWeight: FontWeight.w600),
+      ),
+      trailing: Icon(Icons.chevron_right, color: TriaColors.textMuted(isDark), size: 18),
+      onTap: onTap,
+      dense: true,
+    );
+  }
+
+  Widget _buildDivider(bool isDark) {
+    return Divider(color: TriaColors.border(isDark), height: 1, indent: 16, endIndent: 16);
   }
 
   Widget _buildServerConnectionWidget(ServerConnectionStatus status, String serverUrl, bool isDark) {
@@ -1538,9 +1441,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
+        color: TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AiraColors.border(isDark)),
+        border: Border.all(color: TriaColors.border(isDark)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1549,8 +1452,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Aira AI Core Server',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
+                'Tria AI Core Server',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: TriaColors.textPrimary(isDark)),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1576,7 +1479,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           const SizedBox(height: 12),
           Text(
             'Ensure the client base URL points to your running Node/Express backend. If running on a physical mobile device, enter your host computer\'s local network IP.',
-            style: TextStyle(fontSize: 10.5, color: AiraColors.textSecondary(isDark), height: 1.3),
+            style: TextStyle(fontSize: 10.5, color: TriaColors.textSecondary(isDark), height: 1.3),
           ),
           const SizedBox(height: 14),
           Row(
@@ -1586,13 +1489,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   height: 38,
                   child: TextField(
                     controller: _serverUrlCtrl,
-                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 12, fontWeight: FontWeight.bold),
                     decoration: InputDecoration(
                       isDense: true,
                       labelText: 'Server Base URL',
-                      labelStyle: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AiraColors.border(isDark))),
-                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AiraColors.textPrimary(isDark))),
+                      labelStyle: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: TriaColors.textPrimary(isDark))),
                     ),
                   ),
                 ),
@@ -1612,7 +1515,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ref.read(serverUrlProvider.notifier).state = newUrl;
                     ref.read(serverConnectionProvider.notifier).forceRefresh();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Aira Server URL updated to: $newUrl')),
+                      SnackBar(content: Text('Tria Server URL updated to: $newUrl')),
                     );
                   }
                 },
@@ -1625,226 +1528,1275 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  void _showEmergencySheetFromProfile(BuildContext context, bool isDark) {
-    showModalBottomSheet(
+
+
+  ImageProvider? _getAvatarImageProvider(String photoUrl) {
+    if (photoUrl.isEmpty) return null;
+    if (photoUrl.startsWith('http') || photoUrl.startsWith('blob:')) {
+      return NetworkImage(photoUrl);
+    }
+    if (!kIsWeb) {
+      return FileImage(File(photoUrl));
+    }
+    return NetworkImage(photoUrl);
+  }
+
+  Future<void> _pickImageFromSystem(BuildContext context, ServerConnectionStatus status, String serverUrl, bool isDark) async {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 85,
+      );
+      if (pickedFile != null) {
+        ref.read(userProfileProvider.notifier).updateUserProfile({'photoUrl': pickedFile.path});
+        
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile photo updated successfully!')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to upload device photo: $e')),
+      );
+    }
+  }
+
+  void _showAddPhotoDialog(BuildContext context, ServerConnectionStatus status, String serverUrl, bool isDark) {
+    showDialog(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      isScrollControlled: true,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('Edit Profile Photo', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold)),
+          content: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: AiraColors.border(isDark),
-                    borderRadius: BorderRadius.circular(10),
+              Text(
+                'Upload a photo directly from your phone/mobile device gallery, or choose one of our preset travel avatars.',
+                style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11.5, height: 1.3),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563EB),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 1,
                   ),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _pickImageFromSystem(context, status, serverUrl, isDark);
+                  },
+                  icon: const Icon(Icons.upload_file, color: Colors.white, size: 18),
+                  label: const Text('Upload from Device', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                 ),
+              ),
+              const SizedBox(height: 22),
+              Row(
+                children: [
+                  Expanded(child: Divider(color: TriaColors.border(isDark))),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text('OR PRESETS', style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 9, fontWeight: FontWeight.bold)),
+                  ),
+                  Expanded(child: Divider(color: TriaColors.border(isDark))),
+                ],
               ),
               const SizedBox(height: 16),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF7F1D1D),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.shield_outlined, color: Color(0xFFF87171), size: 22),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'EMERGENCY ASSIST CARD',
-                        style: TextStyle(
-                          color: AiraColors.textPrimary(isDark),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Local Authorities & Health Information',
-                        style: TextStyle(
-                          color: AiraColors.textSecondary(isDark),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+                  _buildPresetAvatarOption(ctx, context, status, serverUrl, 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80', isDark),
+                  _buildPresetAvatarOption(ctx, context, status, serverUrl, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80', isDark),
+                  _buildPresetAvatarOption(ctx, context, status, serverUrl, 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80', isDark),
                 ],
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'LOCAL EMERGENCY SERVICES (TOKYO)',
-                style: TextStyle(
-                  color: Color(0xFFEF4444),
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.0,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildEmergencyCallBtn(
-                      label: 'Police (110)',
-                      icon: Icons.local_police_outlined,
-                      onTap: () {
-                        Navigator.pop(context);
-                        SoundSynthesizer.playSuicaBeep();
-                      },
-                      isDark: isDark,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildEmergencyCallBtn(
-                      label: 'Ambulance (119)',
-                      icon: Icons.medical_services_outlined,
-                      onTap: () {
-                        Navigator.pop(context);
-                        SoundSynthesizer.playSuicaBeep();
-                      },
-                      isDark: isDark,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'PERSONAL EMERGENCY HEALTH CARD',
-                style: TextStyle(
-                  color: AiraColors.textSecondary(isDark),
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.0,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AiraColors.cardBg(isDark),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AiraColors.border(isDark)),
-                ),
-                child: Column(
-                  children: [
-                    _buildMedRow('Full Name', 'Alex Mercer', isDark),
-                    Divider(color: AiraColors.border(isDark), height: 16),
-                    _buildMedRow('Blood Group', 'O-Positive (O+)', isDark),
-                    Divider(color: AiraColors.border(isDark), height: 16),
-                    _buildMedRow('Allergies', 'Penicillin, Peanuts', isDark),
-                    Divider(color: AiraColors.border(isDark), height: 16),
-                    _buildMedRow('Insurance Policy', 'Allianz Global #AZ-99201-X', isDark),
-                    Divider(color: AiraColors.border(isDark), height: 16),
-                    _buildMedRow('Emergency Contact', 'Sarah Mercer (Sister)\n+1 (555) 019-9482', isDark),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AiraColors.cardBgAlt(isDark),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    'Close Hub',
-                    style: TextStyle(
-                      color: AiraColors.textPrimary(isDark),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
               ),
             ],
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+          ],
         );
       },
     );
   }
 
-  Widget _buildEmergencyCallBtn({
-    required String label,
-    required IconData icon,
-    required VoidCallback onTap,
-    required bool isDark,
-  }) {
+  Widget _buildPresetAvatarOption(BuildContext ctx, BuildContext settingsCtx, ServerConnectionStatus status, String serverUrl, String url, bool isDark) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF7F1D1D).withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFEF4444)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: const Color(0xFFEF4444), size: 18),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
+      onTap: () {
+        ref.read(userProfileProvider.notifier).updateUserProfile({'photoUrl': url});
+        Navigator.pop(ctx);
+      },
+      child: CircleAvatar(
+        radius: 22,
+        backgroundImage: NetworkImage(url),
       ),
     );
   }
 
-  Widget _buildMedRow(String label, String value, bool isDark) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: AiraColors.textSecondary(isDark),
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
+  void _showChangePasswordDialog(BuildContext context) {
+    final oldPassCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    final confirmPassCtrl = TextEditingController();
+    final isDark = ref.read(isDarkProvider);
+    
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('Change Account Password', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: oldPassCtrl,
+                obscureText: true,
+                style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                decoration: InputDecoration(
+                  labelText: 'Current Password',
+                  labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: newPassCtrl,
+                obscureText: true,
+                style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                decoration: InputDecoration(
+                  labelText: 'New Password',
+                  labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: confirmPassCtrl,
+                obscureText: true,
+                style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                decoration: InputDecoration(
+                  labelText: 'Confirm New Password',
+                  labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                ),
+              ),
+            ],
           ),
-        ),
-        const SizedBox(width: 12),
-        Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.right,
-            style: TextStyle(
-              color: AiraColors.textPrimary(isDark),
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () async {
+                final oldPass = oldPassCtrl.text;
+                final newPass = newPassCtrl.text;
+                final confirm = confirmPassCtrl.text;
+                
+                final authBox = Hive.box('auth_box');
+                final currentPass = authBox.get('password') as String? ?? 'password';
+                
+                if (oldPass != currentPass) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Current password is incorrect.')),
+                  );
+                  return;
+                }
+                
+                if (newPass.length < 4) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('New password must be at least 4 characters long.')),
+                  );
+                  return;
+                }
+                
+                if (newPass != confirm) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('New passwords do not match.')),
+                  );
+                  return;
+                }
+                
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                final navigator = Navigator.of(ctx);
+                
+                // Persist locally & sync with backend database
+                await authBox.put('password', newPass);
+                ref.read(userProfileProvider.notifier).updateUserProfile({'password': newPass});
+                
+                navigator.pop();
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(content: Text('Password updated successfully!')),
+                );
+              },
+              child: const Text('Save', style: TextStyle(color: Color(0xFF2563EB))),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showTriaWalletPaymentSheet(BuildContext context) {
+    final isDark = ref.read(isDarkProvider);
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: TriaColors.dialogBg(isDark),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (ctx, setStateSheet) {
+            final profile = ref.watch(userProfileProvider).profile;
+            final balance = profile['walletBalance'] as num? ?? 125.0;
+            final hasCard = profile['savedCardNumber'] != null && profile['savedCardNumber'].toString().isNotEmpty;
+            
+            final cardNo = profile['savedCardNumber'] as String? ?? '';
+            final cardHolder = profile['savedCardHolder'] as String? ?? '';
+            final cardExpiry = profile['savedCardExpiry'] as String? ?? '';
+            
+            final topUpCtrl = TextEditingController();
+            final cardNoCtrl = TextEditingController();
+            final cardHolderCtrl = TextEditingController();
+            final cardExpiryCtrl = TextEditingController();
+            final cvvCtrl = TextEditingController();
+
+            return Container(
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 20,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Handle line
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: TriaColors.border(isDark),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    // Title
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'TRIA DIGITAL WALLET',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF10B981),
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Balance & Payments',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                color: TriaColors.textPrimary(isDark),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '\$${balance.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF10B981),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // Card display
+                    if (hasCard) ...[
+                      Container(
+                        width: double.infinity,
+                        height: 180,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF0F1E36), Color(0xFF233B6E)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0xFF00B4D8).withValues(alpha: 0.3), width: 1.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 15,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'tria pay',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white10,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: const Text(
+                                    'ACTIVE VISA',
+                                    style: TextStyle(
+                                      color: Color(0xFF00B4D8),
+                                      fontSize: 8.5,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Icon(Icons.nfc_rounded, color: Colors.white54, size: 24),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  cardNo.length >= 16 
+                                      ? '${cardNo.substring(0, 4)}  ••••  ••••  ${cardNo.substring(12)}' 
+                                      : '••••  ••••  ••••  ••••',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 2.0,
+                                    fontFamily: 'monospace',
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      cardHolder.toUpperCase(),
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      'EXP: $cardExpiry',
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      
+                      // Load Funds Form
+                      Text(
+                        'LOAD APP WALLET PREPAID FUNDS',
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w900,
+                          color: TriaColors.textSecondary(isDark),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: BoxDecoration(
+                                color: TriaColors.cardBgAlt(isDark),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: TriaColors.border(isDark)),
+                              ),
+                              child: TextField(
+                                controller: topUpCtrl,
+                                keyboardType: TextInputType.number,
+                                style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold),
+                                decoration: const InputDecoration(
+                                  isDense: true,
+                                  prefixText: '\$ ',
+                                  prefixStyle: TextStyle(fontWeight: FontWeight.bold),
+                                  hintText: 'Amount to add',
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF10B981),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            ),
+                            onPressed: () {
+                              final amt = double.tryParse(topUpCtrl.text) ?? 0.0;
+                              if (amt <= 0) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Please enter a valid amount.')),
+                                );
+                                return;
+                              }
+                              ref.read(userProfileProvider.notifier).updateUserProfile({
+                                'walletBalance': balance + amt,
+                              });
+                              SoundSynthesizer.playUnlockChime();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Successfully loaded \$${amt.toStringAsFixed(2)} to wallet!')),
+                              );
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(Icons.add_circle_outline, size: 16),
+                            label: const Text('Add Funds', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      
+                      // Remove card button
+                      Center(
+                        child: TextButton.icon(
+                          onPressed: () {
+                            ref.read(userProfileProvider.notifier).updateUserProfile({
+                              'savedCardNumber': '',
+                              'savedCardHolder': '',
+                              'savedCardExpiry': '',
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Card removed successfully!')),
+                            );
+                          },
+                          icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 16),
+                          label: const Text('Remove Saved Card', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 11)),
+                        ),
+                      ),
+                    ] else ...[
+                      // Add Card Form
+                      Text(
+                        'ADD CREDIT / DEBIT CARD',
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w900,
+                          color: TriaColors.textSecondary(isDark),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      
+                      // Card number field
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: TriaColors.cardBgAlt(isDark),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: TriaColors.border(isDark)),
+                        ),
+                        child: TextField(
+                          controller: cardNoCtrl,
+                          keyboardType: TextInputType.number,
+                          maxLength: 16,
+                          style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                          decoration: const InputDecoration(
+                            isDense: true,
+                            hintText: 'Card Number (16 digits)',
+                            counterText: '',
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      
+                      // Cardholder name field
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: TriaColors.cardBgAlt(isDark),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: TriaColors.border(isDark)),
+                        ),
+                        child: TextField(
+                          controller: cardHolderCtrl,
+                          style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                          decoration: const InputDecoration(
+                            isDense: true,
+                            hintText: 'Cardholder Full Name',
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      
+                      // Expiry & CVV row
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: TriaColors.cardBgAlt(isDark),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: TriaColors.border(isDark)),
+                              ),
+                              child: TextField(
+                                controller: cardExpiryCtrl,
+                                keyboardType: TextInputType.datetime,
+                                style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                                decoration: const InputDecoration(
+                                  isDense: true,
+                                  hintText: 'Expiry (MM/YY)',
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: TriaColors.cardBgAlt(isDark),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: TriaColors.border(isDark)),
+                              ),
+                              child: TextField(
+                                controller: cvvCtrl,
+                                keyboardType: TextInputType.number,
+                                obscureText: true,
+                                maxLength: 3,
+                                style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                                decoration: const InputDecoration(
+                                  isDense: true,
+                                  counterText: '',
+                                  hintText: 'CVV',
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onPressed: () {
+                            final number = cardNoCtrl.text.trim();
+                            final name = cardHolderCtrl.text.trim();
+                            final expiry = cardExpiryCtrl.text.trim();
+                            final cvv = cvvCtrl.text.trim();
+                            
+                            if (number.length < 16 || name.isEmpty || expiry.isEmpty || cvv.length < 3) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please fill all card details correctly.')),
+                              );
+                              return;
+                            }
+                            
+                            ref.read(userProfileProvider.notifier).updateUserProfile({
+                              'savedCardNumber': number,
+                              'savedCardHolder': name,
+                              'savedCardExpiry': expiry,
+                            });
+                            
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Card added and saved securely!')),
+                            );
+                          },
+                          child: const Text('Save Card & Set Active', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                    
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showContactPreferencesDialog(BuildContext context) {
+    final isDark = ref.read(isDarkProvider);
+    final profile = ref.read(userProfileProvider).profile;
+    bool emailAlerts = profile['emailAlerts'] ?? true;
+    bool pushAlerts = profile['pushAlerts'] ?? true;
+    
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setStateModal) {
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Text('Contact Preferences', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CheckboxListTile(
+                    title: Text('Email Notifications', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold)),
+                    subtitle: Text('Receive flight delays and receipts', style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 10)),
+                    value: emailAlerts,
+                    activeColor: const Color(0xFF2563EB),
+                    onChanged: (v) {
+                      if (v != null) {
+                        setStateModal(() => emailAlerts = v);
+                        ref.read(userProfileProvider.notifier).updateUserProfile({'emailAlerts': v});
+                      }
+                    },
+                  ),
+                  CheckboxListTile(
+                    title: Text('Push Alerts', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold)),
+                    subtitle: Text('Real-time weather warning notifications', style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 10)),
+                    value: pushAlerts,
+                    activeColor: const Color(0xFF2563EB),
+                    onChanged: (v) {
+                      if (v != null) {
+                        setStateModal(() => pushAlerts = v);
+                        ref.read(userProfileProvider.notifier).updateUserProfile({'pushAlerts': v});
+                      }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Done', style: TextStyle(color: Color(0xFF2563EB))),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showBookingsListDialog(BuildContext context) {
+    final isDark = ref.read(isDarkProvider);
+    final bookings = ref.read(tripBookingsProvider);
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: TriaColors.dialogBg(isDark),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        String? localExpandedPass = 'flight'; // default expand flight pass
+        return StatefulBuilder(
+          builder: (ctx, setStateSheet) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Top Pill handler
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: TriaColors.border(isDark),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // Title
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'MY TRAVEL BOOKINGS',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF6366F1),
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            bookings.destination.isNotEmpty 
+                                ? bookings.destination 
+                                : 'No Active Destination',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: TriaColors.textPrimary(isDark),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6366F1).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.verified_user_rounded, color: Color(0xFF6366F1), size: 14),
+                            SizedBox(width: 4),
+                            Text(
+                              'SYNCED',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF6366F1),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // Duration Row
+                  Row(
+                    children: [
+                      const Icon(Icons.date_range, size: 14, color: Colors.grey),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${bookings.startDate ?? "Not set"} — ${bookings.endDate ?? "Not set"}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // Scrollable Area for Passes
+                  Flexible(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          _buildFlightPassCard(
+                            isDark,
+                            expandedPass: localExpandedPass,
+                            onToggle: (newPass) => setStateSheet(() => localExpandedPass = newPass),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildHotelPassCard(
+                            isDark,
+                            expandedPass: localExpandedPass,
+                            onToggle: (newPass) => setStateSheet(() => localExpandedPass = newPass),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Additional details description
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: TriaColors.cardBgAlt(isDark),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: TriaColors.border(isDark)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline, color: Color(0xFF6366F1), size: 16),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Flights, Hotels, and other booking confirmations are parsed and synced automatically under your timeline.',
+                            style: TextStyle(
+                              color: TriaColors.textSecondary(isDark),
+                              fontSize: 10.5,
+                              height: 1.3,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6366F1),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Close Bookings',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showEditHomeBaseDialog(BuildContext context) {
+    final isDark = ref.read(isDarkProvider);
+    final profile = ref.read(userProfileProvider).profile;
+    final cityCtrl = TextEditingController(text: profile['homeCity'] ?? '');
+    final countryCtrl = TextEditingController(text: profile['homeCountry'] ?? '');
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('Saved Home Base', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: cityCtrl,
+                style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                decoration: InputDecoration(
+                  labelText: 'Home City',
+                  labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: countryCtrl,
+                style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                decoration: InputDecoration(
+                  labelText: 'Home Country',
+                  labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                ref.read(userProfileProvider.notifier).updateUserProfile({
+                  'homeCity': cityCtrl.text.trim(),
+                  'homeCountry': countryCtrl.text.trim(),
+                });
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Home base updated!')),
+                );
+              },
+              child: const Text('Save', style: TextStyle(color: Color(0xFF2563EB))),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showLoyaltyProgramsDialog(BuildContext context) {
+    final isDark = ref.read(isDarkProvider);
+    final profile = ref.read(userProfileProvider).profile;
+    final flyerCtrl = TextEditingController(text: profile['frequentFlyer'] ?? '');
+    final hotelLoyaltyCtrl = TextEditingController(text: profile['hotelLoyalty'] ?? '');
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('Frequent Flyer & Loyalty Programs', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: flyerCtrl,
+                style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                decoration: InputDecoration(
+                  labelText: 'Frequent Flyer airline & #',
+                  labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: hotelLoyaltyCtrl,
+                style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                decoration: InputDecoration(
+                  labelText: 'Hotel Loyalty group & #',
+                  labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                ref.read(userProfileProvider.notifier).updateUserProfile({
+                  'frequentFlyer': flyerCtrl.text.trim(),
+                  'hotelLoyalty': hotelLoyaltyCtrl.text.trim(),
+                });
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Loyalty programs updated!')),
+                );
+              },
+              child: const Text('Save', style: TextStyle(color: Color(0xFF2563EB))),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSignOutConfirmation(BuildContext context) {
+    final isDark = ref.read(isDarkProvider);
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('Sign Out', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold)),
+          content: Text('Are you sure you want to sign out and clear your session?', style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 13)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                ref.read(userProfileProvider.notifier).logout();
+                context.go('/login');
+              },
+              child: const Text('Sign Out', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditNameDialog(BuildContext context) {
+    final isDark = ref.read(isDarkProvider);
+    final currentName = ref.read(userProfileProvider).profile['fullName'] ?? ref.read(userProfileProvider).profile['name'] ?? 'Adventurer';
+    final ctrl = TextEditingController(text: currentName);
+    
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('Edit Full Name', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold)),
+          content: TextField(
+            controller: ctrl,
+            style: TextStyle(color: TriaColors.textPrimary(isDark)),
+            decoration: InputDecoration(
+              labelText: 'Full Name',
+              labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
             ),
           ),
-        ),
-      ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2563EB),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () {
+                final name = ctrl.text.trim();
+                if (name.isNotEmpty) {
+                  ref.read(userProfileProvider.notifier).updateUserProfile({'fullName': name, 'name': name});
+                  Navigator.pop(ctx);
+                }
+              },
+              child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditBioDialog(BuildContext context) {
+    final isDark = ref.read(isDarkProvider);
+    final currentBio = ref.read(userProfileProvider).profile['bio'] ?? 'Exploring the world one custom route at a time.';
+    final ctrl = TextEditingController(text: currentBio);
+    
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('Edit Travel Bio', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold)),
+          content: TextField(
+            controller: ctrl,
+            maxLines: 3,
+            style: TextStyle(color: TriaColors.textPrimary(isDark)),
+            decoration: InputDecoration(
+              labelText: 'Bio',
+              labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2563EB),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () {
+                ref.read(userProfileProvider.notifier).updateUserProfile({'bio': ctrl.text.trim()});
+                Navigator.pop(ctx);
+              },
+              child: const Text('Save', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditVisaDialog(BuildContext context, bool isDark) {
+    final profile = ref.read(userProfileProvider).profile;
+    
+    final visaNumberCtrl = TextEditingController(text: profile['visaNumber'] ?? '');
+    final expiryCtrl = TextEditingController(text: profile['visaExpiry'] ?? '');
+    final countryCtrl = TextEditingController(text: profile['visaCountry'] ?? 'Japan');
+    final typeCtrl = TextEditingController(text: profile['visaType'] ?? 'Tourist');
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: Row(
+            children: [
+              const Icon(Icons.badge, color: Color(0xFFD4AF37)),
+              const SizedBox(width: 10),
+              Text(
+                'Edit Travel Visa Details',
+                style: TextStyle(
+                  color: TriaColors.textPrimary(isDark),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: countryCtrl,
+                  style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                  decoration: InputDecoration(
+                    labelText: 'Destination Country',
+                    labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                    focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: typeCtrl,
+                  style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                  decoration: InputDecoration(
+                    labelText: 'Visa Type (e.g. Tourist, Business)',
+                    labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                    focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: visaNumberCtrl,
+                  style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                  decoration: InputDecoration(
+                    labelText: 'Visa Number',
+                    labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                    focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: expiryCtrl,
+                  style: TextStyle(color: TriaColors.textPrimary(isDark)),
+                  decoration: InputDecoration(
+                    labelText: 'Expiry Date (YYYY-MM-DD)',
+                    labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+                    focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.calendar_month, color: Color(0xFFD4AF37)),
+                      onPressed: () async {
+                        final parsedDate = DateTime.tryParse(expiryCtrl.text) ?? DateTime(2026, 7, 8);
+                        final picked = await showDatePicker(
+                          context: ctx,
+                          initialDate: parsedDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2040),
+                        );
+                        if (picked != null) {
+                          expiryCtrl.text = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2563EB),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () {
+                ref.read(userProfileProvider.notifier).updateUserProfile({
+                  'visaNumber': visaNumberCtrl.text.trim(),
+                  'visaExpiry': expiryCtrl.text.trim(),
+                  'visaCountry': countryCtrl.text.trim(),
+                  'visaType': typeCtrl.text.trim(),
+                });
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Visa details saved successfully!')),
+                );
+              },
+              child: const Text('Save Details', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

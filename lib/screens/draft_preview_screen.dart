@@ -97,6 +97,30 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
       await AiService.saveItinerary(email.toString(), itineraryDays);
     }
 
+    // Save to upcomingTripsProvider persistent store
+    final bookings = draft.bookings;
+    String sourceCity = 'Bangalore, India';
+    if (bookings.flights.isNotEmpty) {
+      sourceCity = bookings.flights.first.departureCity;
+    } else {
+      final userCity = userProfile.profile['city'];
+      if (userCity != null && userCity.toString().isNotEmpty) {
+        sourceCity = userCity.toString();
+      }
+    }
+
+    final uniqueId = 'TRIP-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
+    ref.read(upcomingTripsProvider.notifier).addTrip(
+      UpcomingTrip(
+        tripId: uniqueId,
+        source: sourceCity,
+        destination: bookings.destination.isNotEmpty ? bookings.destination : 'Tokyo, Japan',
+        startDate: bookings.startDate ?? DateTime.now().toString().split(' ').first,
+        endDate: bookings.endDate ?? DateTime.now().add(const Duration(days: 3)).toString().split(' ').first,
+        itinerary: itineraryDays,
+      ),
+    );
+
     // Reset wizard state
     ref.read(tripBookingsProvider.notifier).reset();
     ref.read(selectedPlacesProvider.notifier).state = [];
@@ -119,14 +143,14 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
 
     if (draft == null) {
       return Scaffold(
-        backgroundColor: AiraColors.scaffoldBg(isDark),
+        backgroundColor: TriaColors.scaffoldBg(isDark),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.error_outline, color: Color(0xFFEF4444), size: 48),
               const SizedBox(height: 16),
-              Text('No draft available', style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('No draft available', style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => context.pop(),
@@ -189,18 +213,18 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.scaffoldBg(isDark),
+        backgroundColor: TriaColors.scaffoldBg(isDark),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AiraColors.textPrimary(isDark)),
+          icon: Icon(Icons.arrow_back, color: TriaColors.textPrimary(isDark)),
           onPressed: () => context.pop(),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Draft Preview', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Draft Preview', style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 18)),
             const Text('STEP 4 — REVIEW & ACCEPT', style: TextStyle(color: Color(0xFF00B4D8), fontWeight: FontWeight.w800, fontSize: 9, letterSpacing: 0.5)),
           ],
         ),
@@ -392,7 +416,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                               decoration: BoxDecoration(
                                 color: isDark ? const Color(0xFF1E3A5F) : const Color(0xFFE2E8F0),
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: isDark ? const Color(0xFF2563EB).withValues(alpha: 0.3) : AiraColors.border(isDark)),
+                                border: Border.all(color: isDark ? const Color(0xFF2563EB).withValues(alpha: 0.3) : TriaColors.border(isDark)),
                               ),
                               child: Row(
                                 children: [
@@ -414,10 +438,10 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text('Day ${dayIdx + 1} — $dateNice',
-                                          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14),
+                                          style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14),
                                         ),
                                         Text(dayTheme,
-                                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
+                                          style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11),
                                         ),
                                       ],
                                     ),
@@ -493,7 +517,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                                                         ? const Color(0xFF00B4D8).withValues(alpha: 0.3)
                                                         : (isLogistic
                                                             ? const Color(0xFFF59E0B).withValues(alpha: 0.3)
-                                                            : AiraColors.border(isDark))),
+                                                            : TriaColors.border(isDark))),
                                               ),
                                             ),
                                         ],
@@ -517,7 +541,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                                                     ? (isDark ? const Color(0xFF0F1E36).withValues(alpha: 0.4) : const Color(0xFFECFDF5))
                                                     : (isLogistic
                                                         ? (isDark ? const Color(0xFF1E3A5F).withValues(alpha: 0.5) : const Color(0xFFF1F5F9))
-                                                        : AiraColors.cardBg(isDark))),
+                                                        : TriaColors.cardBg(isDark))),
                                             borderRadius: BorderRadius.circular(14),
                                             border: Border.all(
                                               color: isWarning
@@ -526,7 +550,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                                                       ? (isDark ? const Color(0xFF00B4D8).withValues(alpha: 0.3) : const Color(0xFF34D399))
                                                       : (isLogistic
                                                           ? (isDark ? const Color(0xFFF59E0B).withValues(alpha: 0.2) : const Color(0xFFFBBF24).withValues(alpha: 0.5))
-                                                          : AiraColors.border(isDark))),
+                                                          : TriaColors.border(isDark))),
                                             ),
                                           ),
                                           child: Column(
@@ -548,8 +572,8 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                                                           fit: BoxFit.cover,
                                                           errorBuilder: (ctx, err, st) => Container(
                                                             width: 48, height: 48,
-                                                            color: AiraColors.border(isDark),
-                                                            child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 20),
+                                                            color: TriaColors.border(isDark),
+                                                            child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 20),
                                                           ),
                                                         ),
                                                       ),
@@ -580,7 +604,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                                                                 ? const Color(0xFFF87171)
                                                                 : (isFreeTime
                                                                     ? const Color(0xFF00B4D8)
-                                                                    : (isLogistic ? const Color(0xFFFBBF24) : AiraColors.textPrimary(isDark))),
+                                                                    : (isLogistic ? const Color(0xFFFBBF24) : TriaColors.textPrimary(isDark))),
                                                             fontWeight: FontWeight.bold,
                                                             fontSize: (isLogistic || isFreeTime) ? 12 : 13,
                                                           ),
@@ -592,8 +616,8 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                                                             color: isWarning
                                                                 ? const Color(0xFFFCA5A5)
                                                                 : (isFreeTime
-                                                                    ? AiraColors.textSecondary(isDark).withValues(alpha: 0.7)
-                                                                    : AiraColors.textSecondary(isDark)),
+                                                                    ? TriaColors.textSecondary(isDark).withValues(alpha: 0.7)
+                                                                    : TriaColors.textSecondary(isDark)),
                                                             fontSize: 10,
                                                           ),
                                                           maxLines: 2,
@@ -634,7 +658,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                                                     const SizedBox(width: 6),
                                                     Flexible(
                                                       child: Text(activity.placeDetails,
-                                                        style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 9),
+                                                        style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 9),
                                                         overflow: TextOverflow.ellipsis,
                                                       ),
                                                     ),
@@ -699,8 +723,8 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AiraColors.cardBg(isDark),
-                  border: Border(top: BorderSide(color: AiraColors.border(isDark))),
+                  color: TriaColors.cardBg(isDark),
+                  border: Border(top: BorderSide(color: TriaColors.border(isDark))),
                 ),
                 child: SafeArea(
                   top: false,
@@ -711,9 +735,9 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                         height: 48,
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: AiraColors.border(isDark)),
+                            side: BorderSide(color: TriaColors.border(isDark)),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            foregroundColor: AiraColors.textSecondary(isDark),
+                            foregroundColor: TriaColors.textSecondary(isDark),
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                           ),
                           onPressed: () => context.pop(),
@@ -727,7 +751,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                         height: 48,
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: AiraColors.border(isDark)),
+                            side: BorderSide(color: TriaColors.border(isDark)),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             foregroundColor: const Color(0xFFF59E0B),
                             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -772,7 +796,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
           if (_isAccepting)
             Positioned.fill(
               child: Container(
-                color: AiraColors.scaffoldBg(isDark).withValues(alpha: 0.95),
+                color: TriaColors.scaffoldBg(isDark).withValues(alpha: 0.95),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -787,7 +811,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                           : _acceptProgress < 0.6 ? 'Syncing with backend...'
                           : _acceptProgress < 0.9 ? 'Generating day themes...'
                           : 'Launching your trip!',
-                      style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 15, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 24),
                     SizedBox(
@@ -796,7 +820,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                         borderRadius: BorderRadius.circular(10),
                         child: LinearProgressIndicator(
                           value: _acceptProgress,
-                          backgroundColor: AiraColors.cardBg(isDark),
+                          backgroundColor: TriaColors.cardBg(isDark),
                           valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
                           minHeight: 6,
                         ),
@@ -836,15 +860,15 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
           Container(
             width: 24, height: 24,
             decoration: BoxDecoration(
-              color: active ? const Color(0xFF2563EB) : AiraColors.cardBg(isDark),
+              color: active ? const Color(0xFF2563EB) : TriaColors.cardBg(isDark),
               shape: BoxShape.circle,
-              border: Border.all(color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark), width: 2),
+              border: Border.all(color: active ? const Color(0xFF2563EB) : TriaColors.border(isDark), width: 2),
             ),
             child: active ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
           ),
           const SizedBox(height: 4),
           Text(label, style: TextStyle(
-            color: active ? const Color(0xFF60A5FA) : AiraColors.textMuted(isDark),
+            color: active ? const Color(0xFF60A5FA) : TriaColors.textMuted(isDark),
             fontSize: 9, fontWeight: FontWeight.bold,
           )),
         ],
@@ -857,7 +881,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
       child: Container(
         height: 2,
         margin: const EdgeInsets.only(bottom: 16),
-        color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark),
+        color: active ? const Color(0xFF2563EB) : TriaColors.border(isDark),
       ),
     );
   }
@@ -870,7 +894,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0F1E36) : const Color(0xFFF1F5F9),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? const Color(0xFF1E3A8A).withValues(alpha: 0.5) : AiraColors.border(isDark)),
+        border: Border.all(color: isDark ? const Color(0xFF1E3A8A).withValues(alpha: 0.5) : TriaColors.border(isDark)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -881,7 +905,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
               const SizedBox(width: 8),
               Text(
                 '🛡️ TIMELINE VALIDATION PASS',
-                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.5),
+                style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.5),
               ),
               const Spacer(),
               Container(
@@ -913,7 +937,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
           if (report.conflictsFixed.isNotEmpty) ...[
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Divider(color: AiraColors.border(isDark)),
+              child: Divider(color: TriaColors.border(isDark)),
             ),
             const Text(
               'CONFLICTS FIXED:',
@@ -929,7 +953,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                   Expanded(
                     child: Text(
                       conflict,
-                      style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 11, height: 1.3),
+                      style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 11, height: 1.3),
                     ),
                   ),
                 ],
@@ -938,7 +962,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
           ] else ...[
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Divider(color: AiraColors.border(isDark)),
+              child: Divider(color: TriaColors.border(isDark)),
             ),
             Row(
               children: [
@@ -946,7 +970,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
                 const SizedBox(width: 6),
                 Text(
                   'No timing conflicts detected. All schedules are real-world ready!',
-                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
+                  style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11),
                 ),
               ],
             ),
@@ -968,7 +992,7 @@ class _DraftPreviewScreenState extends ConsumerState<DraftPreviewScreen> {
         const SizedBox(width: 6),
         Text(
           label,
-          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.w500),
+          style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11, fontWeight: FontWeight.w500),
         ),
       ],
     );

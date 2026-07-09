@@ -875,7 +875,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -890,7 +890,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                 child: Container(
                   width: 40, height: 5,
                   decoration: BoxDecoration(
-                    color: AiraColors.border(isDark),
+                    color: TriaColors.border(isDark),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -898,12 +898,12 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
               const SizedBox(height: 16),
               Text(
                 'SCHEDULE TO DAY',
-                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
+                style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
               ),
               const SizedBox(height: 4),
               Text(
                 'Select a day to add and schedule ${place.name}',
-                style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+                style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
               ),
               const SizedBox(height: 20),
               Flexible(
@@ -925,10 +925,10 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                         height: 48,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AiraColors.cardBg(isDark),
+                            backgroundColor: TriaColors.cardBg(isDark),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: AiraColors.border(isDark)),
+                              side: BorderSide(color: TriaColors.border(isDark)),
                             ),
                           ),
                           onPressed: () {
@@ -973,7 +973,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                               Text(
                                 'Day ${idx + 1}$dateLabel',
                                 style: TextStyle(
-                                  color: AiraColors.textPrimary(isDark),
+                                  color: TriaColors.textPrimary(isDark),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -1035,18 +1035,18 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
 
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.scaffoldBg(isDark),
+        backgroundColor: TriaColors.scaffoldBg(isDark),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AiraColors.textPrimary(isDark)),
+          icon: Icon(Icons.arrow_back, color: TriaColors.textPrimary(isDark)),
           onPressed: () => context.pop(),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Explore Places', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Explore Places', style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 18)),
             const Text('STEP 2 — SELECT ATTRACTIONS', style: TextStyle(color: Color(0xFF00B4D8), fontWeight: FontWeight.w800, fontSize: 9, letterSpacing: 0.5)),
           ],
         ),
@@ -1107,10 +1107,10 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                     margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     decoration: BoxDecoration(
-                      color: active ? (genre['color'] as Color) : AiraColors.cardBg(isDark),
+                      color: active ? (genre['color'] as Color) : TriaColors.cardBg(isDark),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: active ? (genre['color'] as Color) : AiraColors.border(isDark),
+                        color: active ? (genre['color'] as Color) : TriaColors.border(isDark),
                       ),
                       boxShadow: active ? [
                         BoxShadow(
@@ -1123,12 +1123,12 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(genre['icon'] as IconData, size: 14,
-                          color: active ? Colors.white : AiraColors.textSecondary(isDark),
+                          color: active ? Colors.white : TriaColors.textSecondary(isDark),
                         ),
                         const SizedBox(width: 6),
                         Text(genre['label'] as String,
                           style: TextStyle(
-                            color: active ? Colors.white : AiraColors.textSecondary(isDark),
+                            color: active ? Colors.white : TriaColors.textSecondary(isDark),
                             fontWeight: FontWeight.bold, fontSize: 11,
                           ),
                         ),
@@ -1144,15 +1144,15 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: TextField(
               controller: _searchCtrl,
-              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 isDense: true,
                 hintText: 'Search places by name...',
-                hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 13),
+                hintStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 13),
                 prefixIcon: const Icon(Icons.search, color: Color(0xFF60A5FA), size: 18),
                 suffixIcon: _searchCtrl.text.isNotEmpty
                     ? IconButton(
-                        icon: Icon(Icons.close, color: AiraColors.textSecondary(isDark), size: 16),
+                        icon: Icon(Icons.close, color: TriaColors.textSecondary(isDark), size: 16),
                         onPressed: () {
                           _searchCtrl.clear();
                           setState(() {
@@ -1162,11 +1162,11 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                       )
                     : null,
                 filled: true,
-                fillColor: AiraColors.cardBg(isDark),
+                fillColor: TriaColors.cardBg(isDark),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AiraColors.border(isDark)),
+                  borderSide: BorderSide(color: TriaColors.border(isDark)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -1191,13 +1191,13 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text('${(genreInfo['label'] as String).toUpperCase()} IN ${_destinationName.toUpperCase()}',
-                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+                    style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text('${currentPlaces.length} places',
-                  style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 11, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 11, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -1237,7 +1237,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                         const SizedBox(height: 16),
                         Text(
                           'Seeking best local attractions...',
-                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 13, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 13, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -1246,7 +1246,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                     ? Center(
                         child: Text(
                           'No attractions found in this category.',
-                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 13),
+                          style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 13),
                         ),
                       )
                     : ListView.builder(
@@ -1263,12 +1263,12 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.only(bottom: 14),
                   decoration: BoxDecoration(
-                    color: AiraColors.cardBg(isDark),
+                    color: TriaColors.cardBg(isDark),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isSelected
                           ? const Color(0xFF10B981)
-                          : AiraColors.border(isDark),
+                          : TriaColors.border(isDark),
                       width: isSelected ? 2 : 1,
                     ),
                     boxShadow: isSelected ? [
@@ -1392,7 +1392,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(place.name,
-                              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                             const SizedBox(height: 6),
                             Row(
@@ -1407,7 +1407,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                             const SizedBox(height: 10),
                             Text(
                               wiki?.description ?? place.description,
-                              style: TextStyle(color: AiraColors.textPrimary(isDark).withValues(alpha: 0.7), fontSize: 12, height: 1.4),
+                              style: TextStyle(color: TriaColors.textPrimary(isDark).withValues(alpha: 0.7), fontSize: 12, height: 1.4),
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1444,9 +1444,9 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                     return Container(
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: AiraColors.surfaceElevated(isDark),
+                                        color: TriaColors.surfaceElevated(isDark),
                                         borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.5)),
+                                        border: Border.all(color: TriaColors.border(isDark).withValues(alpha: 0.5)),
                                       ),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1495,7 +1495,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                                     Text(
                                                       wiki.title,
                                                       style: TextStyle(
-                                                        color: AiraColors.textPrimary(isDark),
+                                                        color: TriaColors.textPrimary(isDark),
                                                         fontWeight: FontWeight.bold,
                                                         fontSize: 13,
                                                       ),
@@ -1504,7 +1504,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                                     Text(
                                                       wiki.description,
                                                       style: TextStyle(
-                                                        color: AiraColors.textSecondary(isDark),
+                                                        color: TriaColors.textSecondary(isDark),
                                                         fontSize: 12,
                                                         height: 1.4,
                                                       ),
@@ -1537,7 +1537,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                                 ),
                               ] else ...[
                                 Text(place.description,
-                                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12, height: 1.4),
+                                  style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12, height: 1.4),
                                 ),
                               ],
                             ],
@@ -1699,7 +1699,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF0F2847) : Colors.white,
-              border: Border(top: BorderSide(color: AiraColors.border(isDark).withValues(alpha: 0.5))),
+              border: Border(top: BorderSide(color: TriaColors.border(isDark).withValues(alpha: 0.5))),
             ),
             child: SafeArea(
               top: false,
@@ -1730,7 +1730,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                         style: ElevatedButton.styleFrom(
                           backgroundColor: selectedPlaces.isNotEmpty
                               ? const Color(0xFF2563EB)
-                              : AiraColors.border(isDark),
+                              : TriaColors.border(isDark),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         onPressed: selectedPlaces.isNotEmpty ? () {
@@ -1790,15 +1790,15 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
           Container(
             width: 24, height: 24,
             decoration: BoxDecoration(
-              color: active ? const Color(0xFF2563EB) : AiraColors.cardBg(isDark),
+              color: active ? const Color(0xFF2563EB) : TriaColors.cardBg(isDark),
               shape: BoxShape.circle,
-              border: Border.all(color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark), width: 2),
+              border: Border.all(color: active ? const Color(0xFF2563EB) : TriaColors.border(isDark), width: 2),
             ),
             child: active ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
           ),
           const SizedBox(height: 4),
           Text(label, style: TextStyle(
-            color: active ? const Color(0xFF60A5FA) : AiraColors.textMuted(isDark),
+            color: active ? const Color(0xFF60A5FA) : TriaColors.textMuted(isDark),
             fontSize: 9, fontWeight: FontWeight.bold,
           )),
         ],
@@ -1811,7 +1811,7 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
       child: Container(
         height: 2,
         margin: const EdgeInsets.only(bottom: 16),
-        color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark),
+        color: active ? const Color(0xFF2563EB) : TriaColors.border(isDark),
       ),
     );
   }

@@ -75,16 +75,16 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
     final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark),
+        backgroundColor: TriaColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        iconTheme: IconThemeData(color: TriaColors.textPrimary(isDark)),
         title: Text(
           'Smart Utilities',
           style: TextStyle(
-            color: AiraColors.textPrimary(isDark),
+            color: TriaColors.textPrimary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -109,9 +109,9 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AiraColors.cardBg(isDark),
+                color: TriaColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AiraColors.border(isDark)),
+                border: Border.all(color: TriaColors.border(isDark)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,9 +145,9 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AiraColors.cardBg(isDark),
+                color: TriaColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AiraColors.border(isDark)),
+                border: Border.all(color: TriaColors.border(isDark)),
               ),
               child: Column(
                 children: [
@@ -155,7 +155,7 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                     'Match word pairs below to claim 100 XP points rewards.',
                     style: TextStyle(
                       fontSize: 11,
-                      color: AiraColors.textSecondary(isDark),
+                      color: TriaColors.textSecondary(isDark),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -182,10 +182,10 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                                   decoration: BoxDecoration(
                                     color: matched
                                         ? Colors.green.withValues(alpha: 0.15)
-                                        : (selected ? const Color(0xFF2563EB) : AiraColors.scaffoldBg(isDark)),
+                                        : (selected ? const Color(0xFF2563EB) : TriaColors.scaffoldBg(isDark)),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: matched ? Colors.green : (selected ? const Color(0xFF2563EB) : AiraColors.border(isDark)),
+                                      color: matched ? Colors.green : (selected ? const Color(0xFF2563EB) : TriaColors.border(isDark)),
                                     ),
                                   ),
                                   child: Text(
@@ -195,7 +195,7 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                                       fontWeight: FontWeight.bold,
                                       color: matched
                                           ? Colors.greenAccent
-                                          : AiraColors.textPrimary(isDark),
+                                          : TriaColors.textPrimary(isDark),
                                     ),
                                   ),
                                 ),
@@ -223,10 +223,10 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                                   decoration: BoxDecoration(
                                     color: matched
                                         ? Colors.green.withValues(alpha: 0.15)
-                                        : (selected ? const Color(0xFF2563EB) : AiraColors.scaffoldBg(isDark)),
+                                        : (selected ? const Color(0xFF2563EB) : TriaColors.scaffoldBg(isDark)),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: matched ? Colors.green : (selected ? const Color(0xFF2563EB) : AiraColors.border(isDark)),
+                                      color: matched ? Colors.green : (selected ? const Color(0xFF2563EB) : TriaColors.border(isDark)),
                                     ),
                                   ),
                                   child: Text(
@@ -236,7 +236,7 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                                       fontWeight: FontWeight.bold,
                                       color: matched
                                           ? Colors.greenAccent
-                                          : AiraColors.textPrimary(isDark),
+                                          : TriaColors.textPrimary(isDark),
                                     ),
                                   ),
                                 ),
@@ -248,7 +248,7 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                     ],
                   ),
                   
-                  Divider(height: 24, color: AiraColors.border(isDark)),
+                  Divider(height: 24, color: TriaColors.border(isDark)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -257,7 +257,7 @@ class _UtilitiesScreenState extends ConsumerState<UtilitiesScreen> {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: AiraColors.textPrimary(isDark),
+                          color: TriaColors.textPrimary(isDark),
                         ),
                       ),
                       TextButton.icon(

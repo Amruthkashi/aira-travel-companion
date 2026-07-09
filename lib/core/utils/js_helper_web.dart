@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:js' as js;
 
-Future<void> downloadHtmlFile(String content, String filename) async {
+Future<String?> downloadHtmlFile(String content, String filename) async {
   js.context.callMethod('eval', [
     '''
     (function(content, filename) {
@@ -17,6 +17,7 @@ Future<void> downloadHtmlFile(String content, String filename) async {
     })(${js.context['JSON'].callMethod('stringify', [content])}, '$filename');
     '''
   ]);
+  return filename;
 }
 
 void openPrintWindow(String content) {
@@ -47,6 +48,7 @@ Future<void> layoutPdf(String htmlContent, String filename) async {
   // No-op on Web
 }
 
-Future<void> savePdfFile(String htmlContent, String filename) async {
+Future<String?> savePdfFile(String htmlContent, String filename) async {
   // No-op on Web
+  return null;
 }

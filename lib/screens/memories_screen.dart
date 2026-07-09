@@ -113,7 +113,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (context) {
         return StatefulBuilder(
@@ -136,10 +136,10 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: _journalTitleCtrl,
-                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 14, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 14, fontWeight: FontWeight.bold),
                     decoration: InputDecoration(
                       hintText: 'Give your memory a title...',
-                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 14),
+                      hintStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 14),
                       fillColor: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
                       filled: true,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -148,11 +148,11 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                   const SizedBox(height: 12),
                   TextField(
                     controller: _journalBodyCtrl,
-                    style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+                    style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
                     maxLines: 3,
                     decoration: InputDecoration(
                       hintText: 'What happened? Reflect on your experience...',
-                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
+                      hintStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 12),
                       fillColor: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
                       filled: true,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -166,7 +166,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                     decoration: BoxDecoration(
                       color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.03),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AiraColors.border(isDark)),
+                      border: Border.all(color: TriaColors.border(isDark)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -177,7 +177,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                             Text(
                               'VOICE MEMO SNAPSHOT',
                               style: TextStyle(
-                                color: AiraColors.textSecondary(isDark),
+                                color: TriaColors.textSecondary(isDark),
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -185,7 +185,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                             const SizedBox(height: 2),
                             Text(
                               _isRecording ? 'Recording audio... 0:0$_recordSeconds' : 'Click mic to record 5s clip',
-                              style: TextStyle(color: _isRecording ? Colors.redAccent : AiraColors.textMuted(isDark), fontSize: 10),
+                              style: TextStyle(color: _isRecording ? Colors.redAccent : TriaColors.textMuted(isDark), fontSize: 10),
                             ),
                           ],
                         ),
@@ -269,15 +269,15 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
     final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark),
+        backgroundColor: TriaColors.cardBg(isDark),
         elevation: 0.5,
-        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        iconTheme: IconThemeData(color: TriaColors.textPrimary(isDark)),
         title: Text(
           'Scrapbook & Memories',
           style: TextStyle(
-            color: AiraColors.textPrimary(isDark),
+            color: TriaColors.textPrimary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -292,10 +292,10 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
           final isPlayingVoice = _currentlyPlayingVoiceId == memoryId;
 
           return Card(
-            color: AiraColors.cardBg(isDark),
+            color: TriaColors.cardBg(isDark),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
-              side: BorderSide(color: AiraColors.border(isDark)),
+              side: BorderSide(color: TriaColors.border(isDark)),
             ),
             margin: const EdgeInsets.only(bottom: 20),
             clipBehavior: Clip.antiAlias,
@@ -359,7 +359,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                       Text(
                         item['title'],
                         style: TextStyle(
-                          color: AiraColors.textPrimary(isDark),
+                          color: TriaColors.textPrimary(isDark),
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                         ),
@@ -373,7 +373,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                           height: 1.45,
                         ),
                       ),
-                      Divider(height: 24, color: AiraColors.border(isDark)),
+                      Divider(height: 24, color: TriaColors.border(isDark)),
 
                       // Voice Note wave play card
                       Container(
@@ -381,7 +381,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                         decoration: BoxDecoration(
                           color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.03),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AiraColors.border(isDark)),
+                          border: Border.all(color: TriaColors.border(isDark)),
                         ),
                         child: Row(
                           children: [
@@ -389,10 +389,10 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                               onTap: () => _playVoiceMemo(memoryId, item['voiceSeconds'] as int),
                               child: CircleAvatar(
                                 radius: 18,
-                                backgroundColor: isPlayingVoice ? Colors.green : AiraColors.scaffoldBg(isDark),
+                                backgroundColor: isPlayingVoice ? Colors.green : TriaColors.scaffoldBg(isDark),
                                 child: Icon(
                                   isPlayingVoice ? Icons.pause : Icons.play_arrow,
-                                  color: AiraColors.textPrimary(isDark),
+                                  color: TriaColors.textPrimary(isDark),
                                   size: 18,
                                 ),
                               ),
@@ -405,7 +405,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                                   Text(
                                     'VOICE JOURNAL MEMO',
                                     style: TextStyle(
-                                      color: AiraColors.textMuted(isDark),
+                                      color: TriaColors.textMuted(isDark),
                                       fontSize: 8,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 1.0,
@@ -431,7 +431,7 @@ class _MemoriesScreenState extends ConsumerState<MemoriesScreen> {
                             const SizedBox(width: 10),
                             Text(
                               '0:${(item['voiceSeconds'] as int).toString().padLeft(2, '0')}',
-                              style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 10),
+                              style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 10),
                             ),
                           ],
                         ),

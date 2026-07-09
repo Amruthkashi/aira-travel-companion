@@ -70,5 +70,9 @@
 	<string>Microphone access is required for real-time speech translation.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Speech recognition is required to transcribe speech for translation.</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 </dict>
 </plist>

@@ -99,8 +99,8 @@ class AiService {
     }
   }
 
-  /// Send a message to Aira Concierge and receive a real-time smart response.
-  static Future<String> chatWithAira(
+  /// Send a message to Tria Concierge and receive a real-time smart response.
+  static Future<String> chatWithTria(
     List<ChatMessage> history,
     Map<String, dynamic> profile,
   ) async {
@@ -124,7 +124,7 @@ class AiService {
       }
       return "I'm having trouble connecting to my servers right now. Let's try again in a moment! 🗺️";
     } catch (e) {
-      debugPrint('Error in Aira Chat backend call: $e');
+      debugPrint('Error in Tria Chat backend call: $e');
       return "I'm having trouble connecting to my servers right now. Let's try again in a moment! 🗺️";
     }
   }

@@ -47,6 +47,32 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
         _checkExceededAlerts();
       }
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final itinerary = ref.read(itineraryProvider);
+      if (itinerary.isEmpty) {
+        final rawTrips = ref.read(upcomingTripsProvider);
+        if (rawTrips.isNotEmpty) {
+          final trips = List<UpcomingTrip>.from(rawTrips);
+          trips.sort((a, b) {
+            try {
+              final dateA = DateTime.parse(a.startDate);
+              final dateB = DateTime.parse(b.startDate);
+              return dateA.compareTo(dateB);
+            } catch (_) {
+              return a.startDate.compareTo(b.startDate);
+            }
+          });
+          final nearest = trips.first;
+          ref.read(itineraryProvider.notifier).setItinerary(nearest.itinerary);
+          ref.read(tripBookingsProvider.notifier).setBookings(TripBookings(
+            destination: nearest.destination,
+            startDate: nearest.startDate,
+            endDate: nearest.endDate,
+          ));
+        }
+      }
+    });
   }
 
   void _checkExceededAlerts() {
@@ -311,7 +337,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               onPressed: () async {
                 if (kIsWeb) {
                   try {
-                    downloadHtmlFile(htmlContent, 'aira_itinerary.html');
+                    downloadHtmlFile(htmlContent, 'tria_itinerary.html');
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('HTML file download started!')),
@@ -338,7 +364,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                     shareOptionLabel: 'Share HTML file',
                     onSave: () async {
                       try {
-                        await downloadHtmlFile(htmlContent, 'aira_itinerary.html');
+                        await downloadHtmlFile(htmlContent, 'tria_itinerary.html');
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('HTML saved to Downloads!')),
@@ -354,7 +380,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                     },
                     onShare: () async {
                       try {
-                        await shareHtmlFile(htmlContent, 'aira_itinerary.html');
+                        await shareHtmlFile(htmlContent, 'tria_itinerary.html');
                       } catch (e) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -404,7 +430,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                             const SnackBar(content: Text('Generating and saving PDF...'), duration: Duration(seconds: 1)),
                           );
                         }
-                        await savePdfFile(htmlContent, 'aira_itinerary.pdf');
+                        await savePdfFile(htmlContent, 'tria_itinerary.pdf');
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('PDF saved to Downloads!')),
@@ -425,7 +451,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                             const SnackBar(content: Text('Preparing PDF document...'), duration: Duration(seconds: 1)),
                           );
                         }
-                        await sharePdfFile(htmlContent, 'aira_itinerary.pdf');
+                        await sharePdfFile(htmlContent, 'tria_itinerary.pdf');
                       } catch (e) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -495,7 +521,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Your Aira Travel Itinerary</title>
+  <title>Your Tria Travel Itinerary</title>
   <style>
     :root {
       --bg-color: #0B132B;
@@ -696,7 +722,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   <div class="container">
     <header>
       <h1>YOUR TRIP ITINERARY</h1>
-      <p>Custom travel plan powered by Aira Travel Companion</p>
+      <p>Custom travel plan powered by Tria Travel Companion</p>
     </header>
 ''');
 
@@ -1003,13 +1029,13 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   Widget build(BuildContext context) {
     final itinerary = ref.watch(itineraryProvider);
     final isDark = ref.watch(isDarkProvider);
-    final bgColor = AiraColors.scaffoldBg(isDark);
-    final cardColor = AiraColors.cardBg(isDark);
-    final textColor = AiraColors.textPrimary(isDark);
-    final mutedTextColor = AiraColors.textMuted(isDark);
-    final borderColor = AiraColors.border(isDark);
+    final bgColor = TriaColors.scaffoldBg(isDark);
+    final cardColor = TriaColors.cardBg(isDark);
+    final textColor = TriaColors.textPrimary(isDark);
+    final mutedTextColor = TriaColors.textMuted(isDark);
+    final borderColor = TriaColors.border(isDark);
     const pillActive = Color(0xFF2563EB);
-    final pillInactive = AiraColors.cardBg(isDark);
+    final pillInactive = TriaColors.cardBg(isDark);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -1024,12 +1050,21 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 children: [
                   Row(
                     children: [
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        icon: Icon(Icons.arrow_back_ios_new_rounded, color: TriaColors.textPrimary(isDark), size: 18),
+                        onPressed: () {
+                          ref.read(currentTabProvider.notifier).state = 0; // Go back to Home tab
+                        },
+                      ),
+                      const SizedBox(width: 12),
                       const Icon(Icons.schedule, color: Color(0xFF2563EB), size: 20),
                       const SizedBox(width: 8),
                       Text(
                         'HOURLY SCHEDULE',
                         style: TextStyle(
-                          color: AiraColors.textPrimary(isDark),
+                          color: TriaColors.textPrimary(isDark),
                           fontWeight: FontWeight.w900,
                           fontSize: 15,
                           letterSpacing: 0.5,
@@ -1041,14 +1076,14 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                     children: [
                       IconButton(
                         tooltip: 'Share Itinerary (HTML)',
-                        icon: Icon(Icons.share_rounded, color: AiraColors.textPrimary(isDark), size: 20),
+                        icon: Icon(Icons.share_rounded, color: TriaColors.textPrimary(isDark), size: 20),
                         onPressed: _showShareItineraryDialog,
                       ),
                       IconButton(
                         tooltip: 'Simulate Time',
                         icon: Icon(
                           Icons.more_time_rounded,
-                          color: _useMockTime ? Colors.amberAccent : AiraColors.textPrimary(isDark),
+                          color: _useMockTime ? Colors.amberAccent : TriaColors.textPrimary(isDark),
                           size: 20,
                         ),
                         onPressed: _showTimeSimulatorDialog,
@@ -1058,6 +1093,9 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 ],
               ),
             ),
+
+            // Dropdown selection for upcoming trips
+            _buildTripDropdown(context, ref),
 
             // Horizontal Day Tabs (Day 1 - Day 5) matching styling from reference image
             _buildHorizontalDayTabs(itinerary, pillActive, pillInactive, borderColor, textColor, mutedTextColor),
@@ -1532,7 +1570,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Create a new itinerary using the "Chat Concierge" or "Ask Aira to Plan" option on the Home screen to populate your journey.',
+                'Create a new itinerary using the "Chat Concierge" or "Ask Tria to Plan" option on the Home screen to populate your journey.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 12, color: Colors.white54, height: 1.4),
               ),
@@ -1548,7 +1586,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                   ref.read(currentTabProvider.notifier).state = 0;
                 },
                 icon: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 16),
-                label: const Text('Go Plan with Aira', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                label: const Text('Go Plan with Tria', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -1747,8 +1785,29 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                             visualDensity: VisualDensity.compact,
                             icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Colors.redAccent),
                             onPressed: () {
-                              ref.read(itineraryProvider.notifier).deleteActivity(_activeDay, activityIdx);
-                              setState(() {});
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  title: Text('Delete Activity?', style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold)),
+                                  content: Text('Are you sure you want to remove "${act.activity}" from your itinerary?', style: TextStyle(color: TriaColors.textSecondary(isDark))),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(ctx),
+                                      child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(ctx);
+                                        ref.read(itineraryProvider.notifier).deleteActivity(_activeDay, activityIdx);
+                                        setState(() {});
+                                      },
+                                      child: const Text('Delete', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                                    ),
+                                  ],
+                                ),
+                              );
                             },
                           ),
                         ],
@@ -2149,7 +2208,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Your review helps us make Aira better for future journeys. Happy travels!',
+                  'Your review helps us make Tria better for future journeys. Happy travels!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: mutedTextColor,
@@ -2179,7 +2238,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Congrats on completing today\'s plan! Help us improve Aira by reviewing your trip and app experience.',
+                  'Congrats on completing today\'s plan! Help us improve Tria by reviewing your trip and app experience.',
                   style: TextStyle(
                     color: mutedTextColor,
                     fontSize: 12,
@@ -2222,7 +2281,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 
                 // App Experience Rating
                 Text(
-                  'How was your App Experience with Aira?',
+                  'How was your App Experience with Tria?',
                   style: TextStyle(
                     color: textColor.withOpacity(0.9),
                     fontWeight: FontWeight.bold,
@@ -2311,6 +2370,96 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               ],
             ),
     );
+  }
+
+  Widget _buildTripDropdown(BuildContext context, WidgetRef ref) {
+    final rawTrips = ref.watch(upcomingTripsProvider);
+    final currentBookings = ref.watch(tripBookingsProvider);
+    final isDark = ref.watch(isDarkProvider);
+
+    if (rawTrips.isEmpty) return const SizedBox.shrink();
+
+    // Sort to ensure consistency with Home tab (nearest trip first)
+    final trips = List<UpcomingTrip>.from(rawTrips);
+    trips.sort((a, b) {
+      try {
+        final dateA = DateTime.parse(a.startDate);
+        final dateB = DateTime.parse(b.startDate);
+        return dateA.compareTo(dateB);
+      } catch (_) {
+        return a.startDate.compareTo(b.startDate);
+      }
+    });
+
+    final activeTrip = trips.firstWhere(
+      (t) => t.destination == currentBookings.destination && t.startDate == currentBookings.startDate,
+      orElse: () => trips.first,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+        decoration: BoxDecoration(
+          color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: TriaColors.border(isDark)),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: activeTrip.tripId,
+            dropdownColor: isDark ? const Color(0xFF0A1628) : Colors.white,
+            icon: Icon(Icons.arrow_drop_down, color: TriaColors.textPrimary(isDark)),
+            style: TextStyle(
+              color: TriaColors.textPrimary(isDark),
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+            isExpanded: true,
+            onChanged: (String? value) {
+              if (value != null) {
+                final selected = trips.firstWhere((t) => t.tripId == value);
+                ref.read(itineraryProvider.notifier).setItinerary(selected.itinerary);
+                ref.read(tripBookingsProvider.notifier).setBookings(TripBookings(
+                  destination: selected.destination,
+                  startDate: selected.startDate,
+                  endDate: selected.endDate,
+                ));
+              }
+            },
+            items: trips.map<DropdownMenuItem<String>>((UpcomingTrip trip) {
+              return DropdownMenuItem<String>(
+                value: trip.tripId,
+                child: Row(
+                  children: [
+                    const Icon(Icons.flight_takeoff, size: 16, color: Color(0xFF00B4D8)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${trip.destination} (${_formatDates(trip.startDate, trip.endDate)})',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatDates(String startStr, String endStr) {
+    try {
+      final start = DateTime.parse(startStr);
+      final end = DateTime.parse(endStr);
+      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return '${months[start.month - 1]} ${start.day} - ${months[end.month - 1]} ${end.day}';
+    } catch (_) {
+      return '$startStr - $endStr';
+    }
   }
 }
 

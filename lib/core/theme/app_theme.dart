@@ -173,9 +173,9 @@ class AppTheme {
 }
 
 /// Centralized dynamic color tokens for Dark/Light theme support.
-/// Usage: `AiraColors.scaffoldBg(isDark)` — returns the correct color for the current mode.
-class AiraColors {
-  AiraColors._(); // Private constructor — use static methods only
+/// Usage: `TriaColors.scaffoldBg(isDark)` — returns the correct color for the current mode.
+class TriaColors {
+  TriaColors._(); // Private constructor — use static methods only
 
   // ── Backgrounds ──
   static Color scaffoldBg(bool isDark) =>

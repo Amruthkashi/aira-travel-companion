@@ -33,6 +33,15 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   String _fromCurrency = 'USD';
   bool _taxFreeReduction = false;
 
+  // Wizard text controllers
+  final TextEditingController _wizardTotalCtrl = TextEditingController();
+  final TextEditingController _wizardFlightsCtrl = TextEditingController();
+  final TextEditingController _wizardHotelsCtrl = TextEditingController();
+  final TextEditingController _wizardDineCtrl = TextEditingController();
+  final TextEditingController _wizardTransitCtrl = TextEditingController();
+  final TextEditingController _wizardShowsCtrl = TextEditingController();
+  final TextEditingController _wizardShoppingCtrl = TextEditingController();
+
   final List<String> _categories = [
     'Flights & Transit',
     'Bed & Hotels',
@@ -47,6 +56,13 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     _descCtrl.dispose();
     _amountCtrl.dispose();
     _convInputCtrl.dispose();
+    _wizardTotalCtrl.dispose();
+    _wizardFlightsCtrl.dispose();
+    _wizardHotelsCtrl.dispose();
+    _wizardDineCtrl.dispose();
+    _wizardTransitCtrl.dispose();
+    _wizardShowsCtrl.dispose();
+    _wizardShoppingCtrl.dispose();
     super.dispose();
   }
 
@@ -86,12 +102,12 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   }
 
   // Get spent in Category: Ledger items + Itinerary activities cost
-  double _getCategorySpent(List<TravelExpense> expenses, List<ItineraryDay> itinerary, String targetCat) {
+  double _getCategorySpent(List<TravelExpense> expenses, List<ItineraryDay> itinerary, String targetCat, String activeTripId) {
     double sum = 0.0;
     
-    // 1. Sum up matching ledger expenses
+    // 1. Sum up matching ledger expenses for active trip
     for (var exp in expenses) {
-      if (_normalizeCategory(exp.category) == targetCat) {
+      if (exp.tripId == activeTripId && _normalizeCategory(exp.category) == targetCat) {
         sum += exp.amount;
       }
     }
@@ -108,24 +124,38 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     return sum;
   }
 
-  // Get total limit per category (defined in spec)
-  double _getCategoryLimit(String cat) {
+  // Get total limit per category (defined in spec) - proportionally scaled to the total budget ceiling unless customized
+  double _getCategoryLimit(String cat, double totalCeiling, String activeTripId, Map<String, Map<String, double>> customCategoryLimits) {
+    if (customCategoryLimits.containsKey(activeTripId) && customCategoryLimits[activeTripId]!.containsKey(cat)) {
+      return customCategoryLimits[activeTripId]![cat]!;
+    }
+
+    if (totalCeiling <= 0) return 0.0;
+    
+    double factor;
     switch (cat) {
       case 'Flights & Transit':
-        return 650.0;
+        factor = 650.0 / 1600.0;
+        break;
       case 'Bed & Hotels':
-        return 450.0;
+        factor = 450.0 / 1600.0;
+        break;
       case 'Local Dine-Out':
-        return 200.0;
+        factor = 200.0 / 1600.0;
+        break;
       case 'Metros & Taxis':
-        return 100.0;
+        factor = 100.0 / 1600.0;
+        break;
       case 'Sightseeing & Shows':
-        return 80.0;
+        factor = 80.0 / 1600.0;
+        break;
       case 'Souvenirs & Anime':
-        return 120.0;
+        factor = 120.0 / 1600.0;
+        break;
       default:
-        return 100.0;
+        factor = 100.0 / 1600.0;
     }
+    return totalCeiling * factor;
   }
 
   // Emoji helper for categories
@@ -181,9 +211,11 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   }
 
   // Show detailed logs of matching items inside a category bottom drawer
-  void _showCategoryLogs(String categoryName, List<TravelExpense> expenses, List<ItineraryDay> itinerary) {
+  void _showCategoryLogs(String categoryName, List<TravelExpense> expenses, List<ItineraryDay> itinerary, String activeTripId) {
     final isDark = ref.read(isDarkProvider);
-    final matchingExpenses = expenses.where((e) => _normalizeCategory(e.category) == categoryName).toList();
+    final matchingExpenses = expenses
+        .where((e) => e.tripId == activeTripId && _normalizeCategory(e.category) == categoryName)
+        .toList();
     final matchingActivities = <ActivityItem>[];
     for (var day in itinerary) {
       for (var act in day.activities) {
@@ -201,7 +233,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -220,7 +252,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   width: 40,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: AiraColors.border(isDark),
+                    color: TriaColors.border(isDark),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -238,7 +270,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                         Text(
                           categoryName.toUpperCase(),
                           style: TextStyle(
-                            color: AiraColors.textPrimary(isDark),
+                            color: TriaColors.textPrimary(isDark),
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.0,
@@ -247,14 +279,14 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                         const SizedBox(height: 2),
                         Text(
                           'Category Ledger Breakdown & Allocations',
-                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
+                          style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11),
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-              Divider(color: AiraColors.border(isDark), height: 32),
+              Divider(color: TriaColors.border(isDark), height: 32),
               
               // Contents
               Expanded(
@@ -262,7 +294,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                     ? Center(
                         child: Text(
                           'No entries recorded in this category.',
-                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 13, fontWeight: FontWeight.w500),
+                          style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 13, fontWeight: FontWeight.w500),
                         ),
                       )
                     : ListView(
@@ -310,7 +342,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: Text('Dismiss Ledger', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold)),
+                  child: Text('Dismiss Ledger', style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -332,9 +364,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
+        color: TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AiraColors.border(isDark)),
+        border: Border.all(color: TriaColors.border(isDark)),
       ),
       child: Row(
         children: [
@@ -361,19 +393,19 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               children: [
                 Text(
                   title,
-                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
+                  style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
-                Text(subtitle, style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 10)),
+                Text(subtitle, style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 10)),
               ],
             ),
           ),
           const SizedBox(width: 8),
           Text(
             _formatCurrency(usdAmount),
-            style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 13),
+            style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 13),
           ),
           if (onDelete != null) ...[
             const SizedBox(width: 6),
@@ -396,6 +428,17 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     final ceiling = ref.watch(budgetCeilingProvider);
     final expenses = ref.watch(expensesProvider);
     final itinerary = ref.watch(itineraryProvider);
+    final trips = ref.watch(upcomingTripsProvider);
+    final currentBookings = ref.watch(tripBookingsProvider);
+    final customCategoryLimits = ref.watch(tripCategoryLimitsProvider);
+
+    final activeTrip = trips.isNotEmpty
+        ? trips.firstWhere(
+            (t) => t.destination == currentBookings.destination && t.startDate == currentBookings.startDate,
+            orElse: () => trips.first,
+          )
+        : null;
+    final activeTripId = activeTrip?.tripId ?? '';
 
     // Apply Smart Savings deductions dynamically to simulate savings in real-time
     double savingsOffset = 0.0;
@@ -417,11 +460,17 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark),
+        backgroundColor: TriaColors.cardBg(isDark),
         elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_rounded, color: TriaColors.textPrimary(isDark)),
+          onPressed: () {
+            ref.read(currentTabProvider.notifier).state = 0; // Go back to Home tab
+          },
+        ),
         title: Text(
           'Intelligent Budget Planner',
-          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
       body: SingleChildScrollView(
@@ -432,32 +481,35 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             // Title Header Intro
             Text(
               'Intelligent Budget Planner',
-              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 20),
+              style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 20),
             ),
             const SizedBox(height: 4),
             Text(
               'Dynamic currency conversions, category target checks, and localized cost suggestions personalized for your travel style.',
-              style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11.5, height: 1.4),
+              style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11.5, height: 1.4),
             ),
             const SizedBox(height: 18),
+
+            // Dynamic Trip dropdown selector
+            _buildTripDropdown(context, ref),
 
             // 1. Display Currency Selector Card
             _buildCurrencySelectorCard(),
             const SizedBox(height: 16),
 
             // 2. Overall Spending Rate Circular Progress Card
-            _buildOverallSpendingCard(spent, ceiling, leftover, spentPercentage),
+            _buildOverallSpendingCard(spent, ceiling, leftover, spentPercentage, activeTripId),
             const SizedBox(height: 16),
 
             // 3. Category-wise Allocations Progress Meters
-            _buildCategoryAllocationsCard(expenses, itinerary),
+            _buildCategoryAllocationsCard(expenses, itinerary, activeTripId, ceiling, customCategoryLimits),
             const SizedBox(height: 16),
 
             // 4. Add Custom Entry Ledger Form
             _buildAddCustomEntryCard(),
             const SizedBox(height: 16),
 
-            // 5. Aira Smart Savings Section
+            // 5. Tria Smart Savings Section
             _buildSmartSavingsCard(),
             const SizedBox(height: 16),
 
@@ -470,6 +522,105 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     );
   }
 
+  Widget _buildTripDropdown(BuildContext context, WidgetRef ref) {
+    final rawTrips = ref.watch(upcomingTripsProvider);
+    final currentBookings = ref.watch(tripBookingsProvider);
+    final isDark = ref.watch(isDarkProvider);
+
+    if (rawTrips.isEmpty) return const SizedBox.shrink();
+
+    // Sort to ensure consistency with Home & Trips tab (nearest trip first)
+    final trips = List<UpcomingTrip>.from(rawTrips);
+    trips.sort((a, b) {
+      try {
+        final dateA = DateTime.parse(a.startDate);
+        final dateB = DateTime.parse(b.startDate);
+        return dateA.compareTo(dateB);
+      } catch (_) {
+        return a.startDate.compareTo(b.startDate);
+      }
+    });
+
+    final activeTrip = trips.firstWhere(
+      (t) => t.destination == currentBookings.destination && t.startDate == currentBookings.startDate,
+      orElse: () => trips.first,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+              decoration: BoxDecoration(
+                color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: TriaColors.border(isDark)),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: activeTrip.tripId,
+                  dropdownColor: isDark ? const Color(0xFF0A1628) : Colors.white,
+                  icon: Icon(Icons.arrow_drop_down, color: TriaColors.textPrimary(isDark)),
+                  style: TextStyle(
+                    color: TriaColors.textPrimary(isDark),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                  isExpanded: true,
+                  onChanged: (String? value) {
+                    if (value != null) {
+                      final selected = trips.firstWhere((t) => t.tripId == value);
+                      ref.read(itineraryProvider.notifier).setItinerary(selected.itinerary);
+                      ref.read(tripBookingsProvider.notifier).setBookings(TripBookings(
+                        destination: selected.destination,
+                        startDate: selected.startDate,
+                        endDate: selected.endDate,
+                      ));
+                    }
+                  },
+                  items: trips.map<DropdownMenuItem<String>>((UpcomingTrip trip) {
+                    return DropdownMenuItem<String>(
+                      value: trip.tripId,
+                      child: Text(
+                        '${trip.source} ➔ ${trip.destination}',
+                        style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 12.5),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: () => _showSetupWizardSheet(context, activeTrip.tripId),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: 0.2)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.auto_awesome, color: Color(0xFF2563EB), size: 16),
+                  SizedBox(width: 6),
+                  Text(
+                    'Setup Wizard',
+                    style: TextStyle(color: Color(0xFF2563EB), fontSize: 11.5, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // 1. Currency Selector
   Widget _buildCurrencySelectorCard() {
     final isDark = ref.read(isDarkProvider);
@@ -477,9 +628,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
+        color: TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AiraColors.border(isDark)),
+        border: Border.all(color: TriaColors.border(isDark)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -494,7 +645,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           Text(
             'DISPLAY CURRENCY',
             style: TextStyle(
-              color: AiraColors.textSecondary(isDark),
+              color: TriaColors.textSecondary(isDark),
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
@@ -557,7 +708,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           child: Text(
             label,
             style: TextStyle(
-              color: isSelected ? AiraColors.textPrimary(isDark) : AiraColors.textSecondary(isDark),
+              color: isSelected ? TriaColors.textPrimary(isDark) : TriaColors.textSecondary(isDark),
               fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
               fontSize: 12.5,
             ),
@@ -567,15 +718,68 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     );
   }
 
+  void _showEditCeilingDialog(BuildContext context, String tripId, double currentCeiling) {
+    if (tripId.isEmpty) return;
+    
+    final isDark = ref.read(isDarkProvider);
+    final textCtrl = TextEditingController(text: currentCeiling.toStringAsFixed(0));
+    
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+          title: Text(
+            'Change Budget Limit',
+            style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          content: TextField(
+            controller: textCtrl,
+            keyboardType: TextInputType.number,
+            style: TextStyle(color: TriaColors.textPrimary(isDark)),
+            decoration: InputDecoration(
+              labelText: 'Target Ceiling (USD)',
+              labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                final newAmt = double.tryParse(textCtrl.text) ?? 0.0;
+                if (newAmt >= 0) {
+                  ref.read(tripBudgetsProvider.notifier).setBudget(tripId, newAmt);
+                  SoundSynthesizer.playTone(
+                    frequency: 800,
+                    durationSeconds: 0.1,
+                    name: 'save.wav',
+                  );
+                  Navigator.pop(ctx);
+                  setState(() {});
+                }
+              },
+              child: const Text('Save', style: TextStyle(color: Color(0xFF2563EB))),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // 2. Overall Spending Card
-  Widget _buildOverallSpendingCard(double spent, double ceiling, double leftover, double spentPercentage) {
+  Widget _buildOverallSpendingCard(double spent, double ceiling, double leftover, double spentPercentage, String activeTripId) {
     final isDark = ref.read(isDarkProvider);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
+        color: TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AiraColors.border(isDark)),
+        border: Border.all(color: TriaColors.border(isDark)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -596,7 +800,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   Text(
                     'OVERALL SPENDING RATE',
                     style: TextStyle(
-                      color: AiraColors.textSecondary(isDark),
+                      color: TriaColors.textSecondary(isDark),
                       fontSize: 9.5,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.0,
@@ -605,7 +809,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   const SizedBox(height: 3),
                   Text(
                     'Target Ceiling vs. Expended',
-                    style: TextStyle(color: AiraColors.textPrimary(isDark).withValues(alpha: 0.95), fontSize: 13.5, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: TriaColors.textPrimary(isDark).withValues(alpha: 0.95), fontSize: 13.5, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -644,7 +848,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                       Text(
                         'LEFTOVER',
                         style: TextStyle(
-                          color: AiraColors.textSecondary(isDark),
+                          color: TriaColors.textSecondary(isDark),
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
@@ -654,7 +858,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                       Text(
                         _formatCurrency(leftover),
                         style: TextStyle(
-                          color: AiraColors.textPrimary(isDark),
+                          color: TriaColors.textPrimary(isDark),
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                         ),
@@ -672,7 +876,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                     Text(
                       'TOTAL EXPENDED',
                       style: TextStyle(
-                        color: AiraColors.textSecondary(isDark),
+                        color: TriaColors.textSecondary(isDark),
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -682,29 +886,48 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                     Text(
                       _formatCurrency(spent),
                       style: TextStyle(
-                        color: spent > ceiling ? const Color(0xFFEF4444) : AiraColors.textPrimary(isDark),
+                        color: spent > ceiling ? const Color(0xFFEF4444) : TriaColors.textPrimary(isDark),
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 14),
                     Text(
                       'TARGET CEILING',
                       style: TextStyle(
-                        color: AiraColors.textSecondary(isDark),
+                        color: TriaColors.textSecondary(isDark),
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      _formatCurrency(ceiling),
-                      style: TextStyle(
-                        color: AiraColors.textSecondary(isDark),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          _formatCurrency(ceiling),
+                          style: TextStyle(
+                            color: TriaColors.textSecondary(isDark),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => _showEditCeilingDialog(context, activeTripId, ceiling),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Icon(
+                              Icons.edit,
+                              color: Color(0xFF2563EB),
+                              size: 14,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -717,14 +940,19 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   }
 
   // 3. Category Allocations List Card
-  Widget _buildCategoryAllocationsCard(List<TravelExpense> expenses, List<ItineraryDay> itinerary) {
+  Widget _buildCategoryAllocationsCard(
+      List<TravelExpense> expenses,
+      List<ItineraryDay> itinerary,
+      String activeTripId,
+      double totalCeiling,
+      Map<String, Map<String, double>> customCategoryLimits) {
     final isDark = ref.read(isDarkProvider);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
+        color: TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AiraColors.border(isDark)),
+        border: Border.all(color: TriaColors.border(isDark)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -739,7 +967,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           Text(
             'CATEGORY-WISE ALLOCATIONS',
             style: TextStyle(
-              color: AiraColors.textSecondary(isDark),
+              color: TriaColors.textSecondary(isDark),
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
@@ -747,7 +975,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           ),
           const SizedBox(height: 14),
           ..._categories.map((cat) {
-            double catSpent = _getCategorySpent(expenses, itinerary, cat);
+            double catSpent = _getCategorySpent(expenses, itinerary, cat, activeTripId);
             // Apply simulated offsets from Smart Savings tips
             if (cat == 'Metros & Taxis' && _commuteOptimized) {
               catSpent = (catSpent - 25.0).clamp(0.0, double.infinity);
@@ -759,10 +987,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               catSpent = (catSpent - 15.0).clamp(0.0, double.infinity);
             }
 
-            final limit = _getCategoryLimit(cat);
+            final limit = _getCategoryLimit(cat, totalCeiling, activeTripId, customCategoryLimits);
             final ratio = limit > 0 ? (catSpent / limit).clamp(0.0, 1.0) : 0.0;
-            final isOver = catSpent > limit;
-            final isNear = (catSpent / limit) >= 0.85 && !isOver;
+            final isOver = limit > 0 ? catSpent > limit : catSpent > 0;
+            final isNear = limit > 0 ? (catSpent / limit) >= 0.85 && !isOver : false;
 
             Color barColor = const Color(0xFF00B4D8); // Indigo-300 default
             if (isOver) {
@@ -775,7 +1003,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               padding: const EdgeInsets.only(bottom: 16.0),
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: () => _showCategoryLogs(cat, expenses, itinerary),
+                onTap: () => _showCategoryLogs(cat, expenses, itinerary, activeTripId),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -794,7 +1022,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.bold,
-                                color: AiraColors.textPrimary(isDark),
+                                color: TriaColors.textPrimary(isDark),
                               ),
                             ),
                             if (isOver) ...[
@@ -825,15 +1053,31 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                             ]
                           ],
                         ),
-                        Text(
-                          '${_formatCurrency(catSpent)} / ${_formatCurrency(limit)}',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.bold,
-                            color: isOver
-                                ? const Color(0xFFEF4444)
-                                : (isNear ? const Color(0xFFF97316) : AiraColors.textSecondary(isDark)),
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              '${_formatCurrency(catSpent)} / ${_formatCurrency(limit)}',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.bold,
+                                color: isOver
+                                    ? const Color(0xFFEF4444)
+                                    : (isNear ? const Color(0xFFF97316) : TriaColors.textSecondary(isDark)),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            GestureDetector(
+                              onTap: () => _showEditCategoryLimitDialog(context, activeTripId, cat, limit),
+                              child: Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Icon(Icons.edit, color: Color(0xFF2563EB), size: 10),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -863,9 +1107,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
+        color: TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AiraColors.border(isDark)),
+        border: Border.all(color: TriaColors.border(isDark)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -880,7 +1124,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           Text(
             'ADD CUSTOM ENTRY',
             style: TextStyle(
-              color: AiraColors.textSecondary(isDark),
+              color: TriaColors.textSecondary(isDark),
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
@@ -897,16 +1141,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   height: 44,
                   child: TextField(
                     controller: _descCtrl,
-                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: TriaColors.textPrimary(isDark)),
                     decoration: InputDecoration(
                       isDense: true,
                       hintText: 'Souvenir description...',
-                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12.5),
+                      hintStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 12.5),
                       filled: true,
                       fillColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AiraColors.border(isDark)),
+                        borderSide: BorderSide(color: TriaColors.border(isDark)),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -925,18 +1169,18 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   child: TextField(
                     controller: _amountCtrl,
                     keyboardType: TextInputType.number,
-                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: TriaColors.textPrimary(isDark)),
                     decoration: InputDecoration(
                       isDense: true,
                       prefixText: '$_currencySymbol ',
                       prefixStyle: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF00B4D8)),
                       hintText: 'Amount',
-                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12.5),
+                      hintStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 12.5),
                       filled: true,
                       fillColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AiraColors.border(isDark)),
+                        borderSide: BorderSide(color: TriaColors.border(isDark)),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -955,7 +1199,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           Text(
             'SELECT LEDGER CATEGORY',
             style: TextStyle(
-              color: AiraColors.textSecondary(isDark),
+              color: TriaColors.textSecondary(isDark),
               fontSize: 8.5,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
@@ -981,7 +1225,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                         color: isSelected ? const Color(0xFF2563EB) : (isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9)),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isSelected ? const Color(0xFF2563EB) : AiraColors.border(isDark),
+                          color: isSelected ? const Color(0xFF2563EB) : TriaColors.border(isDark),
                         ),
                       ),
                       child: Row(
@@ -1067,7 +1311,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     );
   }
 
-  // 5. Aira Smart Savings Section
+  // 5. Tria Smart Savings Section
   Widget _buildSmartSavingsCard() {
     final isDark = ref.read(isDarkProvider);
     return Container(
@@ -1096,8 +1340,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               ),
               const SizedBox(width: 10),
               Text(
-                'Aira Smart Savings',
-                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 15),
+                'Tria Smart Savings',
+                style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 15),
               ),
             ],
           ),
@@ -1182,7 +1426,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             const SizedBox(width: 8),
             Text(
               title,
-              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
+              style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12.5),
             ),
             const Spacer(),
             // Optimization toggle
@@ -1231,7 +1475,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           padding: const EdgeInsets.only(left: 26.0),
           child: Text(
             description,
-            style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10.5, height: 1.35),
+            style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 10.5, height: 1.35),
           ),
         ),
       ],
@@ -1244,9 +1488,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark),
+        color: TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AiraColors.border(isDark)),
+        border: Border.all(color: TriaColors.border(isDark)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -1261,7 +1505,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           Text(
             'SMART CURRENCY CONVERTER',
             style: TextStyle(
-              color: AiraColors.textSecondary(isDark),
+              color: TriaColors.textSecondary(isDark),
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
@@ -1276,16 +1520,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                   child: TextField(
                     controller: _convInputCtrl,
                     keyboardType: TextInputType.number,
-                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: TriaColors.textPrimary(isDark)),
                     decoration: InputDecoration(
                       isDense: true,
                       labelText: 'Amount',
-                      labelStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 11),
+                      labelStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 11),
                       filled: true,
                       fillColor: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AiraColors.border(isDark)),
+                        borderSide: BorderSide(color: TriaColors.border(isDark)),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -1303,21 +1547,21 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF0A1628) : const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AiraColors.border(isDark)),
+                  border: Border.all(color: TriaColors.border(isDark)),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: _fromCurrency,
-                    dropdownColor: AiraColors.cardBg(isDark),
-                    iconEnabledColor: AiraColors.textPrimary(isDark),
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AiraColors.textPrimary(isDark)),
+                    dropdownColor: TriaColors.cardBg(isDark),
+                    iconEnabledColor: TriaColors.textPrimary(isDark),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: TriaColors.textPrimary(isDark)),
                     onChanged: (v) {
                       setState(() => _fromCurrency = v!);
                     },
                     items: ['USD', 'EUR', 'INR', 'GBP'].map((str) {
                       return DropdownMenuItem(
                         value: str,
-                        child: Text(str, style: TextStyle(color: AiraColors.textPrimary(isDark))),
+                        child: Text(str, style: TextStyle(color: TriaColors.textPrimary(isDark))),
                       );
                     }).toList(),
                   ),
@@ -1333,7 +1577,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             child: CheckboxListTile(
               title: Text(
                 'Include JPY Tax-Free Shopping (10% discount)',
-                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AiraColors.textSecondary(isDark)),
+                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: TriaColors.textSecondary(isDark)),
               ),
               value: _taxFreeReduction,
               activeColor: const Color(0xFF2563EB),
@@ -1358,7 +1602,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               children: [
                 Text(
                   'JAPANESE YEN (JPY) VALUE',
-                  style: TextStyle(fontSize: 8.5, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                  style: TextStyle(fontSize: 8.5, color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.w900, letterSpacing: 0.5),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -1383,6 +1627,260 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           )
         ],
       ),
+    );
+  }
+
+  void _showEditCategoryLimitDialog(BuildContext context, String tripId, String category, double currentLimit) {
+    if (tripId.isEmpty) return;
+    final isDark = ref.read(isDarkProvider);
+    final textCtrl = TextEditingController(text: currentLimit.toStringAsFixed(0));
+    
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF0E1A30) : Colors.white,
+          title: Text(
+            'Edit $category Limit',
+            style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          content: TextField(
+            controller: textCtrl,
+            keyboardType: TextInputType.number,
+            style: TextStyle(color: TriaColors.textPrimary(isDark)),
+            decoration: InputDecoration(
+              labelText: 'Category Limit (USD)',
+              labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                final newAmt = double.tryParse(textCtrl.text) ?? 0.0;
+                if (newAmt >= 0) {
+                  ref.read(tripCategoryLimitsProvider.notifier).setCategoryLimit(tripId, category, newAmt);
+                  SoundSynthesizer.playTone(
+                    frequency: 800,
+                    durationSeconds: 0.1,
+                    name: 'save.wav',
+                  );
+                  Navigator.pop(ctx);
+                  setState(() {});
+                }
+              },
+              child: const Text('Save', style: TextStyle(color: Color(0xFF2563EB))),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSetupWizardSheet(BuildContext context, String tripId) {
+    if (tripId.isEmpty) return;
+    final isDark = ref.read(isDarkProvider);
+
+    // Load current values
+    final currentCeiling = ref.read(tripBudgetsProvider)[tripId] ?? 0.0;
+    final customLimits = ref.read(tripCategoryLimitsProvider)[tripId] ?? {};
+
+    _wizardTotalCtrl.text = currentCeiling > 0 ? currentCeiling.toStringAsFixed(0) : '';
+    _wizardFlightsCtrl.text = (customLimits['Flights & Transit'] ?? (currentCeiling * (650.0 / 1600.0))).toStringAsFixed(0);
+    _wizardHotelsCtrl.text = (customLimits['Bed & Hotels'] ?? (currentCeiling * (450.0 / 1600.0))).toStringAsFixed(0);
+    _wizardDineCtrl.text = (customLimits['Local Dine-Out'] ?? (currentCeiling * (200.0 / 1600.0))).toStringAsFixed(0);
+    _wizardTransitCtrl.text = (customLimits['Metros & Taxis'] ?? (currentCeiling * (100.0 / 1600.0))).toStringAsFixed(0);
+    _wizardShowsCtrl.text = (customLimits['Sightseeing & Shows'] ?? (currentCeiling * (80.0 / 1600.0))).toStringAsFixed(0);
+    _wizardShoppingCtrl.text = (customLimits['Souvenirs & Anime'] ?? (currentCeiling * (120.0 / 1600.0))).toStringAsFixed(0);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: TriaColors.scaffoldBg(isDark),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                left: 24,
+                right: 24,
+                top: 24,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Trip Budget Setup Wizard',
+                      style: TextStyle(
+                        color: TriaColors.textPrimary(isDark),
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Enter your overall trip budget, and adjust any category allocations. Tap Save to create your custom budget plan.',
+                      style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11.5, height: 1.3),
+                    ),
+                    const SizedBox(height: 20),
+                    // Overall Budget Field
+                    TextField(
+                      controller: _wizardTotalCtrl,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold),
+                      decoration: InputDecoration(
+                        labelText: 'Total Trip Budget (USD)',
+                        labelStyle: TextStyle(color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.bold),
+                        prefixText: '\$ ',
+                        prefixStyle: TextStyle(color: TriaColors.textPrimary(isDark)),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: TriaColors.border(isDark)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        final total = double.tryParse(val) ?? 0.0;
+                        setModalState(() {
+                          _wizardFlightsCtrl.text = (total * (650.0 / 1600.0)).toStringAsFixed(0);
+                          _wizardHotelsCtrl.text = (total * (450.0 / 1600.0)).toStringAsFixed(0);
+                          _wizardDineCtrl.text = (total * (200.0 / 1600.0)).toStringAsFixed(0);
+                          _wizardTransitCtrl.text = (total * (100.0 / 1600.0)).toStringAsFixed(0);
+                          _wizardShowsCtrl.text = (total * (80.0 / 1600.0)).toStringAsFixed(0);
+                          _wizardShoppingCtrl.text = (total * (120.0 / 1600.0)).toStringAsFixed(0);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 22),
+                    Text(
+                      'CATEGORY BUDGET LIMITS',
+                      style: TextStyle(
+                        color: TriaColors.textSecondary(isDark),
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildWizardCategoryField('✈️ Flights & Transit', _wizardFlightsCtrl, isDark),
+                    const SizedBox(height: 12),
+                    _buildWizardCategoryField('🏨 Stay & Hotels', _wizardHotelsCtrl, isDark),
+                    const SizedBox(height: 12),
+                    _buildWizardCategoryField('🍜 Local Dine-Out', _wizardDineCtrl, isDark),
+                    const SizedBox(height: 12),
+                    _buildWizardCategoryField('🚇 Metros & Taxis', _wizardTransitCtrl, isDark),
+                    const SizedBox(height: 12),
+                    _buildWizardCategoryField('⛩️ Sightseeing & Shows', _wizardShowsCtrl, isDark),
+                    const SizedBox(height: 12),
+                    _buildWizardCategoryField('🛍️ Souvenirs & Anime', _wizardShoppingCtrl, isDark),
+                    const SizedBox(height: 24),
+                    // Action button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2563EB),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          final total = double.tryParse(_wizardTotalCtrl.text) ?? 0.0;
+                          final flights = double.tryParse(_wizardFlightsCtrl.text) ?? 0.0;
+                          final hotels = double.tryParse(_wizardHotelsCtrl.text) ?? 0.0;
+                          final dine = double.tryParse(_wizardDineCtrl.text) ?? 0.0;
+                          final transit = double.tryParse(_wizardTransitCtrl.text) ?? 0.0;
+                          final shows = double.tryParse(_wizardShowsCtrl.text) ?? 0.0;
+                          final shopping = double.tryParse(_wizardShoppingCtrl.text) ?? 0.0;
+
+                          // Save Total budget
+                          ref.read(tripBudgetsProvider.notifier).setBudget(tripId, total);
+
+                          // Save individual category limits
+                          final limits = {
+                            'Flights & Transit': flights,
+                            'Bed & Hotels': hotels,
+                            'Local Dine-Out': dine,
+                            'Metros & Taxis': transit,
+                            'Sightseeing & Shows': shows,
+                            'Souvenirs & Anime': shopping,
+                          };
+                          ref.read(tripCategoryLimitsProvider.notifier).setAllCategoryLimits(tripId, limits);
+
+                          SoundSynthesizer.playTone(
+                            frequency: 700,
+                            endFrequency: 1000,
+                            durationSeconds: 0.2,
+                            name: 'setup_complete.wav',
+                          );
+
+                          Navigator.pop(context);
+                          setState(() {});
+                        },
+                        child: const Text(
+                          'Save & Create Trip Budget Plan',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildWizardCategoryField(String label, TextEditingController ctrl, bool isDark) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: Text(
+            label,
+            style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: SizedBox(
+            height: 40,
+            child: TextField(
+              controller: ctrl,
+              keyboardType: TextInputType.number,
+              style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13),
+              decoration: InputDecoration(
+                prefixText: '\$ ',
+                prefixStyle: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: TriaColors.border(isDark)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Color(0xFF2563EB)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

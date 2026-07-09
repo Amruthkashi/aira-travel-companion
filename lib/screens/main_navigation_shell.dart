@@ -88,7 +88,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
     final isDark = ref.watch(isDarkProvider);
 
     return Container(
-      decoration: AiraColors.auroraBackgroundDynamic(isDark),
+      decoration: TriaColors.auroraBackgroundDynamic(isDark),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(
@@ -112,7 +112,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: AiraColors.cardBg(isDark).withValues(alpha: 0.82),
+            color: TriaColors.cardBg(isDark).withValues(alpha: 0.82),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFF6366F1).withValues(alpha: 0.08), // Subtle indigo glow upwards
@@ -262,7 +262,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -280,7 +280,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
                   width: 40,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: AiraColors.border(isDark),
+                    color: TriaColors.border(isDark),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -304,7 +304,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
                       Text(
                         'EMERGENCY ASSIST CARD',
                         style: TextStyle(
-                          color: AiraColors.textPrimary(isDark),
+                          color: TriaColors.textPrimary(isDark),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.0,
@@ -314,7 +314,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
                       Text(
                         'Local Authorities & Health Information',
                         style: TextStyle(
-                          color: AiraColors.textSecondary(isDark),
+                          color: TriaColors.textSecondary(isDark),
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
                         ),
@@ -367,7 +367,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
               Text(
                 'PERSONAL EMERGENCY HEALTH CARD',
                 style: TextStyle(
-                  color: AiraColors.textSecondary(isDark),
+                  color: TriaColors.textSecondary(isDark),
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.0,
@@ -377,20 +377,20 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AiraColors.scaffoldBg(isDark),
+                  color: TriaColors.scaffoldBg(isDark),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AiraColors.border(isDark)),
+                  border: Border.all(color: TriaColors.border(isDark)),
                 ),
                 child: Column(
                   children: [
                     _buildMedicalRow('Full Name', 'Alex Mercer', isDark),
-                    Divider(color: AiraColors.border(isDark), height: 16),
+                    Divider(color: TriaColors.border(isDark), height: 16),
                     _buildMedicalRow('Blood Group', 'O-Positive (O+)', isDark),
-                    Divider(color: AiraColors.border(isDark), height: 16),
+                    Divider(color: TriaColors.border(isDark), height: 16),
                     _buildMedicalRow('Allergies', 'Penicillin, Peanuts', isDark),
-                    Divider(color: AiraColors.border(isDark), height: 16),
+                    Divider(color: TriaColors.border(isDark), height: 16),
                     _buildMedicalRow('Insurance Policy', 'Allianz Global #AZ-99201-X', isDark),
-                    Divider(color: AiraColors.border(isDark), height: 16),
+                    Divider(color: TriaColors.border(isDark), height: 16),
                     _buildMedicalRow('Emergency Contact', 'Sarah Mercer (Sister)\n+1 (555) 019-9482', isDark),
                   ],
                 ),
@@ -465,7 +465,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
         Text(
           label,
           style: TextStyle(
-            color: AiraColors.textSecondary(isDark),
+            color: TriaColors.textSecondary(isDark),
             fontSize: 11,
             fontWeight: FontWeight.bold,
           ),
@@ -476,7 +476,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
             value,
             textAlign: TextAlign.right,
             style: TextStyle(
-              color: AiraColors.textPrimary(isDark),
+              color: TriaColors.textPrimary(isDark),
               fontSize: 11,
               fontWeight: FontWeight.bold,
             ),
@@ -492,7 +492,7 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
 
     return Positioned.fill(
       child: Container(
-        color: AiraColors.dialogBg(isDark).withValues(alpha: 0.95),
+        color: TriaColors.dialogBg(isDark).withValues(alpha: 0.95),
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -501,12 +501,12 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
             const SizedBox(height: 16),
             Text(
               _sosType == 'police' ? 'LOCAL EMERGENCY (POLICE)' : 'LOCAL EMERGENCY (AMBULANCE)',
-              style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+              style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5),
             ),
             const SizedBox(height: 8),
             Text(
               _sosConnected ? '$min:$sec' : 'DIALING...',
-              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 28, fontWeight: FontWeight.w900),
+              style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 28, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 32),
             

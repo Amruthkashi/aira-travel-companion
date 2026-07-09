@@ -12,20 +12,20 @@ void main() async {
   
   runApp(
     const ProviderScope(
-      child: AiraTravelApp(),
+      child: TriaTravelApp(),
     ),
   );
 }
 
-class AiraTravelApp extends ConsumerWidget {
-  const AiraTravelApp({super.key});
+class TriaTravelApp extends ConsumerWidget {
+  const TriaTravelApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp.router(
-      title: 'Aira — Your Premium AI Travel Companion',
+      title: 'Tria — Your Premium AI Travel Companion',
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
       theme: AppTheme.lightTheme,

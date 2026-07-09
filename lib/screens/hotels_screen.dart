@@ -368,16 +368,16 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
     final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark),
+        backgroundColor: TriaColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        iconTheme: IconThemeData(color: TriaColors.textPrimary(isDark)),
         title: Text(
           'Lodging Selection — $_targetCity',
           style: TextStyle(
-            color: AiraColors.textPrimary(isDark),
+            color: TriaColors.textPrimary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -397,7 +397,7 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
                     const SizedBox(height: 16),
                     Text(
                       'Fetching curated lodging options...',
-                      style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -408,7 +408,7 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: AiraColors.cardBg(isDark),
+                  color: TriaColors.cardBg(isDark),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
                 ),
@@ -417,7 +417,7 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AiraColors.scaffoldBg(isDark),
+                        color: TriaColors.scaffoldBg(isDark),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.check, color: Colors.green, size: 32),
@@ -428,13 +428,13 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
-                        color: AiraColors.textPrimary(isDark),
+                        color: TriaColors.textPrimary(isDark),
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       'Your hotel reservation has been saved and logged into your budget. +300 XP earned.',
-                      style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
+                      style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
@@ -464,10 +464,10 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: AiraColors.cardBg(isDark),
+                    color: TriaColors.cardBg(isDark),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isSelected ? const Color(0xFF2563EB) : AiraColors.border(isDark),
+                      color: isSelected ? const Color(0xFF2563EB) : TriaColors.border(isDark),
                       width: isSelected ? 2 : 1,
                     ),
                     boxShadow: isSelected
@@ -486,8 +486,8 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) => Container(
                             height: 130,
-                            color: AiraColors.scaffoldBg(isDark),
-                            child: Icon(Icons.hotel, color: AiraColors.textMuted(isDark), size: 48),
+                            color: TriaColors.scaffoldBg(isDark),
+                            child: Icon(Icons.hotel, color: TriaColors.textMuted(isDark), size: 48),
                           ),
                         ),
                       ),
@@ -502,7 +502,7 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
                                 Expanded(
                                   child: Text(
                                     hotel['name'],
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AiraColors.textPrimary(isDark)),
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: TriaColors.textPrimary(isDark)),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -516,9 +516,9 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
                             const SizedBox(height: 4),
                             Text(
                               hotel['location'],
-                              style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
+                              style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11),
                             ),
-                            Divider(height: 24, color: AiraColors.border(isDark)),
+                            Divider(height: 24, color: TriaColors.border(isDark)),
                             Text(
                               hotel['details'],
                               style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : const Color(0xFF475569), height: 1.4),
@@ -557,16 +557,16 @@ class _HotelsScreenState extends ConsumerState<HotelsScreen> {
                                     ),
                                     Text(
                                       'Total: \$${totalCost.toInt()} (${hotel['nights']} nights)',
-                                      style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontSize: 10, color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: isSelected ? const Color(0xFF2563EB) : AiraColors.scaffoldBg(isDark),
-                                    foregroundColor: isSelected ? Colors.white : AiraColors.textSecondary(isDark),
+                                    backgroundColor: isSelected ? const Color(0xFF2563EB) : TriaColors.scaffoldBg(isDark),
+                                    foregroundColor: isSelected ? Colors.white : TriaColors.textSecondary(isDark),
                                     elevation: 0,
-                                    side: isSelected ? null : BorderSide(color: AiraColors.border(isDark)),
+                                    side: isSelected ? null : BorderSide(color: TriaColors.border(isDark)),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                   ),
                                   onPressed: () {

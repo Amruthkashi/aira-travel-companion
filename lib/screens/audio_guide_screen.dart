@@ -215,15 +215,15 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
     final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark),
+        backgroundColor: TriaColors.cardBg(isDark),
         elevation: 0.5,
-        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        iconTheme: IconThemeData(color: TriaColors.textPrimary(isDark)),
         title: Text(
           'AR Audio Guides',
           style: TextStyle(
-            color: AiraColors.textPrimary(isDark),
+            color: TriaColors.textPrimary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -232,7 +232,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
           // Dynamic translation language selector
           DropdownButton<String>(
             value: _selectedLang,
-            dropdownColor: AiraColors.cardBg(isDark),
+            dropdownColor: TriaColors.cardBg(isDark),
             style: const TextStyle(color: Color(0xFF00B4D8), fontWeight: FontWeight.bold, fontSize: 12),
             underline: const SizedBox(),
             onChanged: (v) {
@@ -247,14 +247,14 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
               }
             },
             items: [
-              DropdownMenuItem(value: 'English', child: Text('English', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-              DropdownMenuItem(value: 'Japanese', child: Text('Japanese', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-              DropdownMenuItem(value: 'French', child: Text('French', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-              DropdownMenuItem(value: 'Spanish', child: Text('Spanish', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-              DropdownMenuItem(value: 'German', child: Text('German', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-              DropdownMenuItem(value: 'Italian', child: Text('Italian', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-              DropdownMenuItem(value: 'Chinese', child: Text('Chinese', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-              DropdownMenuItem(value: 'Korean', child: Text('Korean', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
+              DropdownMenuItem(value: 'English', child: Text('English', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+              DropdownMenuItem(value: 'Japanese', child: Text('Japanese', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+              DropdownMenuItem(value: 'French', child: Text('French', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+              DropdownMenuItem(value: 'Spanish', child: Text('Spanish', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+              DropdownMenuItem(value: 'German', child: Text('German', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+              DropdownMenuItem(value: 'Italian', child: Text('Italian', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+              DropdownMenuItem(value: 'Chinese', child: Text('Chinese', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+              DropdownMenuItem(value: 'Korean', child: Text('Korean', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
             ],
           ),
           const SizedBox(width: 8),
@@ -329,10 +329,10 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                       // Core Sphere
                       CircleAvatar(
                         radius: 40,
-                        backgroundColor: AiraColors.cardBg(isDark),
+                        backgroundColor: TriaColors.cardBg(isDark),
                         child: Icon(
                           guideState.isPlaying ? Icons.hearing : Icons.hearing_disabled,
-                          color: guideState.isPlaying ? const Color(0xFF00B4D8) : AiraColors.textMuted(isDark),
+                          color: guideState.isPlaying ? const Color(0xFF00B4D8) : TriaColors.textMuted(isDark),
                           size: 32,
                         ),
                       ),
@@ -354,7 +354,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                 const SizedBox(height: 4),
                 Text(
                   activeTrack != null ? 'Location: ${activeTrack['location']}' : 'Stand near landmarks to activate guides',
-                  style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 11),
+                  style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 11),
                 ),
                 
                 // Active Translation Overlay
@@ -381,9 +381,9 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
-                      color: AiraColors.scaffoldBg(isDark).withValues(alpha: 0.5),
+                      color: TriaColors.scaffoldBg(isDark).withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.5)),
+                      border: Border.all(color: TriaColors.border(isDark).withValues(alpha: 0.5)),
                     ),
                     child: Column(
                       children: [
@@ -401,7 +401,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                           const SizedBox(height: 4),
                           Text(
                             _activeRomaji!,
-                            style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 9.5, fontStyle: FontStyle.italic),
+                            style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 9.5, fontStyle: FontStyle.italic),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -415,7 +415,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Text('0:00', style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 10)),
+                      Text('0:00', style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 10)),
                       Expanded(
                         child: Slider(
                           value: guideState.progress,
@@ -424,7 +424,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                           inactiveColor: isDark ? Colors.white10 : Colors.black12,
                         ),
                       ),
-                      Text(activeTrack['duration'], style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 10)),
+                      Text(activeTrack['duration'], style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 10)),
                     ],
                   ),
                   
@@ -459,10 +459,10 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                   margin: const EdgeInsets.only(bottom: 14),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AiraColors.cardBg(isDark),
+                    color: TriaColors.cardBg(isDark),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isCurrent ? const Color(0xFFFF6B35) : AiraColors.border(isDark),
+                      color: isCurrent ? const Color(0xFFFF6B35) : TriaColors.border(isDark),
                       width: isCurrent ? 1.5 : 1,
                     ),
                   ),
@@ -476,10 +476,10 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                             onTap: () => _togglePlayTrack(track),
                             child: CircleAvatar(
                               radius: 20,
-                              backgroundColor: isPlaying ? const Color(0xFF10B981) : AiraColors.scaffoldBg(isDark),
+                              backgroundColor: isPlaying ? const Color(0xFF10B981) : TriaColors.scaffoldBg(isDark),
                               child: Icon(
                                 isPlaying ? Icons.pause : Icons.play_arrow,
-                                color: isPlaying ? Colors.white : AiraColors.textPrimary(isDark),
+                                color: isPlaying ? Colors.white : TriaColors.textPrimary(isDark),
                                 size: 20,
                               ),
                             ),
@@ -492,7 +492,7 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                                 Text(
                                   track['title'],
                                   style: TextStyle(
-                                    color: AiraColors.textPrimary(isDark),
+                                    color: TriaColors.textPrimary(isDark),
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
                                   ),
@@ -500,14 +500,14 @@ class _AudioGuideScreenState extends ConsumerState<AudioGuideScreen> with Single
                                 const SizedBox(height: 2),
                                 Text(
                                   '${track['location']} • ${track['duration']}',
-                                  style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 10.5),
+                                  style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 10.5),
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      Divider(height: 20, color: AiraColors.border(isDark)),
+                      Divider(height: 20, color: TriaColors.border(isDark)),
                       Text(
                         track['description'],
                         style: TextStyle(

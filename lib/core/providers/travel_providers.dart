@@ -283,50 +283,202 @@ final suicaProvider = StateNotifierProvider<SuicaNotifier, SuicaState>((ref) {
   return SuicaNotifier(ref);
 });
 
+class TripCategoryLimitsNotifier extends StateNotifier<Map<String, Map<String, double>>> {
+  TripCategoryLimitsNotifier() : super({}) {
+    _loadLimits();
+  }
+
+  void _loadLimits() {
+    try {
+      final authBox = Hive.box('auth_box');
+      final data = authBox.get('trip_category_limits');
+      if (data != null && data is Map) {
+        state = Map<String, Map<String, double>>.from(
+          data.map((key, valMap) {
+            final innerMap = Map<String, double>.from(
+              (valMap as Map).map((k, v) => MapEntry(k.toString(), (v as num).toDouble())),
+            );
+            return MapEntry(key.toString(), innerMap);
+          }),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error loading category limits: $e');
+    }
+  }
+
+  void setCategoryLimit(String tripId, String category, double limit) {
+    final currentTripLimits = Map<String, double>.from(state[tripId] ?? {});
+    currentTripLimits[category] = limit;
+    state = {...state, tripId: currentTripLimits};
+    _saveLimits();
+  }
+
+  void setAllCategoryLimits(String tripId, Map<String, double> limits) {
+    state = {...state, tripId: limits};
+    _saveLimits();
+  }
+
+  void _saveLimits() {
+    try {
+      final authBox = Hive.box('auth_box');
+      authBox.put('trip_category_limits', state);
+    } catch (e) {
+      debugPrint('Error saving category limits: $e');
+    }
+  }
+}
+
+final tripCategoryLimitsProvider = StateNotifierProvider<TripCategoryLimitsNotifier, Map<String, Map<String, double>>>((ref) {
+  return TripCategoryLimitsNotifier();
+});
+
+class TripBudgetsNotifier extends StateNotifier<Map<String, double>> {
+  TripBudgetsNotifier() : super({}) {
+    _loadBudgets();
+  }
+
+  void _loadBudgets() {
+    try {
+      final authBox = Hive.box('auth_box');
+      final data = authBox.get('trip_budgets');
+      if (data != null && data is Map) {
+        state = Map<String, double>.from(
+          data.map((key, value) => MapEntry(key.toString(), (value as num).toDouble())),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error loading trip budgets: $e');
+    }
+  }
+
+  void setBudget(String tripId, double amount) {
+    state = {...state, tripId: amount};
+    try {
+      final authBox = Hive.box('auth_box');
+      authBox.put('trip_budgets', state);
+    } catch (e) {
+      debugPrint('Error saving trip budgets: $e');
+    }
+  }
+}
+
+final tripBudgetsProvider = StateNotifierProvider<TripBudgetsNotifier, Map<String, double>>((ref) {
+  return TripBudgetsNotifier();
+});
+
 // 3. Expenses State Notifier
 class ExpensesNotifier extends StateNotifier<List<TravelExpense>> {
-  ExpensesNotifier() : super([
-    TravelExpense(
-      id: '1',
-      category: 'Local Dine-Out',
-      amount: 190.00,
-      label: 'Seafood Market Street Food & Crossing District traditional tavern Crawl',
-      date: '2026-06-02',
-    ),
-    TravelExpense(
-      id: '2',
-      category: 'Metros & Taxis',
-      amount: 50.00,
-      label: 'Prepaid Smart Transit Card Top-Up',
-      date: '2026-06-02',
-    ),
-    TravelExpense(
-      id: '3',
-      category: 'Sightseeing & Shows',
-      amount: 1725.00,
-      label: 'VIP Helicopter Skyline Tour & Anime Event Tickets',
-      date: '2026-06-03',
-    ),
-    TravelExpense(
-      id: '4',
-      category: 'Souvenirs & Anime',
-      amount: 50.00,
-      label: 'Retro Collectors Mall Retro Figurines & Manga',
-      date: '2026-06-03',
-    ),
-  ]);
+  final Ref ref;
+  ExpensesNotifier(this.ref) : super([]) {
+    _loadExpenses();
+  }
+
+  void _loadExpenses() {
+    try {
+      final authBox = Hive.box('auth_box');
+      final data = authBox.get('custom_expenses');
+      if (data != null && data is List) {
+        state = data.map((json) => TravelExpense(
+          id: json['id'] ?? '',
+          category: json['category'] ?? '',
+          amount: (json['amount'] as num).toDouble(),
+          label: json['label'] ?? '',
+          date: json['date'] ?? '',
+          tripId: json['tripId'] ?? '',
+        )).toList();
+      } else {
+        // Fallback to default mock list if empty
+        state = [
+          TravelExpense(
+            id: '1',
+            category: 'Local Dine-Out',
+            amount: 190.00,
+            label: 'Seafood Market Street Food & Crossing District traditional tavern Crawl',
+            date: '2026-06-02',
+            tripId: 'TRIP-392D', // Default mock trip
+          ),
+          TravelExpense(
+            id: '2',
+            category: 'Metros & Taxis',
+            amount: 50.00,
+            label: 'Prepaid Smart Transit Card Top-Up',
+            date: '2026-06-02',
+            tripId: 'TRIP-392D',
+          ),
+          TravelExpense(
+            id: '3',
+            category: 'Sightseeing & Shows',
+            amount: 1725.00,
+            label: 'VIP Helicopter Skyline Tour & Anime Event Tickets',
+            date: '2026-06-03',
+            tripId: 'TRIP-392D',
+          ),
+          TravelExpense(
+            id: '4',
+            category: 'Souvenirs & Anime',
+            amount: 50.00,
+            label: 'Retro Collectors Mall Retro Figurines & Manga',
+            date: '2026-06-03',
+            tripId: 'TRIP-392D',
+          ),
+        ];
+        _saveExpenses();
+      }
+    } catch (e) {
+      debugPrint('Error loading expenses: $e');
+    }
+  }
+
+  void _saveExpenses() {
+    try {
+      final authBox = Hive.box('auth_box');
+      final data = state.map((e) => {
+        'id': e.id,
+        'category': e.category,
+        'amount': e.amount,
+        'label': e.label,
+        'date': e.date,
+        'tripId': e.tripId,
+      }).toList();
+      authBox.put('custom_expenses', data);
+    } catch (e) {
+      debugPrint('Error saving expenses: $e');
+    }
+  }
 
   void addExpense(TravelExpense exp) {
-    state = [...state, exp];
+    TravelExpense finalExp = exp;
+    if (exp.tripId.isEmpty) {
+      final trips = ref.read(upcomingTripsProvider);
+      final currentBookings = ref.read(tripBookingsProvider);
+      if (trips.isNotEmpty) {
+        final activeTrip = trips.firstWhere(
+          (t) => t.destination == currentBookings.destination && t.startDate == currentBookings.startDate,
+          orElse: () => trips.first,
+        );
+        finalExp = TravelExpense(
+          id: exp.id,
+          category: exp.category,
+          amount: exp.amount,
+          label: exp.label,
+          date: exp.date,
+          tripId: activeTrip.tripId,
+        );
+      }
+    }
+    state = [...state, finalExp];
+    _saveExpenses();
   }
 
   void removeExpense(String id) {
     state = state.where((e) => e.id != id).toList();
+    _saveExpenses();
   }
 }
 
 final expensesProvider = StateNotifierProvider<ExpensesNotifier, List<TravelExpense>>((ref) {
-  return ExpensesNotifier();
+  return ExpensesNotifier(ref);
 });
 
 // 4. Itinerary State Notifier
@@ -599,7 +751,7 @@ class ChatMessagesNotifier extends StateNotifier<List<ChatMessage>> {
     ChatMessage(
       id: 'init',
       sender: 'assistant',
-      text: 'Hello! 🗺️ I am Aira, your private AI Concierge. Tell me your travel goals so we can construct your budget specs.',
+      text: 'Hello! 🗺️ I am Tria, your private AI Concierge. Tell me your travel goals so we can construct your budget specs.',
       timestamp: '12:00 PM',
     ),
   ]);
@@ -616,7 +768,7 @@ class ChatMessagesNotifier extends StateNotifier<List<ChatMessage>> {
 
   Future<void> sendChatMessageWithAiReply(String text, Map<String, dynamic> profile) async {
     // Call Gemini AI
-    final reply = await AiService.chatWithAira(state, profile);
+    final reply = await AiService.chatWithTria(state, profile);
     
     sendChatMessage(reply, 'assistant');
   }
@@ -675,12 +827,38 @@ final audioGuideProvider = StateNotifierProvider<AudioGuideNotifier, AudioGuideS
 final currentScreenProvider = StateProvider<String>((ref) => '/splash');
 final currentTabProvider = StateProvider<int>((ref) => 0);
 
-// 9. Budget and Spending Selectors
-final budgetCeilingProvider = Provider<double>((ref) => 1500.00);
+final budgetCeilingProvider = Provider<double>((ref) {
+  final trips = ref.watch(upcomingTripsProvider);
+  final currentBookings = ref.watch(tripBookingsProvider);
+  final budgets = ref.watch(tripBudgetsProvider);
+  
+  if (trips.isEmpty) return 0.0;
+  
+  final activeTrip = trips.firstWhere(
+    (t) => t.destination == currentBookings.destination && t.startDate == currentBookings.startDate,
+    orElse: () => trips.first,
+  );
+  
+  return budgets[activeTrip.tripId] ?? 0.0;
+});
+
 final totalSpentProvider = Provider<double>((ref) {
   final expenses = ref.watch(expensesProvider);
   final itinerary = ref.watch(itineraryProvider);
-  final base = expenses.fold(0.0, (double sum, item) => sum + item.amount);
+  final trips = ref.watch(upcomingTripsProvider);
+  final currentBookings = ref.watch(tripBookingsProvider);
+  
+  if (trips.isEmpty) return 0.0;
+  
+  final activeTrip = trips.firstWhere(
+    (t) => t.destination == currentBookings.destination && t.startDate == currentBookings.startDate,
+    orElse: () => trips.first,
+  );
+  
+  final base = expenses
+      .where((e) => e.tripId == activeTrip.tripId)
+      .fold(0.0, (double sum, item) => sum + item.amount);
+      
   double activitiesCost = 0.0;
   for (var day in itinerary) {
     for (var act in day.activities) {
@@ -761,7 +939,11 @@ final serverUrlProvider = StateProvider<String>((ref) {
 
 // 13. Trip Bookings State
 class TripBookingsNotifier extends StateNotifier<TripBookings> {
-  TripBookingsNotifier() : super(TripBookings());
+  TripBookingsNotifier([TripBookings? initial]) : super(initial ?? TripBookings());
+
+  void setBookings(TripBookings bookings) {
+    state = bookings;
+  }
 
   void setTripDates(String start, String end) {
     state = state.copyWith(startDate: start, endDate: end, isManualDates: true);
@@ -1634,4 +1816,97 @@ class PastTripsNotifier extends StateNotifier<List<PastTrip>> {
 
 final pastTripsProvider = StateNotifierProvider<PastTripsNotifier, List<PastTrip>>((ref) {
   return PastTripsNotifier();
+});
+
+class UpcomingTripsNotifier extends StateNotifier<List<UpcomingTrip>> {
+  UpcomingTripsNotifier() : super([]) {
+    _loadTrips();
+  }
+
+  void _loadTrips() {
+    try {
+      final authBox = Hive.box('auth_box');
+      final data = authBox.get('upcoming_trips');
+      if (data != null && data is List) {
+        state = data.map((json) => UpcomingTrip.fromJson(Map<String, dynamic>.from(json as Map))).toList();
+      } else {
+        // Mock default premium upcoming trips
+        state = [
+          UpcomingTrip(
+            tripId: 'TRIP-392D',
+            source: 'Singapore, SG',
+            destination: 'Kyoto, Japan',
+            startDate: '2026-08-10',
+            endDate: '2026-08-15',
+            itinerary: [
+              ItineraryDay(
+                day: 1,
+                theme: 'Arrival & Gion District walking tour',
+                activities: [
+                  ActivityItem(
+                    time: '02:00 PM',
+                    activity: 'Gion District Cultural Walk',
+                    description: 'Explore the traditional wooden houses and look out for geishas.',
+                    cost: 'Free',
+                    locationName: 'Gion, Kyoto',
+                    suggestedAttire: 'Comfortable walking shoes',
+                  ),
+                ],
+              ),
+            ],
+          ),
+          UpcomingTrip(
+            tripId: 'TRIP-884P',
+            source: 'Paris, FR',
+            destination: 'Rome, Italy',
+            startDate: '2026-09-05',
+            endDate: '2026-09-12',
+            itinerary: [
+              ItineraryDay(
+                day: 1,
+                theme: 'Ancient Colosseum & Forum Romanum',
+                activities: [
+                  ActivityItem(
+                    time: '09:30 AM',
+                    activity: 'Colosseum Skip-the-Line Tour',
+                    description: 'Step inside the largest amphitheatre ever built.',
+                    cost: '\$45',
+                    locationName: 'Piazza del Colosseo, Rome',
+                    suggestedAttire: 'Hat and sun protection',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ];
+        _saveTrips();
+      }
+    } catch (e) {
+      debugPrint('Error loading upcoming trips: $e');
+    }
+  }
+
+  void _saveTrips() {
+    try {
+      final authBox = Hive.box('auth_box');
+      final data = state.map((trip) => trip.toJson()).toList();
+      authBox.put('upcoming_trips', data);
+    } catch (e) {
+      debugPrint('Error saving upcoming trips: $e');
+    }
+  }
+
+  void addTrip(UpcomingTrip trip) {
+    state = [...state, trip];
+    _saveTrips();
+  }
+
+  void removeTrip(String tripId) {
+    state = state.where((t) => t.tripId != tripId).toList();
+    _saveTrips();
+  }
+}
+
+final upcomingTripsProvider = StateNotifierProvider<UpcomingTripsNotifier, List<UpcomingTrip>>((ref) {
+  return UpcomingTripsNotifier();
 });

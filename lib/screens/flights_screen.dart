@@ -72,7 +72,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDlgState) => AlertDialog(
-          backgroundColor: AiraColors.dialogBg(isDark),
+          backgroundColor: TriaColors.dialogBg(isDark),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
@@ -80,7 +80,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
               const SizedBox(width: 8),
               Text(
                 'Book Flight ${flight.flightNumber}',
-                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ],
           ),
@@ -182,20 +182,20 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AiraColors.textSecondary(isDark))),
+          Text(label.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: TriaColors.textSecondary(isDark))),
           const SizedBox(height: 6),
           TextField(
             controller: ctrl,
             keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-            style: TextStyle(fontSize: 13, color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 13, color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold),
             decoration: InputDecoration(
               isDense: true,
               filled: true,
-              fillColor: AiraColors.scaffoldBg(isDark),
+              fillColor: TriaColors.scaffoldBg(isDark),
               contentPadding: const EdgeInsets.all(12),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AiraColors.border(isDark)),
+                borderSide: BorderSide(color: TriaColors.border(isDark)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -218,25 +218,25 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AiraColors.textSecondary(isDark))),
+        Text(label.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: TriaColors.textSecondary(isDark))),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: AiraColors.scaffoldBg(isDark),
+            color: TriaColors.scaffoldBg(isDark),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AiraColors.border(isDark)),
+            border: Border.all(color: TriaColors.border(isDark)),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: value,
               isExpanded: true,
-              dropdownColor: AiraColors.dialogBg(isDark),
-              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold),
+              dropdownColor: TriaColors.dialogBg(isDark),
+              style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.bold),
               items: items.map((item) {
                 return DropdownMenuItem<String>(
                   value: item,
-                  child: Text(item, style: TextStyle(color: AiraColors.textPrimary(isDark))),
+                  child: Text(item, style: TextStyle(color: TriaColors.textPrimary(isDark))),
                 );
               }).toList(),
               onChanged: onChanged,
@@ -252,16 +252,16 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
     final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark),
+        backgroundColor: TriaColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        iconTheme: IconThemeData(color: TriaColors.textPrimary(isDark)),
         title: Text(
           'Flight procurement',
           style: TextStyle(
-            color: AiraColors.textPrimary(isDark),
+            color: TriaColors.textPrimary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -272,24 +272,24 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
           // Premium Search Panel
           Container(
             padding: const EdgeInsets.all(16),
-            color: AiraColors.cardBg(isDark),
+            color: TriaColors.cardBg(isDark),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _searchController,
-                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13),
+                    style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13),
                     decoration: InputDecoration(
                       hintText: 'Search Flight (e.g. NH820, SQ12)',
-                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
+                      hintStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 12),
                       isDense: true,
                       filled: true,
-                      fillColor: AiraColors.scaffoldBg(isDark),
+                      fillColor: TriaColors.scaffoldBg(isDark),
                       prefixIcon: const Icon(Icons.search, color: Color(0xFF2563EB), size: 18),
                       contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AiraColors.border(isDark)),
+                        borderSide: BorderSide(color: TriaColors.border(isDark)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -326,7 +326,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: AiraColors.cardBg(isDark),
+                        color: TriaColors.cardBg(isDark),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
                       ),
@@ -335,7 +335,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: AiraColors.scaffoldBg(isDark),
+                              color: TriaColors.scaffoldBg(isDark),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(Icons.check, color: Colors.green, size: 32),
@@ -346,13 +346,13 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w900,
-                              color: AiraColors.textPrimary(isDark),
+                              color: TriaColors.textPrimary(isDark),
                             ),
                           ),
                           const SizedBox(height: 6),
                           Text(
                             'Your flight has been ticketed and logged into your dashboard timeline. +250 XP earned.',
-                            style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
+                            style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 20),
@@ -392,7 +392,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 40.0),
                           child: Text(
                             'No flights found. Enter a flight number like NH820 to search.',
-                            style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+                            style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
                           ),
                         ),
                       )
@@ -414,9 +414,9 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                           margin: const EdgeInsets.only(bottom: 14),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: AiraColors.cardBg(isDark),
+                            color: TriaColors.cardBg(isDark),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AiraColors.border(isDark)),
+                            border: Border.all(color: TriaColors.border(isDark)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,9 +427,9 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: AiraColors.scaffoldBg(isDark),
+                                      color: TriaColors.scaffoldBg(isDark),
                                       borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: AiraColors.border(isDark)),
+                                      border: Border.all(color: TriaColors.border(isDark)),
                                     ),
                                     child: Text(
                                       flight.flightStatus.toUpperCase(),
@@ -445,7 +445,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                               const SizedBox(height: 12),
                               Row(
                                 children: [
-                                  Icon(Icons.flight_takeoff, color: AiraColors.textMuted(isDark), size: 20),
+                                  Icon(Icons.flight_takeoff, color: TriaColors.textMuted(isDark), size: 20),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Column(
@@ -453,7 +453,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                                       children: [
                                         Text(
                                           '${flight.airlineName} • ${flight.flightNumber}',
-                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AiraColors.textPrimary(isDark)),
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: TriaColors.textPrimary(isDark)),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
@@ -463,14 +463,14 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                                         const SizedBox(height: 2),
                                         Text(
                                           'Dept: ${flight.departureDate} at ${flight.departureTime} | Arr: ${flight.arrivalDate} at ${flight.arrivalTime}',
-                                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10),
+                                          style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 10),
                                         ),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
-                              Divider(height: 24, color: AiraColors.border(isDark)),
+                              Divider(height: 24, color: TriaColors.border(isDark)),
                               Row(
                                 children: [
                                   const Icon(Icons.location_on, color: Colors.orangeAccent, size: 14),

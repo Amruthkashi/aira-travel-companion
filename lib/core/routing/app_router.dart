@@ -21,6 +21,11 @@ import '../../screens/day_schedule_screen.dart';
 import '../../screens/draft_preview_screen.dart';
 import '../../screens/past_trips_screen.dart';
 import '../../screens/map_screen.dart';
+import '../../screens/upcoming_trips_screen.dart';
+import '../../screens/itinerary_screen.dart';
+import '../models/travel_models.dart';
+import '../providers/travel_providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
@@ -114,6 +119,43 @@ final GoRouter appRouter = GoRouter(
           fromCity: extra['fromCity'] as String? ?? 'Delhi',
           destinationCity: extra['destinationCity'] as String? ?? 'London',
           layovers: extra['layovers'] as List<String>?,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/upcoming-trips',
+      builder: (context, state) => const UpcomingTripsScreen(),
+    ),
+    GoRoute(
+      path: '/itinerary-detail/:tripId',
+      builder: (context, state) {
+        final tripId = state.pathParameters['tripId']!;
+        return Consumer(
+          builder: (context, ref, child) {
+            final trips = ref.watch(upcomingTripsProvider);
+            final trip = trips.firstWhere(
+              (t) => t.tripId == tripId,
+              orElse: () => UpcomingTrip(
+                tripId: '',
+                source: '',
+                destination: '',
+                startDate: '',
+                endDate: '',
+                itinerary: [],
+              ),
+            );
+            return ProviderScope(
+              overrides: [
+                itineraryProvider.overrideWith((ref) => ItineraryNotifier()..setItinerary(trip.itinerary)),
+                tripBookingsProvider.overrideWith((ref) => TripBookingsNotifier(TripBookings(
+                  destination: trip.destination,
+                  startDate: trip.startDate,
+                  endDate: trip.endDate,
+                ))),
+              ],
+              child: const ItineraryScreen(),
+            );
+          },
         );
       },
     ),

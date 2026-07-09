@@ -48,7 +48,7 @@ class WikipediaService {
           uri,
           headers: {
             'accept': 'application/json; charset=utf-8',
-            'User-Agent': 'AiraTravelCompanion/1.0 (https://github.com/aira-travel; support@airatravel.com)',
+            'User-Agent': 'TriaTravelCompanion/1.0 (https://github.com/aira-travel; support@triatravel.com)',
           },
         ).timeout(const Duration(seconds: 4));
 

@@ -124,7 +124,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
             
             // Brand Title
             Text(
-              'Aira',
+              'Tria',
               style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.w900,

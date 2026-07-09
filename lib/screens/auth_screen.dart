@@ -615,10 +615,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: AiraColors.scaffoldBg(isDark),
+          backgroundColor: TriaColors.scaffoldBg(isDark),
           title: Text(
             'Configure Backend Server URL',
-            style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 16, fontWeight: FontWeight.bold),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -626,17 +626,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             children: [
               Text(
                 'Enter the backend URL/IP address of your local machine. Ensure your phone and machine are on the same Wi-Fi network.',
-                style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+                style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: controller,
-                style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 14),
+                style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 14),
                 decoration: InputDecoration(
                   labelText: 'Server Base URL',
-                  labelStyle: TextStyle(color: AiraColors.textSecondary(isDark)),
+                  labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: AiraColors.border(isDark)),
+                    borderSide: BorderSide(color: TriaColors.border(isDark)),
                   ),
                   focusedBorder: const UnderlineInputBorder(
                     borderSide: BorderSide(color: Color(0xFF2563EB)),
@@ -648,7 +648,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: AiraColors.textSecondary(isDark))),
+              child: Text('Cancel', style: TextStyle(color: TriaColors.textSecondary(isDark))),
             ),
             TextButton(
               onPressed: () {
@@ -673,7 +673,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   Widget build(BuildContext context) {
     final isDark = ref.watch(isDarkProvider);
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       body: Stack(
         children: [
           // Background rotating travel photos
@@ -763,7 +763,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final isDark = ref.read(isDarkProvider);
     return Column(
       children: [
-        // Aira Logo Header Segment
+        // Tria Logo Header Segment
         Padding(
           padding: const EdgeInsets.only(top: 32.0, bottom: 16.0),
           child: Column(
@@ -786,11 +786,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               ),
               const SizedBox(height: 10),
               Text(
-                'Aira',
+                'Tria',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
-                  color: AiraColors.textPrimary(isDark),
+                  color: TriaColors.textPrimary(isDark),
                   letterSpacing: -0.5,
                 ),
               ),
@@ -800,7 +800,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: AiraColors.textSecondary(isDark),
+                  color: TriaColors.textSecondary(isDark),
                 ),
               ),
             ],
@@ -814,7 +814,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           decoration: BoxDecoration(
             color: isDark ? Colors.black.withValues(alpha: 0.4) : const Color(0xFFE2E8F0),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AiraColors.border(isDark)),
+            border: Border.all(color: TriaColors.border(isDark)),
           ),
           child: Row(
             children: [
@@ -922,20 +922,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 10,
-              color: AiraColors.textSecondary(isDark),
+              color: TriaColors.textSecondary(isDark),
               letterSpacing: 1.2,
             ),
           ),
           const SizedBox(height: 8),
           TextField(
             controller: _loginEmailController,
-            style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13),
+            style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13),
             decoration: InputDecoration(
               filled: true,
               fillColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
               hintText: 'shreyas.tokyo@gmail.com',
               hintStyle: TextStyle(
-                color: AiraColors.textMuted(isDark),
+                color: TriaColors.textMuted(isDark),
                 fontSize: 13,
               ),
               contentPadding: const EdgeInsets.symmetric(
@@ -944,11 +944,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AiraColors.border(isDark)),
+                borderSide: BorderSide(color: TriaColors.border(isDark)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AiraColors.border(isDark)),
+                borderSide: BorderSide(color: TriaColors.border(isDark)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -968,7 +968,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 10,
-                  color: AiraColors.textSecondary(isDark),
+                  color: TriaColors.textSecondary(isDark),
                   letterSpacing: 1.2,
                 ),
               ),
@@ -994,23 +994,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           TextField(
             controller: _loginPasswordController,
             obscureText: true,
-            style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13),
+            style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13),
             decoration: InputDecoration(
               filled: true,
               fillColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
               hintText: '••••••••',
-              hintStyle: TextStyle(color: AiraColors.textMuted(isDark)),
+              hintStyle: TextStyle(color: TriaColors.textMuted(isDark)),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 14,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AiraColors.border(isDark)),
+                borderSide: BorderSide(color: TriaColors.border(isDark)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AiraColors.border(isDark)),
+                borderSide: BorderSide(color: TriaColors.border(isDark)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -1051,20 +1051,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           const SizedBox(height: 20),
           Row(
             children: [
-              Expanded(child: Divider(color: AiraColors.border(isDark))),
+              Expanded(child: Divider(color: TriaColors.border(isDark))),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Text(
                   'OTHER METHODS',
                   style: TextStyle(
-                    color: AiraColors.textSecondary(isDark),
+                    color: TriaColors.textSecondary(isDark),
                     fontSize: 9,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),
                 ),
               ),
-              Expanded(child: Divider(color: AiraColors.border(isDark))),
+              Expanded(child: Divider(color: TriaColors.border(isDark))),
             ],
           ),
           const SizedBox(height: 20),
@@ -1074,7 +1074,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             child: OutlinedButton(
               style: OutlinedButton.styleFrom(
                 backgroundColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
-                side: BorderSide(color: AiraColors.border(isDark)),
+                side: BorderSide(color: TriaColors.border(isDark)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1118,7 +1118,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   Text(
                     'Google Sign In',
                     style: TextStyle(
-                      color: AiraColors.textPrimary(isDark),
+                      color: TriaColors.textPrimary(isDark),
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
@@ -1377,7 +1377,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         style: TextStyle(
           fontSize: 9,
           fontWeight: FontWeight.bold,
-          color: AiraColors.textSecondary(isDark),
+          color: TriaColors.textSecondary(isDark),
           letterSpacing: 1.2,
         ),
       ),
@@ -1395,13 +1395,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       child: TextField(
         controller: controller,
         obscureText: obscure,
-        style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12),
+        style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 12),
         decoration: InputDecoration(
           filled: true,
           fillColor: isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: 0.05),
           hintText: hint,
           hintStyle: TextStyle(
-            color: AiraColors.textMuted(isDark),
+            color: TriaColors.textMuted(isDark),
             fontSize: 12,
           ),
           contentPadding: const EdgeInsets.symmetric(
@@ -1410,11 +1410,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: AiraColors.border(isDark)),
+            borderSide: BorderSide(color: TriaColors.border(isDark)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: AiraColors.border(isDark)),
+            borderSide: BorderSide(color: TriaColors.border(isDark)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
@@ -1435,9 +1435,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       height: 40,
       child: DropdownButtonFormField<String>(
         initialValue: value,
-        dropdownColor: AiraColors.cardBg(isDark),
-        style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 12),
-        icon: Icon(Icons.arrow_drop_down, color: AiraColors.textSecondary(isDark), size: 20),
+        dropdownColor: TriaColors.cardBg(isDark),
+        style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 12),
+        icon: Icon(Icons.arrow_drop_down, color: TriaColors.textSecondary(isDark), size: 20),
         decoration: InputDecoration(
           filled: true,
           fillColor: isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: 0.05),
@@ -1447,11 +1447,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: AiraColors.border(isDark)),
+            borderSide: BorderSide(color: TriaColors.border(isDark)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: AiraColors.border(isDark)),
+            borderSide: BorderSide(color: TriaColors.border(isDark)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
@@ -1461,7 +1461,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         items: items.map((str) {
           return DropdownMenuItem(
             value: str,
-            child: Text(str, style: TextStyle(fontSize: 12, color: AiraColors.textPrimary(isDark))),
+            child: Text(str, style: TextStyle(fontSize: 12, color: TriaColors.textPrimary(isDark))),
           );
         }).toList(),
         onChanged: onChanged,
@@ -1488,7 +1488,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           border: Border.all(
             color: isSelected
                 ? const Color(0xFF2563EB)
-                : AiraColors.border(isDark),
+                : TriaColors.border(isDark),
             width: 1,
           ),
         ),
@@ -1497,7 +1497,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           style: TextStyle(
             fontSize: 9.5,
             fontWeight: FontWeight.bold,
-            color: isSelected ? AiraColors.textPrimary(isDark) : AiraColors.textSecondary(isDark),
+            color: isSelected ? TriaColors.textPrimary(isDark) : TriaColors.textSecondary(isDark),
           ),
         ),
       ),
@@ -1513,7 +1513,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         color: isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: AiraColors.border(isDark),
+          color: TriaColors.border(isDark),
           width: 1,
         ),
       ),
@@ -1540,7 +1540,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
-                    color: isSelected ? Colors.white : AiraColors.textSecondary(isDark),
+                    color: isSelected ? Colors.white : TriaColors.textSecondary(isDark),
                   ),
                 ),
               ),
@@ -1570,7 +1570,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Aira Header
+              // Tria Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1588,14 +1588,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       text: 'SELECTED: ',
                       style: TextStyle(
                         fontSize: 9,
-                        color: AiraColors.textSecondary(isDark),
+                        color: TriaColors.textSecondary(isDark),
                         fontWeight: FontWeight.bold,
                       ),
                       children: [
                         TextSpan(
                           text: '${_selectedVibes.length}',
                           style: TextStyle(
-                            color: AiraColors.textPrimary(isDark),
+                            color: TriaColors.textPrimary(isDark),
                             fontWeight: FontWeight.w900,
                           ),
                         ),
@@ -1615,7 +1615,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   color: isDark ? Colors.black.withValues(alpha: 0.4) : const Color(0xFFE2E8F0),
                   borderRadius: BorderRadius.circular(3),
                   border: Border.all(
-                    color: AiraColors.border(isDark),
+                    color: TriaColors.border(isDark),
                     width: 0.5,
                   ),
                 ),
@@ -1641,7 +1641,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
-                    color: AiraColors.textPrimary(isDark),
+                    color: TriaColors.textPrimary(isDark),
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -1651,10 +1651,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               // Subtitle
               Center(
                 child: Text(
-                  'Select at least 5 items to help Aira configure custom routes, restaurant guides, and hotel suggestions tailored for you.',
+                  'Select at least 5 items to help Tria configure custom routes, restaurant guides, and hotel suggestions tailored for you.',
                   style: TextStyle(
                     fontSize: 11,
-                    color: AiraColors.textSecondary(isDark),
+                    color: TriaColors.textSecondary(isDark),
                     height: 1.4,
                   ),
                   textAlign: TextAlign.center,
@@ -1668,19 +1668,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
           child: TextField(
-            style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13),
+            style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13),
             onChanged: (v) => setState(() => _searchQuery = v),
             decoration: InputDecoration(
               filled: true,
               fillColor: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
               hintText: 'Search destinations, cuisines, or spots...',
               hintStyle: TextStyle(
-                color: AiraColors.textMuted(isDark),
+                color: TriaColors.textMuted(isDark),
                 fontSize: 13,
               ),
               prefixIcon: Icon(
                 Icons.search,
-                color: AiraColors.textSecondary(isDark),
+                color: TriaColors.textSecondary(isDark),
                 size: 18,
               ),
               contentPadding: const EdgeInsets.symmetric(
@@ -1689,11 +1689,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AiraColors.border(isDark)),
+                borderSide: BorderSide(color: TriaColors.border(isDark)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AiraColors.border(isDark)),
+                borderSide: BorderSide(color: TriaColors.border(isDark)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -1750,7 +1750,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       color: active ? null : (isDark ? Colors.black.withValues(alpha: 0.3) : const Color(0xFFE2E8F0)),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: active ? const Color(0xFF00B4D8) : AiraColors.border(isDark),
+                        color: active ? const Color(0xFF00B4D8) : TriaColors.border(isDark),
                         width: 1,
                       ),
                       boxShadow: active
@@ -1820,7 +1820,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isSel ? const Color(0xFF7C3AED) : AiraColors.border(isDark),
+                              color: isSel ? const Color(0xFF7C3AED) : TriaColors.border(isDark),
                               width: isSel ? 2.5 : 1.5,
                             ),
                             boxShadow: isSel
@@ -1903,7 +1903,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                       Text(
                                         initial,
                                         style: TextStyle(
-                                          color: AiraColors.textSecondary(isDark),
+                                          color: TriaColors.textSecondary(isDark),
                                           fontSize: 9,
                                           fontWeight: FontWeight.w900,
                                         ),
@@ -1955,7 +1955,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       style: TextStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w900,
-                        color: AiraColors.textPrimary(isDark),
+                        color: TriaColors.textPrimary(isDark),
                         letterSpacing: 0.5,
                       ),
                       textAlign: TextAlign.center,
@@ -1969,7 +1969,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       style: TextStyle(
                         fontSize: 7.5,
                         fontWeight: FontWeight.bold,
-                        color: AiraColors.textMuted(isDark),
+                        color: TriaColors.textMuted(isDark),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -1995,13 +1995,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         : (isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05)),
                     foregroundColor: _selectedVibes.length >= 5
                         ? Colors.white
-                        : AiraColors.textMuted(isDark),
+                        : TriaColors.textMuted(isDark),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                       side: BorderSide(
                         color: _selectedVibes.length >= 5
                             ? Colors.transparent
-                            : AiraColors.border(isDark),
+                            : TriaColors.border(isDark),
                       ),
                     ),
                     elevation: 0,
@@ -2061,9 +2061,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                'Aira automatically mutates advice based on these selections.',
+                'Tria automatically mutates advice based on these selections.',
                 style: TextStyle(
-                  color: AiraColors.textMuted(isDark),
+                  color: TriaColors.textMuted(isDark),
                   fontSize: 9,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -2104,14 +2104,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
-              color: AiraColors.textPrimary(isDark),
+              color: TriaColors.textPrimary(isDark),
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
           Text(
-            'Aira has synchronized your selected favorites into your local device context securely.',
-            style: TextStyle(fontSize: 13, color: AiraColors.textSecondary(isDark), height: 1.5),
+            'Tria has synchronized your selected favorites into your local device context securely.',
+            style: TextStyle(fontSize: 13, color: TriaColors.textSecondary(isDark), height: 1.5),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 28),
@@ -2121,8 +2121,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             runSpacing: 8,
             children: _selectedVibes.map((v) {
               return Chip(
-                backgroundColor: AiraColors.cardBg(isDark),
-                side: BorderSide(color: AiraColors.border(isDark)),
+                backgroundColor: TriaColors.cardBg(isDark),
+                side: BorderSide(color: TriaColors.border(isDark)),
                 label: Text(
                   v,
                   style: TextStyle(

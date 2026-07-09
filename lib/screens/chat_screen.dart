@@ -153,11 +153,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent, // Transparent to show parent's gradient background
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark).withValues(alpha: 0.85),
+        backgroundColor: TriaColors.cardBg(isDark).withValues(alpha: 0.85),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: AiraColors.textPrimary(isDark)),
-          onPressed: () => Navigator.maybePop(context),
+          icon: Icon(Icons.arrow_back_rounded, color: TriaColors.textPrimary(isDark)),
+          onPressed: () {
+            ref.read(currentTabProvider.notifier).state = 0; // Go back to Home tab
+          },
         ),
         title: Row(
           children: [
@@ -172,7 +174,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Text(
-                'AIRA AI',
+                'TRIA AI',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w900,
@@ -183,8 +185,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Aira Concierge',
-              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 15, fontWeight: FontWeight.bold),
+              'Tria Concierge',
+              style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 15, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -207,7 +209,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   itemCount: chatMessages.length + (_chatTyping ? 1 : 0),
                   itemBuilder: (context, idx) {
                     if (idx == chatMessages.length) {
-                      // Aira is typing container with avatar
+                      // Tria is typing container with avatar
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Row(
@@ -240,13 +242,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                   decoration: BoxDecoration(
-                                    color: AiraColors.cardBg(isDark).withValues(alpha: 0.85),
+                                    color: TriaColors.cardBg(isDark).withValues(alpha: 0.85),
                                     borderRadius: const BorderRadius.only(
                                       topLeft: Radius.circular(16),
                                       topRight: Radius.circular(16),
                                       bottomRight: Radius.circular(16),
                                     ),
-                                    border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.4)),
+                                    border: Border.all(color: TriaColors.border(isDark).withValues(alpha: 0.4)),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.05),
@@ -268,10 +270,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        "Aira is typing...",
+                                        "Tria is typing...",
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: AiraColors.textSecondary(isDark),
+                                          color: TriaColors.textSecondary(isDark),
                                           fontStyle: FontStyle.italic,
                                         ),
                                       ),
@@ -302,7 +304,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                 end: Alignment.bottomRight,
                               )
                             : null,
-                        color: isUser ? null : AiraColors.cardBg(isDark).withValues(alpha: 0.85),
+                        color: isUser ? null : TriaColors.cardBg(isDark).withValues(alpha: 0.85),
                         borderRadius: BorderRadius.only(
                           topLeft: const Radius.circular(16),
                           topRight: const Radius.circular(16),
@@ -311,7 +313,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         ),
                         border: isUser
                             ? null
-                            : Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.4), width: 1.0),
+                            : Border.all(color: TriaColors.border(isDark).withValues(alpha: 0.4), width: 1.0),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: isDark ? 0.12 : 0.04),
@@ -328,7 +330,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             style: TextStyle(
                               fontSize: 14, 
                               height: 1.4, 
-                              color: isUser ? Colors.white : AiraColors.textPrimary(isDark),
+                              color: isUser ? Colors.white : TriaColors.textPrimary(isDark),
                             ),
                           ),
                           if (showSaveButton) ...[
@@ -442,7 +444,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                               msg.timestamp,
                               style: TextStyle(
                                 fontSize: 9, 
-                                color: isUser ? Colors.white70 : AiraColors.textMuted(isDark),
+                                color: isUser ? Colors.white70 : TriaColors.textMuted(isDark),
                               ),
                             ),
                           )
@@ -516,9 +518,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AiraColors.cardBg(isDark).withValues(alpha: 0.9),
+                    color: TriaColors.cardBg(isDark).withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.6)),
+                    border: Border.all(color: TriaColors.border(isDark).withValues(alpha: 0.6)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
@@ -534,16 +536,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         child: TextField(
                           controller: _chatInput,
                           enabled: !_chatTyping,
-                          style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13),
+                          style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13),
                           decoration: InputDecoration(
-                            hintText: _chatTyping ? 'Aira is thinking...' : 'Ask about flights, hotels, or trips...',
-                            hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12, fontStyle: FontStyle.italic),
+                            hintText: _chatTyping ? 'Tria is thinking...' : 'Ask about flights, hotels, or trips...',
+                            hintStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 12, fontStyle: FontStyle.italic),
                             border: InputBorder.none,
                           ),
                           onSubmitted: (v) => _sendMessage(v),
                         ),
                       ),
-                      Icon(Icons.mic, color: AiraColors.iconDefault(isDark), size: 20),
+                      Icon(Icons.mic, color: TriaColors.iconDefault(isDark), size: 20),
                       const SizedBox(width: 12),
                       GestureDetector(
                         onTap: () => _sendMessage(_chatInput.text),
@@ -578,8 +580,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Widget _presetChip(String txt, bool isDark) {
     return ActionChip(
-      backgroundColor: AiraColors.cardBg(isDark).withValues(alpha: 0.85),
-      side: BorderSide(color: AiraColors.border(isDark).withValues(alpha: 0.5)),
+      backgroundColor: TriaColors.cardBg(isDark).withValues(alpha: 0.85),
+      side: BorderSide(color: TriaColors.border(isDark).withValues(alpha: 0.5)),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       label: Text(txt, style: TextStyle(color: isDark ? const Color(0xFFFF6B35) : const Color(0xFF2563EB), fontSize: 11, fontWeight: FontWeight.bold)),
       onPressed: () => _sendMessage(txt),
@@ -589,7 +591,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget _buildCompilationOverlay(bool isDark) {
     return Positioned.fill(
       child: Container(
-        color: AiraColors.scaffoldBg(isDark).withValues(alpha: 0.95),
+        color: TriaColors.scaffoldBg(isDark).withValues(alpha: 0.95),
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -598,12 +600,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             const SizedBox(height: 24),
             Text(
               'COMPILING TRAVEL SCENARIO',
-              style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+              style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5),
             ),
             const SizedBox(height: 8),
             Text(
               '$_genProgress%',
-              style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 36, fontWeight: FontWeight.w900),
+              style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 36, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 20),
             ClipRRect(

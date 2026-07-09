@@ -18,12 +18,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final List<Map<String, String>> _slides = [
     {
       'title': 'AI Travel Planning',
-      'desc': 'Simply state your trip desires in natural speech. Aira curates details, routes, and bookings instantly, eliminating complex search forms.',
+      'desc': 'Simply state your trip desires in natural speech. Tria curates details, routes, and bookings instantly, eliminating complex search forms.',
       'step': '01',
     },
     {
       'title': 'Smart Alerts & Routing',
-      'desc': 'Tokyo Central Ring Line delays? Typhoon approaching? Aira automatically mutates your schedule, alerts your phone, and maps alternative ways.',
+      'desc': 'Tokyo Central Ring Line delays? Typhoon approaching? Tria automatically mutates your schedule, alerts your phone, and maps alternative ways.',
       'step': '02',
     },
     {
@@ -49,7 +49,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),

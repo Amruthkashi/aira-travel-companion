@@ -104,7 +104,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AiraColors.dialogBg(isDark),
+        backgroundColor: TriaColors.dialogBg(isDark),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Row(
           children: [
@@ -112,13 +112,13 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
             const SizedBox(width: 10),
             Text(
               'Arrived Safely',
-              style: TextStyle(color: AiraColors.textPrimary(isDark)),
+              style: TextStyle(color: TriaColors.textPrimary(isDark)),
             ),
           ],
         ),
         content: Text(
           'AI Travel Companion confirms you have reached Sky View Deck. Scanning gate voucher or prepaid transit card recommended.',
-          style: TextStyle(color: AiraColors.textSecondary(isDark)),
+          style: TextStyle(color: TriaColors.textSecondary(isDark)),
         ),
         actions: [
           TextButton(
@@ -150,18 +150,18 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
     final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark),
+        backgroundColor: TriaColors.cardBg(isDark),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AiraColors.textPrimary(isDark)),
+          icon: Icon(Icons.arrow_back, color: TriaColors.textPrimary(isDark)),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'AI Real-Time Guidance',
           style: TextStyle(
-            color: AiraColors.textPrimary(isDark),
+            color: TriaColors.textPrimary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -202,13 +202,13 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
+                      color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
                       shape: BoxShape.circle,
-                      border: Border.all(color: AiraColors.border(isDark)),
+                      border: Border.all(color: TriaColors.border(isDark)),
                     ),
                     child: Icon(
                       Icons.compass_calibration_outlined,
-                      color: AiraColors.textSecondary(isDark),
+                      color: TriaColors.textSecondary(isDark),
                       size: 24,
                     ),
                   ),
@@ -221,9 +221,9 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AiraColors.cardBg(isDark).withValues(alpha: 0.8),
+                      color: TriaColors.cardBg(isDark).withValues(alpha: 0.8),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AiraColors.border(isDark)),
+                      border: Border.all(color: TriaColors.border(isDark)),
                     ),
                     child: Row(
                       children: [
@@ -232,7 +232,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                         Text(
                           'GPS Signal Locked',
                           style: TextStyle(
-                            color: AiraColors.textSecondary(isDark),
+                            color: TriaColors.textSecondary(isDark),
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -254,9 +254,9 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _hudItem('REMAINING', '${_distanceRemaining.toStringAsFixed(1)} km', Icons.route, isDark),
-                        Container(width: 1, height: 30, color: AiraColors.border(isDark)),
+                        Container(width: 1, height: 30, color: TriaColors.border(isDark)),
                         _hudItem('EST. TIME', '$_timeRemaining mins', Icons.timer_outlined, isDark),
-                        Container(width: 1, height: 30, color: AiraColors.border(isDark)),
+                        Container(width: 1, height: 30, color: TriaColors.border(isDark)),
                         _hudItem('SPEED', _isNavigating ? '4.8 km/h' : '0.0 km/h', Icons.speed, isDark),
                       ],
                     ),
@@ -270,7 +270,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AiraColors.cardBg(isDark),
+              color: TriaColors.cardBg(isDark),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
               boxShadow: [
                 BoxShadow(
@@ -314,7 +314,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundColor: AiraColors.scaffoldBg(isDark),
+                      backgroundColor: TriaColors.scaffoldBg(isDark),
                       child: Icon(_steps[_currentStepIndex]['icon'], color: const Color(0xFF00B4D8), size: 20),
                     ),
                     const SizedBox(width: 14),
@@ -325,7 +325,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                           Text(
                             _steps[_currentStepIndex]['instruction'],
                             style: TextStyle(
-                              color: AiraColors.textPrimary(isDark),
+                              color: TriaColors.textPrimary(isDark),
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               height: 1.4,
@@ -335,7 +335,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                           Text(
                             'Next action in ${_steps[_currentStepIndex]['distance']}',
                             style: TextStyle(
-                              color: AiraColors.textMuted(isDark),
+                              color: TriaColors.textMuted(isDark),
                               fontSize: 11,
                             ),
                           ),
@@ -351,7 +351,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: _progress,
-                    backgroundColor: AiraColors.scaffoldBg(isDark),
+                    backgroundColor: TriaColors.scaffoldBg(isDark),
                     color: const Color(0xFFFF6B35),
                     minHeight: 6,
                   ),
@@ -402,9 +402,9 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
       children: [
         Icon(icon, color: isDark ? const Color(0xFF00B4D8) : const Color(0xFFFF6B35), size: 16),
         const SizedBox(height: 6),
-        Text(title, style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+        Text(title, style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
         const SizedBox(height: 2),
-        Text(val, style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.w900)),
+        Text(val, style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13, fontWeight: FontWeight.w900)),
       ],
     );
   }

@@ -111,15 +111,15 @@ class MapScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark),
+        backgroundColor: TriaColors.cardBg(isDark),
         elevation: 0,
-        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        iconTheme: IconThemeData(color: TriaColors.textPrimary(isDark)),
         title: Text(
           'FLIGHT PATH VISUALIZER',
           style: TextStyle(
-            color: AiraColors.textPrimary(isDark),
+            color: TriaColors.textPrimary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 15,
             letterSpacing: 0.5,
@@ -139,7 +139,7 @@ class MapScreen extends ConsumerWidget {
               // OpenStreetMap Tile Layer
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'aira_mobile',
+                userAgentPackageName: 'tria_mobile',
               ),
               // Polylines mapping flight segments
               PolylineLayer(
@@ -240,9 +240,9 @@ class MapScreen extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AiraColors.dialogBg(isDark).withValues(alpha: 0.9),
+                color: TriaColors.dialogBg(isDark).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AiraColors.border(isDark)),
+                border: Border.all(color: TriaColors.border(isDark)),
                 boxShadow: [
                   BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 10, offset: const Offset(0, 4)),
                 ],
@@ -254,7 +254,7 @@ class MapScreen extends ConsumerWidget {
                   Text(
                     'FLIGHT ROUTE DETAILS',
                     style: TextStyle(
-                      color: AiraColors.textSecondary(isDark),
+                      color: TriaColors.textSecondary(isDark),
                       fontWeight: FontWeight.bold,
                       fontSize: 10,
                       letterSpacing: 0.8,
@@ -267,7 +267,7 @@ class MapScreen extends ConsumerWidget {
                         child: Text(
                           fromCity,
                           style: TextStyle(
-                            color: AiraColors.textPrimary(isDark),
+                            color: TriaColors.textPrimary(isDark),
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -278,7 +278,7 @@ class MapScreen extends ConsumerWidget {
                         child: Text(
                           destinationCity,
                           style: TextStyle(
-                            color: AiraColors.textPrimary(isDark),
+                            color: TriaColors.textPrimary(isDark),
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -288,7 +288,7 @@ class MapScreen extends ConsumerWidget {
                     ],
                   ),
                   if (cleanLayovers.isNotEmpty) ...[
-                    Divider(height: 16, color: AiraColors.border(isDark)),
+                    Divider(height: 16, color: TriaColors.border(isDark)),
                     Row(
                       children: [
                         const Icon(Icons.airline_stops, color: Colors.orangeAccent, size: 14),

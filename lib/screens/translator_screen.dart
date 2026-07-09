@@ -242,16 +242,16 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
     final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.cardBg(isDark),
+        backgroundColor: TriaColors.cardBg(isDark),
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(color: AiraColors.textPrimary(isDark)),
+        iconTheme: IconThemeData(color: TriaColors.textPrimary(isDark)),
         title: Text(
           'Real-Time AI Translator',
           style: TextStyle(
-            color: AiraColors.textPrimary(isDark),
+            color: TriaColors.textPrimary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -266,31 +266,31 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               decoration: BoxDecoration(
-                color: AiraColors.cardBg(isDark),
+                color: TriaColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AiraColors.border(isDark)),
+                border: Border.all(color: TriaColors.border(isDark)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   DropdownButton<String>(
                     value: _sourceLang,
-                    dropdownColor: AiraColors.cardBg(isDark),
-                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold),
+                    dropdownColor: TriaColors.cardBg(isDark),
+                    style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold),
                     underline: const SizedBox(),
                     onChanged: (v) => setState(() => _sourceLang = v!),
                     items: [
                       DropdownMenuItem(
                         value: 'English',
-                        child: Text('English', style: TextStyle(color: AiraColors.textPrimary(isDark))),
+                        child: Text('English', style: TextStyle(color: TriaColors.textPrimary(isDark))),
                       )
                     ],
                   ),
-                  Icon(Icons.arrow_forward_rounded, color: AiraColors.textSecondary(isDark)),
+                  Icon(Icons.arrow_forward_rounded, color: TriaColors.textSecondary(isDark)),
                   DropdownButton<String>(
                     value: _targetLang,
-                    dropdownColor: AiraColors.cardBg(isDark),
-                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold),
+                    dropdownColor: TriaColors.cardBg(isDark),
+                    style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold),
                     underline: const SizedBox(),
                     onChanged: (v) => setState(() {
                       _targetLang = v!;
@@ -298,13 +298,13 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                       _romajiText = '';
                     }),
                     items: [
-                      DropdownMenuItem(value: 'Japanese', child: Text('Japanese', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-                      DropdownMenuItem(value: 'French', child: Text('French', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-                      DropdownMenuItem(value: 'Spanish', child: Text('Spanish', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-                      DropdownMenuItem(value: 'German', child: Text('German', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-                      DropdownMenuItem(value: 'Italian', child: Text('Italian', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-                      DropdownMenuItem(value: 'Chinese', child: Text('Chinese', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
-                      DropdownMenuItem(value: 'Korean', child: Text('Korean', style: TextStyle(color: AiraColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'Japanese', child: Text('Japanese', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'French', child: Text('French', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'Spanish', child: Text('Spanish', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'German', child: Text('German', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'Italian', child: Text('Italian', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'Chinese', child: Text('Chinese', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
+                      DropdownMenuItem(value: 'Korean', child: Text('Korean', style: TextStyle(color: TriaColors.textPrimary(isDark)))),
                     ],
                   ),
                 ],
@@ -316,23 +316,23 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AiraColors.cardBg(isDark),
+                color: TriaColors.cardBg(isDark),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AiraColors.border(isDark)),
+                border: Border.all(color: TriaColors.border(isDark)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
                     controller: _inputCtrl,
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: TriaColors.textPrimary(isDark)),
                     decoration: InputDecoration(
                       hintText: 'Type phrase here (e.g. hello, thank you...)',
-                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 13),
+                      hintStyle: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 13),
                       filled: true,
-                      fillColor: AiraColors.scaffoldBg(isDark),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
-                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AiraColors.border(isDark))),
+                      fillColor: TriaColors.scaffoldBg(isDark),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: TriaColors.border(isDark))),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: TriaColors.border(isDark))),
                       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF2563EB))),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.translate, color: Color(0xFF2563EB)),
@@ -342,12 +342,12 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                     onSubmitted: (v) => _translateCustomText(v),
                   ),
                   if (_resultText.isNotEmpty) ...[
-                    Divider(height: 24, color: AiraColors.border(isDark)),
+                    Divider(height: 24, color: TriaColors.border(isDark)),
                     Text(
                       'TRANSLATED OUTPUT',
                       style: TextStyle(
                         fontSize: 9,
-                        color: AiraColors.textSecondary(isDark),
+                        color: TriaColors.textSecondary(isDark),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -366,7 +366,7 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                                   _romajiText,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: AiraColors.textSecondary(isDark),
+                                    color: TriaColors.textSecondary(isDark),
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -398,7 +398,7 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AiraColors.border(isDark)),
+                border: Border.all(color: TriaColors.border(isDark)),
               ),
               child: Row(
                 children: [
@@ -418,7 +418,7 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                         Text(
                           _isListening ? 'Listening to voice logs...' : 'Hold Mic to scan audio speech',
                           style: TextStyle(
-                            color: AiraColors.textPrimary(isDark),
+                            color: TriaColors.textPrimary(isDark),
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                           ),
@@ -459,12 +459,12 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                     label: Text(cat),
                     selected: active,
                     selectedColor: const Color(0xFF2563EB),
-                    backgroundColor: AiraColors.cardBg(isDark),
-                    disabledColor: AiraColors.cardBg(isDark),
-                    side: BorderSide(color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark)),
+                    backgroundColor: TriaColors.cardBg(isDark),
+                    disabledColor: TriaColors.cardBg(isDark),
+                    side: BorderSide(color: active ? const Color(0xFF2563EB) : TriaColors.border(isDark)),
                     labelStyle: TextStyle(
                       fontSize: 11,
-                      color: active ? Colors.white : AiraColors.textSecondary(isDark),
+                      color: active ? Colors.white : TriaColors.textSecondary(isDark),
                       fontWeight: FontWeight.bold,
                     ),
                     onSelected: (sel) {
@@ -483,7 +483,7 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                   padding: const EdgeInsets.all(20.0),
                   child: Text(
                     'No offline phrases found for this category.',
-                    style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+                    style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
                   ),
                 ),
               )
@@ -507,9 +507,9 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AiraColors.cardBg(isDark),
+                        color: TriaColors.cardBg(isDark),
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AiraColors.border(isDark)),
+                        border: Border.all(color: TriaColors.border(isDark)),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -518,10 +518,10 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(p['eng']!, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AiraColors.textPrimary(isDark))),
+                                Text(p['eng']!, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: TriaColors.textPrimary(isDark))),
                                 const SizedBox(height: 4),
                                 Text(p['tr']!, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF00B4D8))),
-                                Text(p['rom']!, style: TextStyle(fontSize: 10, color: AiraColors.textSecondary(isDark), fontWeight: FontWeight.bold)),
+                                Text(p['rom']!, style: TextStyle(fontSize: 10, color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),

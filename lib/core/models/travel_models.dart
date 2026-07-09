@@ -18,6 +18,7 @@ class TravelExpense {
   final double amount; // In USD
   final String label;
   final String date;
+  final String tripId;
 
   TravelExpense({
     required this.id,
@@ -25,6 +26,7 @@ class TravelExpense {
     required this.amount,
     required this.label,
     required this.date,
+    this.tripId = '',
   });
 }
 
@@ -574,4 +576,78 @@ class DraftItinerary {
     this.status = 'draft',
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
+}
+
+class UpcomingTrip {
+  final String tripId;
+  final String source;
+  final String destination;
+  final String startDate;
+  final String endDate;
+  final List<ItineraryDay> itinerary;
+
+  UpcomingTrip({
+    required this.tripId,
+    required this.source,
+    required this.destination,
+    required this.startDate,
+    required this.endDate,
+    required this.itinerary,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'tripId': tripId,
+      'source': source,
+      'destination': destination,
+      'startDate': startDate,
+      'endDate': endDate,
+      'itinerary': itinerary.map((day) => {
+        'day': day.day,
+        'theme': day.theme,
+        'activities': day.activities.map((act) => {
+          'time': act.time,
+          'activity': act.activity,
+          'description': act.description,
+          'locationName': act.locationName,
+          'cost': act.cost,
+          'suggestedAttire': act.suggestedAttire,
+          'transport': act.transport,
+          'ticketInfo': act.ticketInfo,
+          'placeDetails': act.placeDetails,
+          'checked': act.checked,
+        }).toList(),
+      }).toList(),
+    };
+  }
+
+  factory UpcomingTrip.fromJson(Map<String, dynamic> json) {
+    return UpcomingTrip(
+      tripId: json['tripId'] ?? '',
+      source: json['source'] ?? '',
+      destination: json['destination'] ?? '',
+      startDate: json['startDate'] ?? '',
+      endDate: json['endDate'] ?? '',
+      itinerary: (json['itinerary'] as List? ?? []).map((dayJson) {
+        return ItineraryDay(
+          day: dayJson['day'] ?? 1,
+          theme: dayJson['theme'] ?? '',
+          activities: (dayJson['activities'] as List? ?? []).map((actJson) {
+            return ActivityItem(
+              time: actJson['time'] ?? '',
+              activity: actJson['activity'] ?? '',
+              description: actJson['description'] ?? '',
+              cost: actJson['cost'] ?? '',
+              locationName: actJson['locationName'] ?? '',
+              suggestedAttire: actJson['suggestedAttire'] ?? '',
+              transport: actJson['transport'] ?? '',
+              ticketInfo: actJson['ticketInfo'] ?? '',
+              placeDetails: actJson['placeDetails'] ?? '',
+              checked: actJson['checked'] ?? false,
+            );
+          }).toList(),
+        );
+      }).toList(),
+    );
+  }
 }

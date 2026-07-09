@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'AIRA';
+  static const String appName = 'TRIA';
   static const String appVersion = 'v2.0.0';
   
   // Storage Keys

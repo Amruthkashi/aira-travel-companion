@@ -84,7 +84,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -105,7 +105,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                     child: Container(
                       width: 40, height: 5,
                       decoration: BoxDecoration(
-                        color: AiraColors.border(isDark),
+                        color: TriaColors.border(isDark),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -114,7 +114,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   Row(
                     children: [
                       Text('SET ACTIVITY TIME',
-                        style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
+                        style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
                       ),
                       const Spacer(),
                       Container(
@@ -131,7 +131,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(item.place.name,
-                    style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+                    style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
                   ),
                   const SizedBox(height: 16),
                   // Quick time presets with availability indicators
@@ -174,14 +174,14 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                 ? const Color(0xFFEF4444).withValues(alpha: 0.08)
                                 : isSelected
                                     ? const Color(0xFF2563EB)
-                                    : AiraColors.cardBg(isDark),
+                                    : TriaColors.cardBg(isDark),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: !isFree
                                   ? const Color(0xFFEF4444).withValues(alpha: 0.3)
                                   : isSelected
                                       ? const Color(0xFF2563EB)
-                                      : AiraColors.border(isDark),
+                                      : TriaColors.border(isDark),
                             ),
                           ),
                           child: Row(
@@ -198,7 +198,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                       ? const Color(0xFFEF4444).withValues(alpha: 0.5)
                                       : isSelected
                                           ? Colors.white
-                                          : AiraColors.textSecondary(isDark),
+                                          : TriaColors.textSecondary(isDark),
                                   fontWeight: FontWeight.bold, fontSize: 11,
                                   decoration: !isFree ? TextDecoration.lineThrough : null,
                                 ),
@@ -212,19 +212,19 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: timeCtrl,
-                    style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14),
+                    style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14),
                     decoration: InputDecoration(
                       hintText: 'Custom time (e.g. 10:30 AM)',
-                      hintStyle: TextStyle(color: AiraColors.textMuted(isDark)),
+                      hintStyle: TextStyle(color: TriaColors.textMuted(isDark)),
                       filled: true,
-                      fillColor: AiraColors.cardBg(isDark),
+                      fillColor: TriaColors.cardBg(isDark),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AiraColors.border(isDark)),
+                        borderSide: BorderSide(color: TriaColors.border(isDark)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AiraColors.border(isDark)),
+                        borderSide: BorderSide(color: TriaColors.border(isDark)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -286,7 +286,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -301,18 +301,18 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                 child: Container(
                   width: 40, height: 5,
                   decoration: BoxDecoration(
-                    color: AiraColors.border(isDark),
+                    color: TriaColors.border(isDark),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               Text('DAY ${targetDay + 1} OPTIONS',
-                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
+                style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
               ),
               const SizedBox(height: 4),
               Text('Move or swap: ${item.place.name}',
-                style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+                style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
               ),
               const SizedBox(height: 20),
               
@@ -322,7 +322,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                 height: 48,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: hasFreeSlot ? const Color(0xFF2563EB) : AiraColors.border(isDark),
+                    backgroundColor: hasFreeSlot ? const Color(0xFF2563EB) : TriaColors.border(isDark),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: !hasFreeSlot ? null : () {
@@ -342,7 +342,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   icon: const Icon(Icons.forward, color: Colors.white, size: 18),
                   label: Text(
                     hasFreeSlot ? 'Move to First Free Slot' : 'No Free Slots Available',
-                    style: TextStyle(color: hasFreeSlot ? Colors.white : AiraColors.textMuted(isDark), fontWeight: FontWeight.bold),
+                    style: TextStyle(color: hasFreeSlot ? Colors.white : TriaColors.textMuted(isDark), fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -398,9 +398,9 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: AiraColors.cardBg(isDark),
+                              color: TriaColors.cardBg(isDark),
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: AiraColors.border(isDark)),
+                              border: Border.all(color: TriaColors.border(isDark)),
                             ),
                             child: Row(
                               children: [
@@ -444,7 +444,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -459,18 +459,18 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                 child: Container(
                   width: 40, height: 5,
                   decoration: BoxDecoration(
-                    color: AiraColors.border(isDark),
+                    color: TriaColors.border(isDark),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               Text('MOVE TO ANOTHER DAY',
-                style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
+                style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
               ),
               const SizedBox(height: 4),
               Text('${item.place.name} (${item.place.durationMinutes} min)',
-                style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 12),
+                style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12),
               ),
               const SizedBox(height: 16),
               ...List.generate(schedule.length, (idx) {
@@ -490,18 +490,18 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isCurrent
-                            ? AiraColors.border(isDark)
+                            ? TriaColors.border(isDark)
                             : isFull
                                 ? const Color(0xFFFBBF24).withValues(alpha: 0.1)
-                                : AiraColors.cardBg(isDark),
+                                : TriaColors.cardBg(isDark),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
                             color: isCurrent
-                                ? AiraColors.textMuted(isDark)
+                                ? TriaColors.textMuted(isDark)
                                 : isFull
                                     ? const Color(0xFFFBBF24).withValues(alpha: 0.3)
-                                    : AiraColors.border(isDark),
+                                    : TriaColors.border(isDark),
                           ),
                         ),
                       ),
@@ -603,7 +603,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
     final isDark = ref.read(isDarkProvider);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -618,7 +618,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                 child: Container(
                   width: 40, height: 5,
                   decoration: BoxDecoration(
-                    color: AiraColors.border(isDark),
+                    color: TriaColors.border(isDark),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -635,14 +635,14 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                             fit: BoxFit.cover,
                             errorBuilder: (ctx, err, st) => Container(
                               width: 48, height: 48,
-                              color: AiraColors.border(isDark),
-                              child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 20),
+                              color: TriaColors.border(isDark),
+                              child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 20),
                             ),
                           )
                         : Container(
                             width: 48, height: 48,
-                            color: AiraColors.border(isDark),
-                            child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 20),
+                            color: TriaColors.border(isDark),
+                            child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 20),
                           ),
                   ),
                   const SizedBox(width: 12),
@@ -652,13 +652,13 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                       children: [
                         Text(
                           item.place.name,
-                          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 14),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           '${item.place.genre} • ${item.place.durationMinutes} mins',
-                          style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
+                          style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11),
                         ),
                       ],
                     ),
@@ -670,13 +670,13 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
               // Action 1: Change Time
               ListTile(
                 leading: const Icon(Icons.schedule, color: Color(0xFF60A5FA)),
-                title: Text('Change Time Slot', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13)),
-                subtitle: Text('Currently: ${item.scheduledTime} – ${item.endTime}', style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 11)),
+                title: Text('Change Time Slot', style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13)),
+                subtitle: Text('Currently: ${item.scheduledTime} – ${item.endTime}', style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 11)),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showTimePicker(dayIdx, item.place.id, item.scheduledTime);
                 },
-                tileColor: AiraColors.cardBg(isDark),
+                tileColor: TriaColors.cardBg(isDark),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               const SizedBox(height: 10),
@@ -684,13 +684,13 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
               // Action 2: Move to Another Day
               ListTile(
                 leading: const Icon(Icons.calendar_today, color: Color(0xFFF59E0B)),
-                title: Text('Move to Another Day', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13)),
-                subtitle: Text('Currently on Day ${dayIdx + 1}', style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 11)),
+                title: Text('Move to Another Day', style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13)),
+                subtitle: Text('Currently on Day ${dayIdx + 1}', style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 11)),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showMoveToDaySheet(dayIdx, item.place.id);
                 },
-                tileColor: AiraColors.cardBg(isDark),
+                tileColor: TriaColors.cardBg(isDark),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               const SizedBox(height: 10),
@@ -803,10 +803,10 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AiraColors.cardBgAlt(isDark).withValues(alpha: 0.4),
+        color: TriaColors.cardBgAlt(isDark).withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AiraColors.border(isDark),
+          color: TriaColors.border(isDark),
           style: BorderStyle.solid,
           width: 1.5,
         ),
@@ -835,7 +835,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                     Text(
                       item.title,
                       style: TextStyle(
-                        color: AiraColors.textPrimary(isDark),
+                        color: TriaColors.textPrimary(isDark),
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
                       ),
@@ -862,7 +862,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                 Text(
                   item.description,
                   style: TextStyle(
-                    color: AiraColors.textSecondary(isDark),
+                    color: TriaColors.textSecondary(isDark),
                     fontSize: 10.5,
                   ),
                 ),
@@ -914,7 +914,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AiraColors.dialogBg(isDark),
+      backgroundColor: TriaColors.dialogBg(isDark),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -935,7 +935,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                     child: Container(
                       width: 40, height: 5,
                       decoration: BoxDecoration(
-                        color: AiraColors.border(isDark),
+                        color: TriaColors.border(isDark),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -946,13 +946,13 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                       const Icon(Icons.add_circle, color: Color(0xFF00B4D8), size: 20),
                       const SizedBox(width: 12),
                       Text('SCHEDULE PLACE IN SLOT',
-                        style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
+                        style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 0.5),
                       ),
                     ],
                   ),
                   const SizedBox(height: 6),
                   Text('Available interval: ${slotItem.time} – ${slotItem.endTime} ($slotDuration mins free)',
-                    style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11),
+                    style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11),
                   ),
                   const SizedBox(height: 20),
                   if (unassigned.isEmpty)
@@ -961,7 +961,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 24),
                         child: Text(
                           'No unassigned places in pool. Add some from the Explore screen first!',
-                          style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 12),
+                          style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 12),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -998,10 +998,10 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: AiraColors.cardBg(isDark),
+                                    color: TriaColors.cardBg(isDark),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: fits ? AiraColors.border(isDark) : const Color(0xFF7F1D1D).withValues(alpha: 0.5),
+                                      color: fits ? TriaColors.border(isDark) : const Color(0xFF7F1D1D).withValues(alpha: 0.5),
                                     ),
                                   ),
                                   child: Row(
@@ -1015,14 +1015,14 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                                 fit: BoxFit.cover,
                                                 errorBuilder: (ctx, err, st) => Container(
                                                   width: 40, height: 40,
-                                                  color: AiraColors.border(isDark),
-                                                  child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 20),
+                                                  color: TriaColors.border(isDark),
+                                                  child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 20),
                                                 ),
                                               )
                                             : Container(
                                                 width: 40, height: 40,
-                                                color: AiraColors.border(isDark),
-                                                child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 20),
+                                                color: TriaColors.border(isDark),
+                                                child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 20),
                                               ),
                                       ),
                                       const SizedBox(width: 12),
@@ -1032,12 +1032,12 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                           children: [
                                             Text(
                                               place.name,
-                                              style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12),
+                                              style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             Text(
                                               '${place.genre} • Need: ${place.durationMinutes} min',
-                                              style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10),
+                                              style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 10),
                                             ),
                                           ],
                                         ),
@@ -1113,18 +1113,18 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
     );
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.scaffoldBg(isDark),
+        backgroundColor: TriaColors.scaffoldBg(isDark),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AiraColors.textPrimary(isDark)),
+          icon: Icon(Icons.arrow_back, color: TriaColors.textPrimary(isDark)),
           onPressed: () => context.pop(),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Day Planner', style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Day Planner', style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 18)),
             const Text('STEP 3 — SCHEDULE ACTIVITIES', style: TextStyle(color: Color(0xFF00B4D8), fontWeight: FontWeight.w800, fontSize: 9, letterSpacing: 0.5)),
           ],
         ),
@@ -1182,10 +1182,10 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                     margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                     padding: const EdgeInsets.symmetric(horizontal: 18),
                     decoration: BoxDecoration(
-                      color: active ? const Color(0xFF2563EB) : AiraColors.cardBg(isDark),
+                      color: active ? const Color(0xFF2563EB) : TriaColors.cardBg(isDark),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark),
+                        color: active ? const Color(0xFF2563EB) : TriaColors.border(isDark),
                       ),
                       boxShadow: active ? [
                         BoxShadow(
@@ -1199,7 +1199,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                       children: [
                         Text('Day ${idx + 1}',
                           style: TextStyle(
-                            color: active ? Colors.white : AiraColors.textSecondary(isDark),
+                            color: active ? Colors.white : TriaColors.textSecondary(isDark),
                             fontWeight: FontWeight.bold, fontSize: 13,
                           ),
                         ),
@@ -1208,12 +1208,12 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: active ? Colors.white.withValues(alpha: 0.2) : AiraColors.border(isDark),
+                              color: active ? Colors.white.withValues(alpha: 0.2) : TriaColors.border(isDark),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text('$dayItemCount',
                               style: TextStyle(
-                                color: active ? Colors.white : AiraColors.textMuted(isDark),
+                                color: active ? Colors.white : TriaColors.textMuted(isDark),
                                 fontWeight: FontWeight.bold, fontSize: 10,
                               ),
                             ),
@@ -1247,12 +1247,12 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                       children: [
                         Text(
                           'Timeline conflicts detected!',
-                          style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12),
+                          style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           'Activities overlap with bookings or operating hours.',
-                          style: TextStyle(color: AiraColors.textPrimary(isDark).withValues(alpha: 0.6), fontSize: 10),
+                          style: TextStyle(color: TriaColors.textPrimary(isDark).withValues(alpha: 0.6), fontSize: 10),
                         ),
                       ],
                     ),
@@ -1285,7 +1285,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
             child: Row(
               children: [
                 Text('DAY ${_activeDay + 1} SCHEDULE',
-                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+                  style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
                 ),
                 const SizedBox(width: 8),
                 IconButton(
@@ -1336,7 +1336,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AiraColors.cardBgAlt(isDark).withValues(alpha: 0.5),
+                color: TriaColors.cardBgAlt(isDark).withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -1350,7 +1350,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   const Spacer(),
                   Text(
                     '${currentDayItems.fold<int>(0, (sum, item) => sum + item.place.durationMinutes)} min total',
-                    style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 10, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -1441,7 +1441,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                   Container(
                                     height: 1,
                                     width: 30,
-                                    color: AiraColors.border(isDark),
+                                    color: TriaColors.border(isDark),
                                   ),
                                   const Padding(
                                     padding: EdgeInsets.symmetric(horizontal: 12),
@@ -1452,7 +1452,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                   Expanded(
                                     child: Container(
                                       height: 1,
-                                      color: AiraColors.border(isDark),
+                                      color: TriaColors.border(isDark),
                                     ),
                                   ),
                                 ],
@@ -1476,8 +1476,8 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AiraColors.dialogBg(isDark),
-              border: Border(top: BorderSide(color: AiraColors.border(isDark))),
+              color: TriaColors.dialogBg(isDark),
+              border: Border(top: BorderSide(color: TriaColors.border(isDark))),
             ),
             child: SafeArea(
               top: false,
@@ -1558,9 +1558,9 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
       key: key,
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: hasWarning ? const Color(0xFF7F1D1D).withValues(alpha: 0.2) : AiraColors.cardBg(isDark),
+        color: hasWarning ? const Color(0xFF7F1D1D).withValues(alpha: 0.2) : TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: hasWarning ? const Color(0xFFEF4444).withValues(alpha: 0.8) : AiraColors.border(isDark)),
+        border: Border.all(color: hasWarning ? const Color(0xFFEF4444).withValues(alpha: 0.8) : TriaColors.border(isDark)),
       ),
       child: Column(
         children: [
@@ -1593,14 +1593,14 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                         fit: BoxFit.cover,
                         errorBuilder: (ctx, err, st) => Container(
                           width: 56, height: 56,
-                          color: AiraColors.border(isDark),
-                          child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 24),
+                          color: TriaColors.border(isDark),
+                          child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 24),
                         ),
                       )
                     : Container(
                         width: 56, height: 56,
-                        color: AiraColors.border(isDark),
-                        child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 24),
+                        color: TriaColors.border(isDark),
+                        child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 24),
                       ),
               ),
               const SizedBox(width: 12),
@@ -1610,7 +1610,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(item.place.name,
-                      style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13),
+                      style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 13),
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (hasWarning) ...[
@@ -2254,14 +2254,14 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                Container(height: 1, width: 30, color: AiraColors.border(isDark)),
+                Container(height: 1, width: 30, color: TriaColors.border(isDark)),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12),
                   child: Text('UNASSIGNED PLACES',
                     style: TextStyle(color: Color(0xFFF59E0B), fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1),
                   ),
                 ),
-                Expanded(child: Container(height: 1, color: AiraColors.border(isDark))),
+                Expanded(child: Container(height: 1, color: TriaColors.border(isDark))),
               ],
             ),
           ),
@@ -2291,10 +2291,10 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
     if (item.cost == 'free-slot') {
       return Container(
         decoration: BoxDecoration(
-          color: AiraColors.cardBg(isDark).withValues(alpha: 0.5),
+          color: TriaColors.cardBg(isDark).withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AiraColors.border(isDark).withValues(alpha: 0.4),
+            color: TriaColors.border(isDark).withValues(alpha: 0.4),
             style: BorderStyle.solid,
             width: 1,
           ),
@@ -2341,9 +2341,9 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
     if (isBooking) {
       return Container(
         decoration: BoxDecoration(
-          color: AiraColors.cardBg(isDark),
+          color: TriaColors.cardBg(isDark),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.4)),
+          border: Border.all(color: TriaColors.border(isDark).withValues(alpha: 0.4)),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -2365,13 +2365,13 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   children: [
                     Text(
                       item.title,
-                      style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 11),
+                      style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 11),
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (!isCompact && item.description.isNotEmpty)
                       Text(
                         item.description,
-                        style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 9.5),
+                        style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 9.5),
                         overflow: TextOverflow.ellipsis,
                       ),
                   ],
@@ -2380,7 +2380,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
               const SizedBox(width: 6),
               Text(
                 '${item.time} – ${item.endTime}',
-                style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 9, fontWeight: FontWeight.bold),
+                style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 9, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -2392,27 +2392,27 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
     if (activity == null) {
       return Container(
         decoration: BoxDecoration(
-          color: AiraColors.cardBg(isDark),
+          color: TriaColors.cardBg(isDark),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AiraColors.border(isDark).withValues(alpha: 0.4)),
+          border: Border.all(color: TriaColors.border(isDark).withValues(alpha: 0.4)),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           child: Row(
             children: [
-              Icon(Icons.info_outline, color: AiraColors.textMuted(isDark), size: 14),
+              Icon(Icons.info_outline, color: TriaColors.textMuted(isDark), size: 14),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   item.title,
-                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 11.5),
+                  style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 11.5),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 6),
               Text(
                 '${item.time} – ${item.endTime}',
-                style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 9, fontWeight: FontWeight.bold),
+                style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 9, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -2421,9 +2421,9 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
     }
     return Container(
       decoration: BoxDecoration(
-        color: hasWarning ? const Color(0xFF7F1D1D).withValues(alpha: 0.2) : AiraColors.cardBg(isDark),
+        color: hasWarning ? const Color(0xFF7F1D1D).withValues(alpha: 0.2) : TriaColors.cardBg(isDark),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: hasWarning ? const Color(0xFFEF4444).withValues(alpha: 0.8) : AiraColors.border(isDark)),
+        border: Border.all(color: hasWarning ? const Color(0xFFEF4444).withValues(alpha: 0.8) : TriaColors.border(isDark)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -2444,14 +2444,14 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                             fit: BoxFit.cover,
                             errorBuilder: (ctx, err, st) => Container(
                               width: 32, height: 32,
-                              color: AiraColors.border(isDark),
-                              child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 16),
+                              color: TriaColors.border(isDark),
+                              child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 16),
                             ),
                           )
                         : Container(
                             width: 32, height: 32,
-                            color: AiraColors.border(isDark),
-                            child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 16),
+                            color: TriaColors.border(isDark),
+                            child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 16),
                           ),
                   ),
                   const SizedBox(width: 8),
@@ -2463,7 +2463,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                     children: [
                       Text(
                         activity.place.name,
-                        style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 11.5),
+                        style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 11.5),
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (!isCompact && hasWarning)
@@ -2475,7 +2475,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                       else if (!isCompact)
                         Text(
                           '${activity.place.durationMinutes} mins',
-                          style: TextStyle(color: AiraColors.textMuted(isDark), fontSize: 9),
+                          style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 9),
                         ),
                     ],
                   ),
@@ -2884,9 +2884,9 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AiraColors.cardBgAlt(isDark),
+        color: TriaColors.cardBgAlt(isDark),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AiraColors.border(isDark)),
+        border: Border.all(color: TriaColors.border(isDark)),
       ),
       child: Row(
         children: [
@@ -2904,7 +2904,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   size: 18,
                 ),
                 const SizedBox(height: 4),
-                Icon(Icons.lock_outline, color: AiraColors.textMuted(isDark), size: 11),
+                Icon(Icons.lock_outline, color: TriaColors.textMuted(isDark), size: 11),
               ],
             ),
           ),
@@ -2916,7 +2916,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                 Text(
                   item.title,
                   style: TextStyle(
-                    color: AiraColors.textPrimary(isDark),
+                    color: TriaColors.textPrimary(isDark),
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                   ),
@@ -2926,7 +2926,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   Text(
                     item.description,
                     style: TextStyle(
-                      color: AiraColors.textSecondary(isDark),
+                      color: TriaColors.textSecondary(isDark),
                       fontSize: 11,
                     ),
                   ),
@@ -2940,18 +2940,18 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AiraColors.scaffoldBg(isDark),
+                        color: TriaColors.scaffoldBg(isDark),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.lock, size: 9, color: AiraColors.textSecondary(isDark)),
+                          Icon(Icons.lock, size: 9, color: TriaColors.textSecondary(isDark)),
                           const SizedBox(width: 4),
                           Text(
                             item.time == item.endTime ? item.time : '${item.time} – ${item.endTime}',
                             style: TextStyle(
-                              color: AiraColors.textSecondary(isDark),
+                              color: TriaColors.textSecondary(isDark),
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                             ),
@@ -3045,10 +3045,10 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
       context: context,
       builder: (ctx) {
         return Dialog(
-          backgroundColor: AiraColors.dialogBg(isDark),
+          backgroundColor: TriaColors.dialogBg(isDark),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: AiraColors.border(isDark)),
+            side: BorderSide(color: TriaColors.border(isDark)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -3078,7 +3078,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                           Text(
                             'SCHEDULE OPTIMIZED',
                             style: TextStyle(
-                              color: AiraColors.textPrimary(isDark),
+                              color: TriaColors.textPrimary(isDark),
                               fontWeight: FontWeight.w900,
                               fontSize: 14,
                               letterSpacing: 1,
@@ -3087,7 +3087,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                           Text(
                             'AI Auto-Resolution Changes',
                             style: TextStyle(
-                              color: AiraColors.textSecondary(isDark),
+                              color: TriaColors.textSecondary(isDark),
                               fontSize: 11,
                             ),
                           ),
@@ -3099,7 +3099,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                 const SizedBox(height: 20),
                 Text(
                   'The following activity timings were automatically adjusted to avoid overlapping logistics & operating hours:',
-                  style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 11, height: 1.4),
+                  style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11, height: 1.4),
                 ),
                 const SizedBox(height: 16),
                 Container(
@@ -3126,7 +3126,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                   Text(
                                     key,
                                     style: TextStyle(
-                                      color: AiraColors.textPrimary(isDark),
+                                      color: TriaColors.textPrimary(isDark),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
                                     ),
@@ -3185,9 +3185,9 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AiraColors.cardBg(isDark).withValues(alpha: 0.6),
+        color: TriaColors.cardBg(isDark).withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AiraColors.border(isDark)),
+        border: Border.all(color: TriaColors.border(isDark)),
       ),
       child: Row(
         children: [
@@ -3200,14 +3200,14 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                     fit: BoxFit.cover,
                     errorBuilder: (ctx, err, st) => Container(
                       width: 40, height: 40,
-                      color: AiraColors.border(isDark),
-                      child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 20),
+                      color: TriaColors.border(isDark),
+                      child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 20),
                     ),
                   )
                 : Container(
                     width: 40, height: 40,
-                    color: AiraColors.border(isDark),
-                    child: Icon(Icons.image, color: AiraColors.textMuted(isDark), size: 20),
+                    color: TriaColors.border(isDark),
+                    child: Icon(Icons.image, color: TriaColors.textMuted(isDark), size: 20),
                   ),
           ),
           const SizedBox(width: 12),
@@ -3216,23 +3216,23 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(place.name,
-                  style: TextStyle(color: AiraColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold, fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Row(
                   children: [
                     Text(place.genre,
-                      style: TextStyle(color: AiraColors.textSecondary(isDark), fontSize: 10),
+                      style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 10),
                     ),
                     const SizedBox(width: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                       decoration: BoxDecoration(
-                        color: AiraColors.border(isDark).withValues(alpha: 0.3),
+                        color: TriaColors.border(isDark).withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text('${place.durationMinutes}min',
-                        style: TextStyle(color: AiraColors.textPrimary(isDark), fontSize: 8, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 8, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -3277,7 +3277,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   decoration: BoxDecoration(
                     color: dayIdx == _activeDay
                         ? const Color(0xFF2563EB)
-                        : AiraColors.border(isDark),
+                        : TriaColors.border(isDark),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
@@ -3319,15 +3319,15 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
           Container(
             width: 24, height: 24,
             decoration: BoxDecoration(
-              color: active ? const Color(0xFF2563EB) : AiraColors.cardBg(isDark),
+              color: active ? const Color(0xFF2563EB) : TriaColors.cardBg(isDark),
               shape: BoxShape.circle,
-              border: Border.all(color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark), width: 2),
+              border: Border.all(color: active ? const Color(0xFF2563EB) : TriaColors.border(isDark), width: 2),
             ),
             child: active ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
           ),
           const SizedBox(height: 4),
           Text(label, style: TextStyle(
-            color: active ? const Color(0xFF60A5FA) : AiraColors.textMuted(isDark),
+            color: active ? const Color(0xFF60A5FA) : TriaColors.textMuted(isDark),
             fontSize: 9, fontWeight: FontWeight.bold,
           )),
         ],
@@ -3341,7 +3341,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
       child: Container(
         height: 2,
         margin: const EdgeInsets.only(bottom: 16),
-        color: active ? const Color(0xFF2563EB) : AiraColors.border(isDark),
+        color: active ? const Color(0xFF2563EB) : TriaColors.border(isDark),
       ),
     );
   }

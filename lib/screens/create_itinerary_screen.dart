@@ -237,6 +237,19 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
     // 4. Update Riverpod client state
     ref.read(itineraryProvider.notifier).setItinerary(hourlyItinerary);
 
+    // Save to upcomingTripsProvider persistent store
+    final uniqueId = 'TRIP-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
+    ref.read(upcomingTripsProvider.notifier).addTrip(
+      UpcomingTrip(
+        tripId: uniqueId,
+        source: _sourceCtrl.text.isNotEmpty ? _sourceCtrl.text : 'Bangalore, India',
+        destination: city.isNotEmpty ? city : 'Tokyo, Japan',
+        startDate: startDateStr,
+        endDate: endDateStr,
+        itinerary: hourlyItinerary,
+      ),
+    );
+
     SoundSynthesizer.playTone(
       frequency: 960,
       durationSeconds: 0.3,
@@ -367,12 +380,12 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
     final isDark = ref.watch(isDarkProvider);
 
     return Scaffold(
-      backgroundColor: AiraColors.scaffoldBg(isDark),
+      backgroundColor: TriaColors.scaffoldBg(isDark),
       appBar: AppBar(
-        backgroundColor: AiraColors.scaffoldBg(isDark),
+        backgroundColor: TriaColors.scaffoldBg(isDark),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AiraColors.textPrimary(isDark)),
+          icon: Icon(Icons.arrow_back, color: TriaColors.textPrimary(isDark)),
           onPressed: () => context.pop(),
         ),
         title: Column(
@@ -381,7 +394,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
             Text(
               'Create Itinerary',
               style: TextStyle(
-                color: AiraColors.textPrimary(isDark),
+                color: TriaColors.textPrimary(isDark),
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -410,9 +423,9 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: AiraColors.scaffoldBg(isDark),
+                    color: TriaColors.scaffoldBg(isDark),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AiraColors.border(isDark)),
+                    border: Border.all(color: TriaColors.border(isDark)),
                   ),
                   child: Row(
                     children: [
@@ -440,7 +453,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                             Text(
                               'Smart Ticket Sync',
                               style: TextStyle(
-                                color: AiraColors.textPrimary(isDark),
+                                color: TriaColors.textPrimary(isDark),
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13.5,
                               ),
@@ -449,7 +462,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                             Text(
                               'Scan your boarding pass or booking voucher with your device camera for instant form auto-fill!',
                               style: TextStyle(
-                                color: AiraColors.textSecondary(isDark),
+                                color: TriaColors.textSecondary(isDark),
                                 fontSize: 10.5,
                                 height: 1.3,
                               ),
@@ -494,7 +507,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                 Text(
                   'Custom Traveler Flight & Dates Parameters',
                   style: TextStyle(
-                    color: AiraColors.textPrimary(isDark),
+                    color: TriaColors.textPrimary(isDark),
                     fontWeight: FontWeight.bold,
                     fontSize: 14.5,
                   ),
@@ -503,7 +516,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                 Text(
                   'Set your custom flight details, budget caps, and specific travel themes. Our compiler loads fully grounded itineraries in seconds.',
                   style: TextStyle(
-                    color: AiraColors.textSecondary(isDark),
+                    color: TriaColors.textSecondary(isDark),
                     fontSize: 11,
                     height: 1.4,
                   ),
@@ -543,7 +556,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                           Text(
                             'MODE OF TRANSPORT',
                             style: TextStyle(
-                              color: AiraColors.textSecondary(isDark),
+                              color: TriaColors.textSecondary(isDark),
                               fontWeight: FontWeight.bold,
                               fontSize: 9.5,
                               letterSpacing: 0.5,
@@ -553,25 +566,25 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: AiraColors.cardBg(isDark),
+                              color: TriaColors.cardBg(isDark),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: AiraColors.border(isDark),
+                                color: TriaColors.border(isDark),
                               ),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: _transportMode,
-                                dropdownColor: AiraColors.cardBg(isDark),
+                                dropdownColor: TriaColors.cardBg(isDark),
                                 isExpanded: true,
                                 style: TextStyle(
-                                  color: AiraColors.textPrimary(isDark),
+                                  color: TriaColors.textPrimary(isDark),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12.5,
                                 ),
                                 icon: Icon(
                                   Icons.keyboard_arrow_down,
-                                  color: AiraColors.textSecondary(isDark),
+                                  color: TriaColors.textSecondary(isDark),
                                 ),
                                 items: <String>['Flight', 'Train', 'Car'].map((
                                   String val,
@@ -593,7 +606,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                                         Text(
                                           val,
                                           style: TextStyle(
-                                            color: AiraColors.textPrimary(
+                                            color: TriaColors.textPrimary(
                                               isDark,
                                             ),
                                           ),
@@ -831,7 +844,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
         Text(
           label,
           style: TextStyle(
-            color: AiraColors.textSecondary(isDark),
+            color: TriaColors.textSecondary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 9.5,
             letterSpacing: 0.5,
@@ -843,7 +856,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
           maxLines: maxLines,
           keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
           style: TextStyle(
-            color: AiraColors.textPrimary(isDark),
+            color: TriaColors.textPrimary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 12.5,
           ),
@@ -851,15 +864,15 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
             isDense: true,
             hintText: hint,
             hintStyle: TextStyle(
-              color: AiraColors.textMuted(isDark),
+              color: TriaColors.textMuted(isDark),
               fontSize: 12,
             ),
             filled: true,
-            fillColor: AiraColors.cardBg(isDark),
+            fillColor: TriaColors.cardBg(isDark),
             contentPadding: const EdgeInsets.all(12),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: AiraColors.border(isDark)),
+              borderSide: BorderSide(color: TriaColors.border(isDark)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -882,7 +895,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
         Text(
           label,
           style: TextStyle(
-            color: AiraColors.textSecondary(isDark),
+            color: TriaColors.textSecondary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 9.5,
             letterSpacing: 0.5,
@@ -985,7 +998,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
             }
           },
           style: TextStyle(
-            color: AiraColors.textPrimary(isDark),
+            color: TriaColors.textPrimary(isDark),
             fontWeight: FontWeight.bold,
             fontSize: 12.5,
           ),
@@ -993,7 +1006,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
             isDense: true,
             hintText: 'Tap to select date range',
             hintStyle: TextStyle(
-              color: AiraColors.textMuted(isDark),
+              color: TriaColors.textMuted(isDark),
               fontSize: 12,
             ),
             suffixIcon: const Icon(
@@ -1002,11 +1015,11 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
               size: 16,
             ),
             filled: true,
-            fillColor: AiraColors.cardBg(isDark),
+            fillColor: TriaColors.cardBg(isDark),
             contentPadding: const EdgeInsets.all(12),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: AiraColors.border(isDark)),
+              borderSide: BorderSide(color: TriaColors.border(isDark)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -1106,7 +1119,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
   Widget _buildCompilingOverlay(bool isDark) {
     return Positioned.fill(
       child: Container(
-        color: AiraColors.dialogBg(isDark).withValues(alpha: 0.92),
+        color: TriaColors.dialogBg(isDark).withValues(alpha: 0.92),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1127,7 +1140,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
             Text(
               _compileStatus,
               style: TextStyle(
-                color: AiraColors.textPrimary(isDark),
+                color: TriaColors.textPrimary(isDark),
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
@@ -1139,7 +1152,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                 borderRadius: BorderRadius.circular(10),
                 child: LinearProgressIndicator(
                   value: _compileProgress,
-                  backgroundColor: AiraColors.scaffoldBg(isDark),
+                  backgroundColor: TriaColors.scaffoldBg(isDark),
                   valueColor: const AlwaysStoppedAnimation<Color>(
                     Color(0xFF2563EB),
                   ),

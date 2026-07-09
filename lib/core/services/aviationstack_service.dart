@@ -35,7 +35,7 @@ class AviationstackService {
   List<AviationFlight> _generateMockFlights(String query) {
     final cleanQuery = query.replaceAll(' ', '').toUpperCase();
     final prefix = cleanQuery.length >= 2 ? cleanQuery.substring(0, 2) : 'AA';
-    final airline = _iataToAirline[prefix] ?? 'Aira Airways';
+    final airline = _iataToAirline[prefix] ?? 'Tria Airways';
 
     final today = DateTime.now();
     final todayStr = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
