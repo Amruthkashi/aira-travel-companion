@@ -5624,12 +5624,11 @@
           "name": "Akihabara Electric Town",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.9,
-          "desc": "The ultimate haven for anime shopping and cutting-edge tech gadgets, perfectly matching your high tech score with endless neon-lit multi-story hobby shops.",
+          "rating": 4.8,
+          "desc": "The ultimate haven for tech gadgets, anime shopping, and quirky maid cafes, perfectly aligning with your high tech score and solo adventure style.",
           "tags": [
             "Tech",
-            "Anime",
-            "Gadgets"
+            "Anime"
           ],
           "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
         },
@@ -5637,12 +5636,11 @@
           "name": "Asakusa Senso-ji Temple",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.8,
-          "desc": "Experience Tokyo's oldest temple and vibrant Nakamise-dori food stalls, offering a rich blend of traditional heritage and local street eats for solo explorers.",
+          "rating": 4.9,
+          "desc": "Immerse yourself in Tokyo's oldest temple, featuring historic street food stalls along Nakamise Shopping Street that satisfy your high heritage and cultural interests.",
           "tags": [
-            "Temple",
-            "Heritage",
-            "Street-Food"
+            "Culture",
+            "Temples"
           ],
           "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
         },
@@ -5650,115 +5648,112 @@
           "name": "Nakano Broadway",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.7,
-          "desc": "A nostalgic multi-level indoor mall filled with rare anime collectibles, vintage video games, and hidden basement food stalls catering to dedicated pop-culture fans.",
+          "rating": 4.6,
+          "desc": "A retro-pop culture paradise ideal for solo collectors seeking rare anime merch, vintage console games, and underground local food stalls.",
           "tags": [
             "Anime",
-            "Retro",
             "Shopping"
           ],
           "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Kiyomizu-dera and Higashiyama",
+          "name": "Kamakura Temple District",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.9,
-          "desc": "Dive deep into Japan's spiritual heritage at this iconic cliffside temple, surrounded by historic preserved streets perfect for peaceful, solo cultural exploration.",
+          "rating": 4.7,
+          "desc": "Escape the city to explore historic Zen temples, the Great Buddha, and vibrant local street food stalls perfect for a solo cultural excursion.",
           "tags": [
-            "Temple",
-            "Heritage",
-            "Culture"
+            "Culture",
+            "Temples"
           ],
           "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Nipponbashi Denden Town",
+          "name": "Odaiba Futuristic Island",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.6,
-          "desc": "Osaka’s premier subculture hub blending retro tech gadgets, anime stores, and nearby Shinsekai street food stalls, ideal for a balanced solo traveler journey.",
+          "rating": 4.7,
+          "desc": "Unleash your inner sci-fi enthusiast with giant Gundam statues, digital art museums, and cutting-edge tech showcases overlooking Tokyo Bay.",
           "tags": [
             "Tech",
-            "Anime",
-            "Street-Food"
+            "Sci-Fi"
           ],
-          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
         }
       ],
-      "timestamp": 1783588719928
+      "timestamp": 1783592856513
     },
     {
       "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Tokyo_Anime Shopping,Local Food Stalls,Temples,Tech Gadgets_48.3766233766234_85_78_40",
       "category": "👤 Solo Traveler",
       "places": [
         {
-          "name": "Akihabara & Kanda, Tokyo",
+          "name": "Akihabara Electric Town",
           "country": "Japan",
           "countryCode": "JPN",
           "rating": 4.9,
-          "desc": "Dive into Tokyo’s premier geek-culture hub for anime shopping and cutting-edge tech gadgets, beautifully paired with the historic Kanda Myojin Shinto shrine nearby.",
+          "desc": "Dive into Tokyo's neon heart. Perfect for solo travelers seeking cutting-edge tech gadgets, endless anime shopping, and the nearby historic Kanda Myojin Temple.",
           "tags": [
             "Tech",
             "Anime",
-            "Heritage"
-          ],
-          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Nipponbashi & Shinsekai, Osaka",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.8,
-          "desc": "Explore Osaka's retro-futuristic arcade district for rare tech and anime goods, then grab local kushikatsu street food near the historic Shitennoji Temple.",
-          "tags": [
-            "Street Food",
-            "Tech",
             "Culture"
           ],
           "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Osu Shopping District, Nagoya",
+          "name": "Osaka Nipponbashi",
           "country": "Japan",
           "countryCode": "JPN",
           "rating": 4.7,
-          "desc": "A solo traveler's dream blending the historic Osu Kannon Temple with massive arcades packed with retro-tech shops, anime figure stores, and local food stalls.",
+          "desc": "Explore Den-Den Town's incredible anime and retro-tech shops, then grab local street food at Kuromon Market and visit the historic Shitenno-ji Temple nearby.",
           "tags": [
-            "Temples",
-            "Anime",
-            "Shopping"
-          ],
-          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Ximending & Longshan, Taipei",
-          "country": "Taiwan",
-          "countryCode": "TWN",
-          "rating": 4.6,
-          "desc": "Just a short flight from Tokyo, experience Taiwan's neon-lit youth culture hub for anime and tech, balanced by the spiritual beauty of historic Longshan Temple.",
-          "tags": [
-            "Heritage",
             "Tech",
-            "Street Food"
+            "Foodie",
+            "Culture"
           ],
           "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Nakano Broadway, Tokyo",
+          "name": "Nagoya Osu District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "A solo traveler's dream combining the historic Osu Kannon Temple with a vibrant shopping arcade packed with PC gadgets, anime stores, and tasty street food.",
+          "tags": [
+            "Culture",
+            "Tech",
+            "Foodie"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Seoul Yongsan & Insadong",
+          "country": "South Korea",
+          "countryCode": "KOR",
+          "rating": 4.8,
+          "desc": "Experience the ultimate balance of high-tech gadget markets in Yongsan, traditional Buddhist temples, and vibrant street food stalls in the historic alleyways of Seoul.",
+          "tags": [
+            "Tech",
+            "Culture",
+            "Foodie"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Teramachi",
           "country": "Japan",
           "countryCode": "JPN",
           "rating": 4.8,
-          "desc": "A retro subculture paradise perfect for solo exploration, offering rare vintage anime collectibles, local underground food stalls, and nearby serene neighborhood temples.",
+          "desc": "Wander through ancient temples before exploring Teramachi's modern arcade, featuring retro gaming, local food stalls, and unique specialty hobby shops.",
           "tags": [
-            "Anime",
             "Culture",
-            "Local Food"
+            "Heritage",
+            "Foodie"
           ],
-          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
         }
       ],
-      "timestamp": 1783588723821
+      "timestamp": 1783592857666
     }
   ],
   "squads": []

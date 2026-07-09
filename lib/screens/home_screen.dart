@@ -175,17 +175,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       child: Row(
         children: [
-          // Back arrow button to satisfy the request
-          IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            icon: Icon(Icons.arrow_back_rounded, color: TriaColors.textPrimary(isDark), size: 20),
-            onPressed: () {
-              // Switches to the last slide (Profile tab) as a dynamic back navigation
-              ref.read(currentTabProvider.notifier).state = 4;
-            },
-          ),
-          const SizedBox(width: 8),
+
           // Compass Explorer branding logo badge
           Container(
             width: 32,
