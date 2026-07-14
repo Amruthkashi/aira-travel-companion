@@ -15,8 +15,8 @@ class WalletScreen extends ConsumerStatefulWidget {
 }
 
 class _WalletScreenState extends ConsumerState<WalletScreen> {
-  // Active currency selected by the traveler: 'USD', 'INR', 'JPY'
-  String _selectedCurrency = 'USD';
+  // Active currency selected by the traveler: 'USD', 'INR', 'EUR', 'GBP'
+  String _selectedCurrency = 'INR';
 
   // Manual entry controllers
   final TextEditingController _descCtrl = TextEditingController();
@@ -31,7 +31,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   // Currency Converter states (lower section)
   final TextEditingController _convInputCtrl = TextEditingController(text: '100');
   String _fromCurrency = 'USD';
-  bool _taxFreeReduction = false;
+  final bool _taxFreeReduction = false;
+
+  // Wizard currency selector (default INR)
+  String _wizardCurrency = 'INR';
 
   // Wizard text controllers
   final TextEditingController _wizardTotalCtrl = TextEditingController();
@@ -181,14 +184,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   // Exchange rates configurations
   double get _exchangeRate {
     if (_selectedCurrency == 'INR') return 83.0;
-    if (_selectedCurrency == 'JPY') return 155.0;
-    return 1.0;
+    if (_selectedCurrency == 'EUR') return 0.93;
+    if (_selectedCurrency == 'GBP') return 0.79;
+    return 1.0; // USD
   }
 
   String get _currencySymbol {
     if (_selectedCurrency == 'INR') return '₹';
-    if (_selectedCurrency == 'JPY') return '¥';
-    return '\$';
+    if (_selectedCurrency == 'EUR') return '€';
+    if (_selectedCurrency == 'GBP') return '£';
+    return '\$'; // USD
   }
 
   // Formats currency string with appropriate commas and zero decimals
@@ -203,10 +208,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   }
 
   double _getConversionRate(String from) {
-    if (from == 'USD') return 155.0; // 1 USD = 155 JPY
-    if (from == 'EUR') return 168.0; // 1 EUR = 168 JPY
-    if (from == 'INR') return 1.86;  // 1 INR = 1.86 JPY
-    if (from == 'GBP') return 198.0; // 1 GBP = 198 JPY
+    if (from == 'USD') return 83.0;  // 1 USD = 83 INR
+    if (from == 'EUR') return 90.0;  // 1 EUR = 90 INR
+    if (from == 'INR') return 1.0;   // 1 INR = 1 INR
+    if (from == 'GBP') return 105.0; // 1 GBP = 105 INR
     return 1.0;
   }
 
@@ -451,11 +456,11 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     final spentPercentage = ceiling > 0 ? spent / ceiling : 0.0;
     final leftover = (ceiling - spent).clamp(0.0, double.infinity);
 
-    // Dynamic Converter values (lower card)
+    // Dynamic Converter values (lower card) - shows INR equivalent
     final inputVal = double.tryParse(_convInputCtrl.text) ?? 0.0;
-    final rawJpy = inputVal * _getConversionRate(_fromCurrency);
-    final jpyOutput = _taxFreeReduction ? rawJpy * 0.9 : rawJpy;
-    final taxSavings = _taxFreeReduction ? rawJpy * 0.1 : 0.0;
+    final rawInr = inputVal * _getConversionRate(_fromCurrency);
+    final inrOutput = _taxFreeReduction ? rawInr * 0.9 : rawInr;
+    final taxSavings = _taxFreeReduction ? rawInr * 0.1 : 0.0;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -514,7 +519,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             const SizedBox(height: 16),
 
             // 6. Smart Currency Converter (Legacy Integration)
-            _buildLegacyConverterCard(jpyOutput, taxSavings),
+            _buildLegacyConverterCard(inrOutput, taxSavings),
             const SizedBox(height: 30),
           ],
         ),
@@ -662,7 +667,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               children: [
                 _buildCurrencyPill('USD', 'USD (\$)'),
                 _buildCurrencyPill('INR', 'INR (₹)'),
-                _buildCurrencyPill('JPY', 'JPY (¥)'),
+                _buildCurrencyPill('EUR', 'EUR (€)'),
               ],
             ),
           ),
@@ -738,7 +743,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             keyboardType: TextInputType.number,
             style: TextStyle(color: TriaColors.textPrimary(isDark)),
             decoration: InputDecoration(
-              labelText: 'Target Ceiling (USD)',
+              labelText: 'Target Ceiling (INR)',
               labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
               enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
               focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
@@ -1483,7 +1488,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   }
 
   // 6. Smart Currency Converter (Legacy Card Integration)
-  Widget _buildLegacyConverterCard(double jpyOutput, double taxSavings) {
+  Widget _buildLegacyConverterCard(double inrOutput, double taxSavings) {
     final isDark = ref.read(isDarkProvider);
     return Container(
       padding: const EdgeInsets.all(18),
@@ -1570,24 +1575,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          
-          // Tax Free Checkbox
-          Material(
-            color: Colors.transparent,
-            child: CheckboxListTile(
-              title: Text(
-                'Include JPY Tax-Free Shopping (10% discount)',
-                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: TriaColors.textSecondary(isDark)),
-              ),
-              value: _taxFreeReduction,
-              activeColor: const Color(0xFF2563EB),
-              onChanged: (v) => setState(() => _taxFreeReduction = v!),
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-          ),
-          const SizedBox(height: 6),
 
           // Output Display
           Container(
@@ -1601,12 +1588,12 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'JAPANESE YEN (JPY) VALUE',
+                  'INDIAN RUPEE (INR) VALUE',
                   style: TextStyle(fontSize: 8.5, color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.w900, letterSpacing: 0.5),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '¥${jpyOutput.round().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                  '₹${inrOutput.round().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
                   style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF00B4D8)),
                 ),
                 if (_taxFreeReduction) ...[
@@ -1616,7 +1603,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                       const Icon(Icons.verified, color: Color(0xFF06D6A0), size: 12),
                       const SizedBox(width: 4),
                       Text(
-                        'Tax Savings: ¥${taxSavings.round()} (10% saved)',
+                        'Savings: ₹${taxSavings.round()} (10% saved)',
                         style: const TextStyle(fontSize: 10.5, color: Color(0xFF06D6A0), fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -1649,7 +1636,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             keyboardType: TextInputType.number,
             style: TextStyle(color: TriaColors.textPrimary(isDark)),
             decoration: InputDecoration(
-              labelText: 'Category Limit (USD)',
+              labelText: 'Category Limit (INR)',
               labelStyle: TextStyle(color: TriaColors.textSecondary(isDark)),
               enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: TriaColors.border(isDark))),
               focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF2563EB))),
@@ -1734,15 +1721,57 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                       style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 11.5, height: 1.3),
                     ),
                     const SizedBox(height: 20),
+                    // Currency selector for the wizard
+                    Row(
+                      children: [
+                        Text(
+                          'Currency:',
+                          style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: TriaColors.border(isDark)),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _wizardCurrency,
+                                dropdownColor: TriaColors.cardBg(isDark),
+                                iconEnabledColor: TriaColors.textPrimary(isDark),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: TriaColors.textPrimary(isDark)),
+                                onChanged: (v) {
+                                  setModalState(() => _wizardCurrency = v!);
+                                },
+                                items: [
+                                  {'code': 'INR', 'label': 'INR (₹)'},
+                                  {'code': 'USD', 'label': 'USD (\$)'},
+                                  {'code': 'EUR', 'label': 'EUR (€)'},
+                                  {'code': 'GBP', 'label': 'GBP (£)'},
+                                ].map((item) {
+                                  return DropdownMenuItem<String>(
+                                    value: item['code'],
+                                    child: Text(item['label']!, style: TextStyle(color: TriaColors.textPrimary(isDark))),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
                     // Overall Budget Field
                     TextField(
                       controller: _wizardTotalCtrl,
                       keyboardType: TextInputType.number,
                       style: TextStyle(color: TriaColors.textPrimary(isDark), fontWeight: FontWeight.bold),
                       decoration: InputDecoration(
-                        labelText: 'Total Trip Budget (USD)',
+                        labelText: 'Total Trip Budget ($_wizardCurrency)',
                         labelStyle: TextStyle(color: TriaColors.textSecondary(isDark), fontWeight: FontWeight.bold),
-                        prefixText: '\$ ',
+                        prefixText: '${_wizardCurrencySymbol(_wizardCurrency)} ',
                         prefixStyle: TextStyle(color: TriaColors.textPrimary(isDark)),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: TriaColors.border(isDark)),
@@ -1776,17 +1805,17 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    _buildWizardCategoryField('✈️ Flights & Transit', _wizardFlightsCtrl, isDark),
+                    _buildWizardCategoryField('✈️ Flights & Transit', _wizardFlightsCtrl, isDark, _wizardCurrencySymbol(_wizardCurrency)),
                     const SizedBox(height: 12),
-                    _buildWizardCategoryField('🏨 Stay & Hotels', _wizardHotelsCtrl, isDark),
+                    _buildWizardCategoryField('🏨 Stay & Hotels', _wizardHotelsCtrl, isDark, _wizardCurrencySymbol(_wizardCurrency)),
                     const SizedBox(height: 12),
-                    _buildWizardCategoryField('🍜 Local Dine-Out', _wizardDineCtrl, isDark),
+                    _buildWizardCategoryField('🍜 Local Dine-Out', _wizardDineCtrl, isDark, _wizardCurrencySymbol(_wizardCurrency)),
                     const SizedBox(height: 12),
-                    _buildWizardCategoryField('🚇 Metros & Taxis', _wizardTransitCtrl, isDark),
+                    _buildWizardCategoryField('🚇 Metros & Taxis', _wizardTransitCtrl, isDark, _wizardCurrencySymbol(_wizardCurrency)),
                     const SizedBox(height: 12),
-                    _buildWizardCategoryField('⛩️ Sightseeing & Shows', _wizardShowsCtrl, isDark),
+                    _buildWizardCategoryField('⛩️ Sightseeing & Shows', _wizardShowsCtrl, isDark, _wizardCurrencySymbol(_wizardCurrency)),
                     const SizedBox(height: 12),
-                    _buildWizardCategoryField('🛍️ Souvenirs & Anime', _wizardShoppingCtrl, isDark),
+                    _buildWizardCategoryField('🛍️ Souvenirs & Anime', _wizardShoppingCtrl, isDark, _wizardCurrencySymbol(_wizardCurrency)),
                     const SizedBox(height: 24),
                     // Action button
                     SizedBox(
@@ -1846,7 +1875,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     );
   }
 
-  Widget _buildWizardCategoryField(String label, TextEditingController ctrl, bool isDark) {
+  String _wizardCurrencySymbol(String code) {
+    switch (code) {
+      case 'INR': return '₹';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      default: return '\$';
+    }
+  }
+
+  Widget _buildWizardCategoryField(String label, TextEditingController ctrl, bool isDark, String currencySymbol) {
     return Row(
       children: [
         Expanded(
@@ -1865,7 +1903,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               keyboardType: TextInputType.number,
               style: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13),
               decoration: InputDecoration(
-                prefixText: '\$ ',
+                prefixText: '$currencySymbol ',
                 prefixStyle: TextStyle(color: TriaColors.textPrimary(isDark), fontSize: 13),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 enabledBorder: OutlineInputBorder(
