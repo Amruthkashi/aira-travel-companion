@@ -854,20 +854,44 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                                     }
                                   }
 
-                                  for (int i = 0; i < itineraryLegs.length; i++) {
+                                   for (int i = 0; i < itineraryLegs.length; i++) {
                                     final leg = itineraryLegs[i];
                                     final legNo = leg['leg']?.toString() ?? (i + 1).toString();
                                     
-                                    // Map direction
+                                    // Map direction dynamically based on leg type or segment index in round trip
                                     String directionType = determinedType;
-                                    if (isRoundTrip) {
-                                      if (i == 0) {
+                                    final legType = leg['type']?.toString().toLowerCase() ?? '';
+                                    if (legType.contains('outbound') || legType.contains('going') || legType.contains('depart')) {
+                                      directionType = 'going';
+                                    } else if (legType.contains('return') || legType.contains('inbound') || legType.contains('arrival')) {
+                                      directionType = 'return';
+                                    } else if (isRoundTrip) {
+                                      if (i < itineraryLegs.length / 2) {
                                         directionType = 'going';
-                                      } else if (i == itineraryLegs.length - 1) {
-                                        directionType = 'return';
                                       } else {
-                                        directionType = 'other';
+                                        directionType = 'return';
                                       }
+                                    }
+
+                                    // Parse leg date dynamically to fix the dates of the return legs
+                                    String legDate = flightDate;
+                                    if (leg['date'] != null && leg['date'].toString().isNotEmpty) {
+                                      try {
+                                        final rawLegDate = leg['date'].toString();
+                                        DateTime.parse(rawLegDate);
+                                        legDate = rawLegDate;
+                                      } catch (_) {}
+                                    } else if (directionType == 'return' && flight['return_flight'] != null) {
+                                      try {
+                                        final retFlight = flight['return_flight'] as Map;
+                                        final retDep = retFlight['departure']?.toString() ?? '';
+                                        if (retDep.contains(' ')) {
+                                          legDate = retDep.split(' ')[0];
+                                        } else if (retDep.isNotEmpty) {
+                                          legDate = retDep;
+                                        }
+                                        DateTime.parse(legDate);
+                                      } catch (_) {}
                                     }
 
                                     ref.read(tripBookingsProvider.notifier).addFlight(FlightBooking(
@@ -877,8 +901,8 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                                       pnr: flight['pnr'] ?? '',
                                       departureCity: leg['from'] ?? '',
                                       arrivalCity: leg['to'] ?? '',
-                                      departureDate: flightDate,
-                                      arrivalDate: flightDate,
+                                      departureDate: legDate,
+                                      arrivalDate: legDate,
                                       departureTime: leg['dep'] ?? '',
                                       arrivalTime: leg['arr'] ?? '',
                                       seatClass: flight['class'] ?? 'Economy',
@@ -887,15 +911,47 @@ class _BookingUploadScreenState extends ConsumerState<BookingUploadScreen>
                                     ));
                                   }
 
-                                  // Set destination city to final arrival city of the flight
-                                  final lastLeg = itineraryLegs.last;
-                                  final finalCity = lastLeg['to']?.toString() ?? '';
+                                  // Set destination city to final arrival city of outbound/going legs
+                                  String finalCity = '';
+                                  for (int i = 0; i < itineraryLegs.length; i++) {
+                                    final leg = itineraryLegs[i];
+                                    final type = leg['type']?.toString().toLowerCase() ?? '';
+                                    final isOutboundLeg = type.contains('outbound') || type.contains('going') || (itineraryLegs.length > 1 && i < itineraryLegs.length / 2);
+                                    if (isOutboundLeg) {
+                                      finalCity = leg['to']?.toString() ?? '';
+                                    }
+                                  }
+                                  if (finalCity.isEmpty && itineraryLegs.isNotEmpty) {
+                                    finalCity = itineraryLegs.last['to']?.toString() ?? '';
+                                  }
                                   if (finalCity.isNotEmpty) {
                                     ref.read(tripBookingsProvider.notifier).setDestination(finalCity);
                                   }
 
-                                  // Update trip dates
-                                  ref.read(tripBookingsProvider.notifier).setTripDates(flightDate, flightDate);
+                                  // Update trip start and end dates based on legs
+                                  String startDate = flightDate;
+                                  String endDate = flightDate;
+                                  if (itineraryLegs.isNotEmpty) {
+                                    final firstLeg = itineraryLegs.first;
+                                    final lastLeg = itineraryLegs.last;
+                                    if (firstLeg['date'] != null && firstLeg['date'].toString().isNotEmpty) {
+                                      startDate = firstLeg['date'].toString();
+                                    }
+                                    if (lastLeg['date'] != null && lastLeg['date'].toString().isNotEmpty) {
+                                      endDate = lastLeg['date'].toString();
+                                    } else if (flight['return_flight'] != null) {
+                                      try {
+                                        final retFlight = flight['return_flight'] as Map;
+                                        final retDep = retFlight['departure']?.toString() ?? '';
+                                        if (retDep.contains(' ')) {
+                                          endDate = retDep.split(' ')[0];
+                                        } else if (retDep.isNotEmpty) {
+                                          endDate = retDep;
+                                        }
+                                      } catch (_) {}
+                                    }
+                                  }
+                                  ref.read(tripBookingsProvider.notifier).setTripDates(startDate, endDate);
 
                                   Navigator.pop(ctx);
                                   ScaffoldMessenger.of(context).showSnackBar(

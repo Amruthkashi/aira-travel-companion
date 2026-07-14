@@ -2074,6 +2074,137 @@ app.post('/api/itinerary/save', (req, res) => {
   res.json({ success: true });
 });
 
+// Swap Itinerary Activity with a brand new AI-suggested activity
+app.post('/api/itinerary/swap', async (req, res) => {
+  const { currentActivity, destination, dayTheme, profile } = req.body;
+
+  let activeProfile = { ...profile };
+  const style = activeProfile.travelStyle || 'Solo';
+  const interests = (activeProfile.selectedPreferences as string[])?.join(', ') || 'sightseeing';
+  const dnaFoodie = activeProfile.dnaFoodie ?? 92.0;
+  const dnaHeritage = activeProfile.dnaHeritage ?? 85.0;
+  const dnaTech = activeProfile.dnaTech ?? 78.0;
+  const dnaAdventure = activeProfile.dnaAdventure ?? 40.0;
+  const travelArchetype = activeProfile.travelArchetype || 'Balanced Voyager';
+
+  // Fallback preset replacements in case AI rate limits or fails
+  const fallbackSwaps = [
+    {
+      activity: "Hidden Specialty Food Tour",
+      description: "Discover off-the-beaten-path culinary gems and taste local delicacies in a cozy back-alley setting with a local food expert.",
+      locationName: "Local Lantern Drink Alley",
+      cost: "$45",
+      suggestedAttire: "Casual with walking shoes",
+      transport: "Take local subway, exit 3, walk 4 mins",
+      ticketInfo: "Digital reservation confirmed",
+      placeDetails: "Known to host the best local street vendors with multi-generational recipes."
+    },
+    {
+      activity: "Ancient Heritage Shrine Walk",
+      description: "Walk the peaceful wood-scented pathways of a historic local shrine and participate in a traditional purification cleansing ritual.",
+      locationName: "Asakusa Shinto Gardens",
+      cost: "Free",
+      suggestedAttire: "Modest attire, slip-on shoes recommended",
+      transport: "Local express bus to Shrine gate",
+      ticketInfo: "Public admission open",
+      placeDetails: "Constructed over 400 years ago, this location is an architectural marvel."
+    },
+    {
+      activity: "Modern Virtual Reality Theme Park",
+      description: "Immerse yourself in neon arcade levels, dynamic simulator capsules, and competitive cyberpunk gaming arenas.",
+      locationName: "Cyberpunk Arcade Hub",
+      cost: "$28",
+      suggestedAttire: "Sporty casual",
+      transport: "Walk 10 mins from Crossing District station",
+      ticketInfo: "Priority queue pass issued",
+      placeDetails: "Houses the latest state-of-the-art interactive gaming tech."
+    },
+    {
+      activity: "Scenic Nature Trail Trek",
+      description: "Hike along the peaceful forested trails overlooking a scenic mountain stream, catching views of wild flora and fauna.",
+      locationName: "Red Leaf River Valley",
+      cost: "Free",
+      suggestedAttire: "Sturdy hiking shoes, activewear",
+      transport: "Train line to mountain terminal",
+      ticketInfo: "No ticket required",
+      placeDetails: "Highly popular spot for autumn and spring foliage viewings."
+    }
+  ];
+
+  // Select a fallback based on dominant DNA
+  let fallbackSelected = fallbackSwaps[0];
+  if (dnaHeritage > Math.max(dnaFoodie, dnaTech, dnaAdventure)) {
+    fallbackSelected = fallbackSwaps[1];
+  } else if (dnaTech > Math.max(dnaFoodie, dnaHeritage, dnaAdventure)) {
+    fallbackSelected = fallbackSwaps[2];
+  } else if (dnaAdventure > Math.max(dnaFoodie, dnaHeritage, dnaTech)) {
+    fallbackSelected = fallbackSwaps[3];
+  }
+
+  if (!ai || isRateLimited()) {
+    return res.json(fallbackSelected);
+  }
+
+  try {
+    const prompt = `
+You are an expert travel assistant. Re-generate and suggest a brand new alternate activity to swap out the following current activity:
+- Current Activity: "${currentActivity.activity}"
+- Current Activity Description: "${currentActivity.description}"
+- Destination: "${destination}"
+- Day Theme: "${dayTheme}"
+
+The traveler's profile is:
+- Travel Style: ${style}
+- Interests: ${interests}
+- Dominant Traveler DNA: Foodie ${dnaFoodie}%, Heritage ${dnaHeritage}%, Tech ${dnaTech}%, Adventure ${dnaAdventure}%
+- Archetype: ${travelArchetype}
+
+Suggest a completely different, exciting activity that perfectly fits this traveler's style and destination, but is a full swap for the current one.
+CRITICAL RULE:
+Write everything in STRICT ENGLISH. Do NOT use any Japanese language, kanji, or Romanized Japanese names/words for landmarks or dishes anywhere (e.g. use USD / $ symbols, use general descriptive English terms).
+
+You must respond with a JSON object containing the replacement activity details:
+- activity: Title of the alternate activity (strictly in English)
+- description: Extremely comprehensive descriptive note of what to do (35-60 words, including minute details, specific tips, and suggestions)
+- locationName: Name of the venue/spot (strictly in English)
+- cost: Cost in USD (strictly using the "$" symbol, e.g. "Free", "$15", "$30")
+- suggestedAttire: Suggestion of what to wear
+- transport: Comprehensive description of transport to take
+- ticketInfo: Detailed information about tickets or reservations
+- placeDetails: Extensive background information or interesting facts about the spot (strictly in English)
+
+Response Format:
+{
+  "activity": "...",
+  "description": "...",
+  "locationName": "...",
+  "cost": "...",
+  "suggestedAttire": "...",
+  "transport": "...",
+  "ticketInfo": "...",
+  "placeDetails": "..."
+}
+`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+      }
+    });
+
+    const text = response.text;
+    if (!text) throw new Error("Empty response");
+    const cleaned = cleanJsonString(text);
+    const parsed = JSON.parse(cleaned);
+    res.json(parsed);
+  } catch (error) {
+    console.error('Error swapping activity with AI:', error);
+    res.json(fallbackSelected);
+  }
+});
+
 // Get Itinerary for a user
 app.get('/api/itinerary/:userId', (req, res) => {
   const { userId } = req.params;

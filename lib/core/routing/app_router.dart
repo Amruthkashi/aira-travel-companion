@@ -146,7 +146,7 @@ final GoRouter appRouter = GoRouter(
             );
             return ProviderScope(
               overrides: [
-                itineraryProvider.overrideWith((ref) => ItineraryNotifier()..setItinerary(trip.itinerary)),
+                itineraryProvider.overrideWith((ref) => ItineraryNotifier(ref)..setItinerary(trip.itinerary)),
                 tripBookingsProvider.overrideWith((ref) => TripBookingsNotifier(TripBookings(
                   destination: trip.destination,
                   startDate: trip.startDate,

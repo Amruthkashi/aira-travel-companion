@@ -1,4 +1,4 @@
-Future<void> speakText(String text, String targetLang) async {
+Future<void> speakText(String text, String targetLang, {double rate = 1.0}) async {
   // Stub fallback
 }
 

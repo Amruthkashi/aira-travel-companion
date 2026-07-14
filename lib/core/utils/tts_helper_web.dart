@@ -2,7 +2,7 @@
 import 'dart:js' as js;
 import 'package:flutter/foundation.dart';
 
-Future<void> speakText(String text, String targetLang) async {
+Future<void> speakText(String text, String targetLang, {double rate = 1.0}) async {
   String localeCode = 'en-US';
   if (targetLang == 'Japanese') {
     localeCode = 'ja-JP';
@@ -21,11 +21,13 @@ Future<void> speakText(String text, String targetLang) async {
   }
 
   try {
+    final cleanText = text.replaceAll('"', '\\"').replaceAll("'", "\\'").replaceAll('\n', ' ');
     js.context.callMethod('eval', ['''
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        var utterance = new SpeechSynthesisUtterance("${text.replaceAll('"', '\\"').replaceAll('\n', ' ')}");
+        var utterance = new SpeechSynthesisUtterance("$cleanText");
         utterance.lang = "$localeCode";
+        utterance.rate = $rate;
         window.speechSynthesis.speak(utterance);
       }
     ''']);

@@ -63,6 +63,34 @@
           "checked": false
         }
       ]
+    },
+    {
+      "email": "f@gugb.com",
+      "password": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
+      "fullName": "GF",
+      "username": "d",
+      "mobile": "",
+      "dob": "",
+      "gender": "Male",
+      "country": "",
+      "state": "",
+      "city": "",
+      "address": "",
+      "travelStyle": "Solo Traveler",
+      "budgetPref": "Mid-range",
+      "selectedPreferences": [
+        "Dubai",
+        "Paris",
+        "Switzerland",
+        "Singapore",
+        "Goa"
+      ],
+      "dnaFoodie": 92,
+      "dnaHeritage": 85,
+      "dnaTech": 78,
+      "dnaAdventure": 40,
+      "travelArchetype": "Balanced Voyager",
+      "id": "user_1783934570816"
     }
   ],
   "itineraries": {
@@ -5473,148 +5501,148 @@
       "timestamp": 1783581006453
     },
     {
-      "userId": "guest_Solo_Tokyo__92_85_78_40",
+      "userId": "f@gugb.com_Solo Traveler_Tokyo_Dubai,Paris,Switzerland,Singapore,Goa_92_85_78_40",
       "category": "Personalized",
       "places": [
         {
-          "name": "Dotonbori Cyber Food District, Osaka",
-          "country": "Japan",
-          "countryCode": "JPN",
+          "name": "Marina Bay",
+          "country": "Singapore",
+          "countryCode": "SGP",
           "rating": 4.9,
-          "desc": "Experience a cyberpunk culinary paradise. Marvel at neon-drenched streets while feasting on legendary street food like takoyaki and okonomiyaki under towering digital billboards.",
-          "tags": [
-            "Street Food",
-            "Neon",
-            "Cyberpunk"
-          ],
-          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Kanda Myojin & Akihabara, Tokyo",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.8,
-          "desc": "Where ancient spirits meet digital frontiers. Visit a historic tech-blessed Shinto shrine, then dive into neon retro-arcade hubs and futuristic gadget markets nearby.",
+          "desc": "A futuristic wonderland blending neon-lit supertrees and robotic art museums with world-class Michelin-starred hawker stalls, ideal for the ultimate solo Gourmet Netrunner.",
           "tags": [
             "Tech",
-            "Shrines",
-            "Culture"
-          ],
-          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Nakasu Yatai Stalls, Fukuoka",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.7,
-          "desc": "Perfect for solo foodies, these legendary canal-side night stalls serve world-class Hakata ramen under atmospheric neon lights, blending old-school charm with vibrant city energy.",
-          "tags": [
-            "Street Food",
-            "Heritage",
-            "Nightlife"
+            "Gastronomy",
+            "Futuristic"
           ],
           "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Fushimi Inari Night Trail, Kyoto",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.9,
-          "desc": "Hike the iconic vermillion torii gates at twilight for a surreal, neon-like spiritual atmosphere, followed by local street food stalls offering grilled quail and fox sushi.",
+          "name": "Le Marais & Atelier des Lumières",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.8,
+          "desc": "Indulge in cutting-edge digital art installations, historic architecture, and experimental French bistronomy in this vibrant, culturally rich solo traveler haven.",
           "tags": [
-            "Temples",
-            "Culture",
-            "Street Food"
+            "Heritage",
+            "Culinary",
+            "Digital-Art"
           ],
-          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+          "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Kamakura Historic & Street Food Trail",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.6,
-          "desc": "Escape Tokyo to explore ancient Zen temples, eat sweet potato soft-serve on Komachi-dori street, and ride the retro-futuristic Enoden coastal train line.",
+          "name": "Downtown Dubai & Museum of the Future",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.7,
+          "desc": "Experience dazzling cyber-architectural wonders, high-tech museums, and an opulent culinary scene featuring avant-garde molecular gastronomy and traditional Arabian flavors.",
           "tags": [
-            "Temples",
-            "Street Food",
-            "History"
+            "Futuristic",
+            "Fine-Dining",
+            "Tech"
           ],
-          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Geneva CERN & Old Town",
+          "country": "Switzerland",
+          "countryCode": "CHE",
+          "rating": 4.6,
+          "desc": "Explore the birthplace of the World Wide Web at CERN, wander historic cobbled streets, and savor sophisticated Swiss chocolate and artisanal fondue.",
+          "tags": [
+            "Science",
+            "History",
+            "Gourmet"
+          ],
+          "image": "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Fontainhas",
+          "country": "India",
+          "countryCode": "IND",
+          "rating": 4.5,
+          "desc": "Wander through the historic, colorful Latin Quarter of Goa, enjoying rich Portuguese-Indian fusion cuisine and coastal heritage in a relaxed solo setting.",
+          "tags": [
+            "Heritage",
+            "Fusion-Food",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80"
         }
       ],
-      "timestamp": 1783586979518
+      "timestamp": 1783934599468
     },
     {
-      "userId": "guest_Solo_Tokyo__92_85_78_40",
+      "userId": "f@gugb.com_Solo Traveler_Tokyo_Dubai,Paris,Switzerland,Singapore,Goa_92_85_78_40",
       "category": "👤 Solo Traveler",
       "places": [
         {
-          "name": "Osaka Dotonbori and Shinsekai",
-          "country": "Japan",
-          "countryCode": "JPN",
+          "name": "Singapore Marina Bay & Hawker Hubs",
+          "country": "Singapore",
+          "countryCode": "SGP",
           "rating": 4.9,
-          "desc": "A neon-soaked playground perfect for the Gourmet Netrunner. Experience sci-fi streets while indulging in incredible street food like takoyaki and kushikatsu.",
+          "desc": "Experience a sci-fi skyline blended with Michelin-starred hawker stalls. Perfect for solo exploration of futuristic gardens and heritage-rich culinary streets.",
           "tags": [
-            "Street Food",
+            "Tech",
+            "Foodie",
+            "Solo-Friendly"
+          ],
+          "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Seoul Dongdaemun & Street Food",
+          "country": "South Korea",
+          "countryCode": "KOR",
+          "rating": 4.8,
+          "desc": "Dive into a neon-lit cyberpunk dreamscape featuring ultra-modern design plazas, historic palaces, and incredible late-night solo food alleys.",
+          "tags": [
             "Cyberpunk",
-            "Solo-friendly"
+            "Gastronomy",
+            "Heritage"
           ],
           "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Kyoto Fushimi Inari and Gion",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.8,
-          "desc": "Wander through thousands of vermilion torii gates before exploring historic streets filled with traditional tea houses, temples, and delicious street-side dango.",
-          "tags": [
-            "Temples",
-            "Heritage",
-            "Solo-friendly"
-          ],
-          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Fukuoka Nakasu Yatai Stalls",
-          "country": "Japan",
-          "countryCode": "JPN",
+          "name": "Dubai Museum of the Future & Old Souks",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
           "rating": 4.7,
-          "desc": "The ultimate solo foodie destination. Sit at atmospheric outdoor riverfront stalls to enjoy legendary Hakata ramen alongside historic shrines.",
+          "desc": "A striking blend of hyper-futuristic architecture and historic gold souks, offering solo epicureans high-end dining alongside rich cultural heritage.",
           "tags": [
-            "Street Food",
+            "Futuristic",
             "Culture",
-            "Nightlife"
+            "Luxury-Dining"
           ],
-          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Kamakura Komachi-dori and Temples",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.6,
-          "desc": "Just outside Tokyo, this coastal gem offers a perfect blend of historic Zen temples, giant Buddha statues, and bustling street-food alleyways.",
-          "tags": [
-            "Temples",
-            "Street Food",
-            "Zen"
-          ],
-          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Tokyo Akihabara and Kanda",
-          "country": "Japan",
-          "countryCode": "JPN",
+          "name": "Taipei Neon Night Markets",
+          "country": "Taiwan",
+          "countryCode": "TWN",
           "rating": 4.8,
-          "desc": "Immerse yourself in neon-lit retro arcades and tech hubs before discovering hidden gourmet curry spots and historic Kanda Myojin Shrine.",
+          "desc": "Navigate vibrant tech-laden districts and ancient temples before diving solo into legendary night markets for an unmatched, high-tech street food adventure.",
           "tags": [
+            "Foodie",
             "Tech",
-            "Gourmet",
-            "Solo-friendly"
+            "Heritage"
           ],
-          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Paris Digital Art & Gastronomy",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.7,
+          "desc": "Discover historic Parisian streets alongside cutting-edge digital art museums, paired with legendary solo dining experiences in cozy, historic bistros.",
+          "tags": [
+            "Gastronomy",
+            "Heritage",
+            "Digital-Art"
+          ],
+          "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80"
         }
       ],
-      "timestamp": 1783586983232
+      "timestamp": 1783934613962
     },
     {
       "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Tokyo_Anime Shopping,Local Food Stalls,Temples,Tech Gadgets_48.3766233766234_85_78_40",
@@ -5624,8 +5652,8 @@
           "name": "Akihabara Electric Town",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.8,
-          "desc": "The ultimate haven for tech gadgets, anime shopping, and quirky maid cafes, perfectly aligning with your high tech score and solo adventure style.",
+          "rating": 4.9,
+          "desc": "The ultimate cyber-hub matching your high tech score. Explore multi-story retro gadget shops, massive anime complexes, and grab quick bites at local yakitori stalls.",
           "tags": [
             "Tech",
             "Anime"
@@ -5633,13 +5661,13 @@
           "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Asakusa Senso-ji Temple",
+          "name": "Senso-ji Temple & Nakamise",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.9,
-          "desc": "Immerse yourself in Tokyo's oldest temple, featuring historic street food stalls along Nakamise Shopping Street that satisfy your high heritage and cultural interests.",
+          "rating": 4.8,
+          "desc": "Feed your 85% heritage score at Tokyo’s oldest temple. Walk the ancient gates and sample traditional street food like ningyo-yaki along the historic Nakamise-dori.",
           "tags": [
-            "Culture",
+            "Heritage",
             "Temples"
           ],
           "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
@@ -5648,20 +5676,87 @@
           "name": "Nakano Broadway",
           "country": "Japan",
           "countryCode": "JPN",
-          "rating": 4.6,
-          "desc": "A retro-pop culture paradise ideal for solo collectors seeking rare anime merch, vintage console games, and underground local food stalls.",
+          "rating": 4.7,
+          "desc": "A vintage pop-culture paradise ideal for solo collectors. Browse rare anime figurines and retro electronics, then head downstairs for underground street food stalls.",
           "tags": [
             "Anime",
-            "Shopping"
+            "Tech"
           ],
           "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Kamakura Temple District",
+          "name": "Osu Shopping District",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "Nagoya's vibrant hub seamlessly blends Osu Kannon Temple with massive electronics stores, cosplay shops, and incredible street food stalls perfect for a balanced voyager.",
+          "tags": [
+            "Heritage",
+            "Tech"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Nipponbashi Den Den Town",
           "country": "Japan",
           "countryCode": "JPN",
           "rating": 4.7,
-          "desc": "Escape the city to explore historic Zen temples, the Great Buddha, and vibrant local street food stalls perfect for a solo cultural excursion.",
+          "desc": "Osaka’s premier geek district caters to your love for tech gadgets and anime. Enjoy nearby Kuromon Market for excellent food stalls and local historic shrines.",
+          "tags": [
+            "Tech",
+            "Anime"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1783941589309
+    },
+    {
+      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Tokyo_Anime Shopping,Local Food Stalls,Temples,Tech Gadgets_48.3766233766234_85_78_40",
+      "category": "👤 Solo Traveler",
+      "places": [
+        {
+          "name": "Akihabara and Kanda Myojin",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "The ultimate solo sanctuary blending cutting-edge tech gadgets and anime shops with the historic Kanda Myojin Shrine, reflecting your high tech and heritage DNA.",
+          "tags": [
+            "Tech",
+            "Culture"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kyoto Higashiyama and Nishiki",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.8,
+          "desc": "Immerse yourself in ancient temples before exploring Nishiki Market's local food stalls. It perfectly matches your high heritage drive and love for local bites.",
+          "tags": [
+            "Culture",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Osaka Nipponbashi and Shinsekai",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.7,
+          "desc": "Explore Denden Town for retro tech and anime shopping, then wander down to Shinsekai's vibrant food stalls for classic kushikatsu near ancient Shitennoji Temple.",
+          "tags": [
+            "Tech",
+            "Food"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Kamakura Historic Temples",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.6,
+          "desc": "A coastal solo escape offering majestic zen temples, giant Buddha statues, and historic street food stalls along Komachi-dori, satisfying your deep appreciation for heritage.",
           "tags": [
             "Culture",
             "Temples"
@@ -5669,91 +5764,179 @@
           "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Odaiba Futuristic Island",
-          "country": "Japan",
-          "countryCode": "JPN",
+          "name": "Seoul Yongsan and Insadong",
+          "country": "South Korea",
+          "countryCode": "KOR",
           "rating": 4.7,
-          "desc": "Unleash your inner sci-fi enthusiast with giant Gundam statues, digital art museums, and cutting-edge tech showcases overlooking Tokyo Bay.",
+          "desc": "A quick hop from Tokyo leads to Yongsan's massive tech markets and Insadong’s traditional teahouses and temples, seamlessly merging sci-fi and ancient culture.",
           "tags": [
             "Tech",
-            "Sci-Fi"
+            "Culture"
           ],
-          "image": "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&auto=format&fit=crop&q=80"
+          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
         }
       ],
-      "timestamp": 1783592856513
+      "timestamp": 1783941591108
     },
     {
-      "userId": "shreyas.tokyo@gmail.com_Solo Traveler_Tokyo_Anime Shopping,Local Food Stalls,Temples,Tech Gadgets_48.3766233766234_85_78_40",
+      "userId": "guest_Solo_Tokyo__92_85_78_40",
       "category": "👤 Solo Traveler",
       "places": [
         {
-          "name": "Akihabara Electric Town",
+          "name": "Geek Town Otaku Pilgrimage",
           "country": "Japan",
           "countryCode": "JPN",
           "rating": 4.9,
-          "desc": "Dive into Tokyo's neon heart. Perfect for solo travelers seeking cutting-edge tech gadgets, endless anime shopping, and the nearby historic Kanda Myojin Temple.",
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
           "tags": [
-            "Tech",
             "Anime",
-            "Culture"
+            "Tokyo",
+            "Street Food",
+            "Japanese"
           ],
           "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Osaka Nipponbashi",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.7,
-          "desc": "Explore Den-Den Town's incredible anime and retro-tech shops, then grab local street food at Kuromon Market and visit the historic Shitenno-ji Temple nearby.",
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
           "tags": [
-            "Tech",
-            "Foodie",
-            "Culture"
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
           ],
-          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Nagoya Osu District",
-          "country": "Japan",
-          "countryCode": "JPN",
-          "rating": 4.6,
-          "desc": "A solo traveler's dream combining the historic Osu Kannon Temple with a vibrant shopping arcade packed with PC gadgets, anime stores, and tasty street food.",
-          "tags": [
-            "Culture",
-            "Tech",
-            "Foodie"
-          ],
-          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
-        },
-        {
-          "name": "Seoul Yongsan & Insadong",
-          "country": "South Korea",
-          "countryCode": "KOR",
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
           "rating": 4.8,
-          "desc": "Experience the ultimate balance of high-tech gadget markets in Yongsan, traditional Buddhist temples, and vibrant street food stalls in the historic alleyways of Seoul.",
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
           "tags": [
-            "Tech",
-            "Culture",
-            "Foodie"
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
           ],
-          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
         },
         {
-          "name": "Kyoto Teramachi",
-          "country": "Japan",
-          "countryCode": "JPN",
+          "name": "Marina Bay Sands Skypark Walk",
+          "country": "Singapore",
+          "countryCode": "SGP",
           "rating": 4.8,
-          "desc": "Wander through ancient temples before exploring Teramachi's modern arcade, featuring retro gaming, local food stalls, and unique specialty hobby shops.",
+          "desc": "Stroll along the world's largest infinity pool deck overlooking Singapore's futuristic skyline.",
           "tags": [
-            "Culture",
-            "Heritage",
-            "Foodie"
+            "Singapore",
+            "Modern",
+            "Luxury Shopping",
+            "Waterfront Diners",
+            "Bustling Food Markets"
           ],
-          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80"
+          "image": "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Swiss Alps Scenic Train Journey",
+          "country": "Switzerland",
+          "countryCode": "CHE",
+          "rating": 4.9,
+          "desc": "Board the Glacier Express for a panoramic ride through snow-capped peaks and mountain villages.",
+          "tags": [
+            "Switzerland",
+            "Hiking & Trekking",
+            "Adventure Sports",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=600&auto=format&fit=crop&q=80"
         }
       ],
-      "timestamp": 1783592857666
+      "timestamp": 1783942199051
+    },
+    {
+      "userId": "guest_Solo_Tokyo__92_85_78_40",
+      "category": "Personalized",
+      "places": [
+        {
+          "name": "Geek Town Otaku Pilgrimage",
+          "country": "Japan",
+          "countryCode": "JPN",
+          "rating": 4.9,
+          "desc": "Dive deep into the ultimate anime figure and collectible hubs, retro game shops, and themed cafés.",
+          "tags": [
+            "Anime",
+            "Tokyo",
+            "Street Food",
+            "Japanese"
+          ],
+          "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Eiffel Tower Sunset Picnic",
+          "country": "France",
+          "countryCode": "FRA",
+          "rating": 4.9,
+          "desc": "Enjoy fresh baguettes, cheese, and wine on the Champ de Mars with beautiful views of the Eiffel Tower.",
+          "tags": [
+            "Paris",
+            "French",
+            "Historical Tours",
+            "Cozy Cafes",
+            "Fine Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Burj Khalifa Sky Lounge Dinner",
+          "country": "United Arab Emirates",
+          "countryCode": "ARE",
+          "rating": 4.8,
+          "desc": "Dine high above the clouds at the world's tallest tower, enjoying a multi-course gourmet menu.",
+          "tags": [
+            "Dubai",
+            "Luxury Shopping",
+            "Fine Dining",
+            "Modern",
+            "Rooftop Dining"
+          ],
+          "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Marina Bay Sands Skypark Walk",
+          "country": "Singapore",
+          "countryCode": "SGP",
+          "rating": 4.8,
+          "desc": "Stroll along the world's largest infinity pool deck overlooking Singapore's futuristic skyline.",
+          "tags": [
+            "Singapore",
+            "Modern",
+            "Luxury Shopping",
+            "Waterfront Diners",
+            "Bustling Food Markets"
+          ],
+          "image": "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600&auto=format&fit=crop&q=80"
+        },
+        {
+          "name": "Swiss Alps Scenic Train Journey",
+          "country": "Switzerland",
+          "countryCode": "CHE",
+          "rating": 4.9,
+          "desc": "Board the Glacier Express for a panoramic ride through snow-capped peaks and mountain villages.",
+          "tags": [
+            "Switzerland",
+            "Hiking & Trekking",
+            "Adventure Sports",
+            "Nature"
+          ],
+          "image": "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=600&auto=format&fit=crop&q=80"
+        }
+      ],
+      "timestamp": 1783942201742
     }
   ],
   "squads": []

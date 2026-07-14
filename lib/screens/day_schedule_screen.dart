@@ -274,15 +274,176 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
     );
   }
 
+  void _showCannotFitModal({
+    required int targetDay,
+    required ExplorePlaceItem place,
+    String? reason,
+  }) {
+    final isDark = ref.read(isDarkProvider);
+    final schedule = ref.read(dayScheduleProvider);
+    final notifier = ref.read(dayScheduleProvider.notifier);
+
+    // Collect alternative days that can fit this place
+    final List<int> alternativeDays = [];
+    for (int i = 0; i < schedule.length; i++) {
+      if (i == targetDay) continue;
+      final slot = notifier.findFreeSlotForPlace(i, place);
+      if (slot >= 0) {
+        alternativeDays.add(i);
+      }
+    }
+
+    final displayReason = reason ?? 'Flight schedule bounds or airport departure buffer limits scheduling on Day ${targetDay + 1}.';
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: TriaColors.dialogBg(isDark),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40, height: 5,
+                  decoration: BoxDecoration(
+                    color: TriaColors.border(isDark),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.flight_land, color: Color(0xFFEF4444), size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Cannot Fit on Day ${targetDay + 1}',
+                      style: TextStyle(
+                        color: TriaColors.textPrimary(isDark),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '${place.name} cannot be scheduled on Day ${targetDay + 1}.\n$displayReason',
+                style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'CHOOSE AN ALTERNATIVE OPTION:',
+                style: TextStyle(
+                  color: TriaColors.textMuted(isDark),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (alternativeDays.isNotEmpty) ...[
+                ...alternativeDays.map((altDay) {
+                  final slotMin = notifier.findFreeSlotForPlace(altDay, place);
+                  final timeStr = minutesToTimeString(slotMin);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2563EB),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        icon: const Icon(Icons.calendar_month, color: Colors.white, size: 18),
+                        label: Text(
+                          'Schedule on Day ${altDay + 1} (Free slot at $timeStr)',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          final item = DayScheduleItem(place: place, dayNumber: altDay + 1);
+                          final added = notifier.addToDay(altDay, item);
+                          if (added) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Scheduled ${place.name} on Day ${altDay + 1} at $timeStr'),
+                                backgroundColor: const Color(0xFF10B981),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  );
+                }),
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    'No other trip days have available free slots for this activity.',
+                    style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 12, fontStyle: FontStyle.italic),
+                  ),
+                ),
+              ],
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: const Color(0xFFF59E0B).withValues(alpha: 0.5)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  icon: const Icon(Icons.inventory_2_outlined, color: Color(0xFFF59E0B), size: 18),
+                  label: const Text(
+                    'Keep in Unassigned Places Pool',
+                    style: TextStyle(color: Color(0xFFF59E0B), fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    notifier.removeFromDay(targetDay, place.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Kept ${place.name} in Unassigned Places pool'),
+                        backgroundColor: const Color(0xFFF59E0B),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _showDayOptionsSheet(int currentDay, int targetDay, String placeId) {
     final isDark = ref.read(isDarkProvider);
     final schedule = ref.read(dayScheduleProvider);
-    final bookings = ref.read(tripBookingsProvider);
     final item = schedule[currentDay].firstWhere((i) => i.place.id == placeId);
     final targetItems = schedule[targetDay];
     
     final notifier = ref.read(dayScheduleProvider.notifier);
-    final hasFreeSlot = notifier.findFreeSlotForPlace(targetDay, item.place, bookings, excludePlaceId: placeId) >= 0;
+    final hasFreeSlot = notifier.findFreeSlotForPlace(targetDay, item.place, excludePlaceId: placeId) >= 0;
 
     showModalBottomSheet(
       context: context,
@@ -326,7 +487,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: !hasFreeSlot ? null : () {
-                    final success = notifier.moveToDay(currentDay, targetDay, placeId, bookings);
+                    final success = notifier.moveToDay(currentDay, targetDay, placeId);
                     if (success) {
                       Navigator.pop(ctx); // Close option sheet
                       Navigator.pop(context); // Close day selection sheet
@@ -439,7 +600,6 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
   void _showMoveToDaySheet(int currentDay, String placeId) {
     final isDark = ref.read(isDarkProvider);
     final schedule = ref.read(dayScheduleProvider);
-    final bookings = ref.read(tripBookingsProvider);
     final item = schedule[currentDay].firstWhere((i) => i.place.id == placeId);
 
     showModalBottomSheet(
@@ -478,7 +638,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                 // Check if target day has a free slot
                 final notifier = ref.read(dayScheduleProvider.notifier);
                 final hasFreeSlot = isCurrent ? true :
-                    notifier.findFreeSlotForPlace(idx, item.place, bookings, excludePlaceId: placeId) >= 0;
+                    notifier.findFreeSlotForPlace(idx, item.place, excludePlaceId: placeId) >= 0;
                 final dayItemCount = schedule[idx].length;
                 final isFull = !isCurrent && !hasFreeSlot;
 
@@ -507,7 +667,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                       ),
                       onPressed: isCurrent ? null : () {
                         if (dayItemCount == 0) {
-                          final success = ref.read(dayScheduleProvider.notifier).moveToDay(currentDay, idx, placeId, bookings);
+                          final success = ref.read(dayScheduleProvider.notifier).moveToDay(currentDay, idx, placeId);
                           if (success) {
                             Navigator.pop(ctx);
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -979,19 +1139,26 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                             padding: const EdgeInsets.only(bottom: 8),
                             child: InkWell(
                               onTap: !fits ? null : () {
-                                ref.read(dayScheduleProvider.notifier).addToDayAtTime(
+                                final success = ref.read(dayScheduleProvider.notifier).addToDayAtTime(
                                   dayIdx,
                                   place,
                                   slotItem.time,
                                 );
                                 Navigator.pop(ctx);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Scheduled ${place.name} at ${slotItem.time}!'),
-                                    backgroundColor: const Color(0xFF10B981),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
+                                if (success) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Scheduled ${place.name} at ${slotItem.time}!'),
+                                      backgroundColor: const Color(0xFF10B981),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                } else {
+                                  _showCannotFitModal(
+                                    targetDay: dayIdx,
+                                    place: place,
+                                  );
+                                }
                               },
                               child: Opacity(
                                 opacity: fits ? 1.0 : 0.4,
@@ -1259,7 +1426,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      final changes = ref.read(dayScheduleProvider.notifier).resolveConflictsForDay(_activeDay, bookings);
+                      final changes = ref.read(dayScheduleProvider.notifier).resolveConflictsForDay(_activeDay);
                       _showResolutionPopup(changes);
                     },
                     style: ElevatedButton.styleFrom(
@@ -1303,7 +1470,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                 if (currentDayItems.isNotEmpty)
                   GestureDetector(
                     onTap: () {
-                      final changes = ref.read(dayScheduleProvider.notifier).autoSuggestTimings(_activeDay, bookings);
+                      final changes = ref.read(dayScheduleProvider.notifier).autoSuggestTimings(_activeDay);
                       _showResolutionPopup(changes);
                     },
                     child: Container(
@@ -1408,7 +1575,6 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                 _activeDay,
                                 oldActivityIndex,
                                 targetActivityIndex,
-                                bookings,
                               );
                             }
                           }
@@ -1876,15 +2042,10 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                       final data = details.data;
                                       if (data is ExplorePlaceItem) {
                                         final place = data;
-                                        final duration = place.durationMinutes;
-                                        final isFree = ref.read(dayScheduleProvider.notifier).isTimeSlotFree(
-                                          _activeDay, targetStartMin, duration,
+                                        final success = ref.read(dayScheduleProvider.notifier).addToDayAtTime(
+                                          _activeDay, place, targetTimeStr,
                                         );
-                                        
-                                        if (isFree) {
-                                          ref.read(dayScheduleProvider.notifier).addToDayAtTime(
-                                            _activeDay, place, targetTimeStr,
-                                          );
+                                        if (success) {
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(
                                               content: Text('Scheduled ${place.name} at $targetTimeStr'),
@@ -1893,35 +2054,10 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                             ),
                                           );
                                         } else {
-                                          // Find overlapping items
-                                          final activeDayItems = ref.read(dayScheduleProvider)[_activeDay];
-                                          final conflicts = activeDayItems.where((i) {
-                                            final sMin = i.startMinutes;
-                                            final eMin = i.endMinutes;
-                                            return targetStartMin < eMin && (targetStartMin + duration) > sMin;
-                                          }).toList();
-                                          
-                                          if (conflicts.length == 1) {
-                                            final conflictItem = conflicts.first;
-                                            ref.read(dayScheduleProvider.notifier).removeFromDay(_activeDay, conflictItem.place.id);
-                                            ref.read(dayScheduleProvider.notifier).addToDayAtTime(_activeDay, place, targetTimeStr);
-                                            
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text('Replaced ${conflictItem.place.name} with ${place.name} at $targetTimeStr'),
-                                                backgroundColor: const Color(0xFF10B981),
-                                                behavior: SnackBarBehavior.floating,
-                                              ),
-                                            );
-                                          } else {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: const Text('Slot occupied by multiple activities'),
-                                                backgroundColor: const Color(0xFFEF4444),
-                                                behavior: SnackBarBehavior.floating,
-                                              ),
-                                            );
-                                          }
+                                          _showCannotFitModal(
+                                            targetDay: _activeDay,
+                                            place: place,
+                                          );
                                         }
                                       } else if (data is DayScheduleItem) {
                                         final item = data;
@@ -2079,7 +2215,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                                         } else {
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(
-                                              content: const Text('Slot occupied by multiple activities'),
+                                              content: const Text('Slot occupied by flight or multiple activities'),
                                               backgroundColor: const Color(0xFFEF4444),
                                               behavior: SnackBarBehavior.floating,
                                             ),
@@ -2242,14 +2378,14 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
                           }),
                         ],
                       );
-                    }
+                    },
                   ),
                 ),
               ],
             ),
           ),
         ),
-        if (unassigned.isNotEmpty) ...[
+        if (unassigned.isNotEmpty)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
@@ -2265,6 +2401,7 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
               ],
             ),
           ),
+        if (unassigned.isNotEmpty)
           SizedBox(
             height: 120,
             child: ListView.builder(
@@ -2276,7 +2413,6 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
               },
             ),
           ),
-        ],
       ],
     );
   }
@@ -3247,29 +3383,18 @@ class _DayScheduleScreenState extends ConsumerState<DayScheduleScreen> {
               padding: const EdgeInsets.only(left: 4),
               child: GestureDetector(
                 onTap: () {
-                   final bookings = ref.read(tripBookingsProvider);
                    final notifier = ref.read(dayScheduleProvider.notifier);
-                   final freeSlot = notifier.findFreeSlotForPlace(dayIdx, place, bookings);
+                   final freeSlot = notifier.findFreeSlotForPlace(dayIdx, place);
                    if (freeSlot < 0) {
-                     ScaffoldMessenger.of(context).showSnackBar(
-                       SnackBar(
-                         content: Row(
-                           children: [
-                             const Icon(Icons.block, color: Colors.white, size: 16),
-                             const SizedBox(width: 8),
-                             Expanded(child: Text('No available free time slots on Day ${dayIdx + 1} that can fit this place.')),
-                           ],
-                         ),
-                         backgroundColor: const Color(0xFFEF4444),
-                         behavior: SnackBarBehavior.floating,
-                       ),
+                     _showCannotFitModal(
+                       targetDay: dayIdx,
+                       place: place,
                      );
                      return;
                    }
                    notifier.addToDay(
                      dayIdx,
                      DayScheduleItem(place: place, dayNumber: dayIdx + 1),
-                     bookings,
                    );
                 },
                 child: Container(

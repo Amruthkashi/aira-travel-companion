@@ -953,18 +953,25 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                               place: place,
                               dayNumber: idx + 1,
                             );
-                            ref.read(dayScheduleProvider.notifier).addToDay(idx, item, bookings);
+                            final added = ref.read(dayScheduleProvider.notifier).addToDay(idx, item);
 
                             Navigator.pop(ctx);
                             ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Added ${place.name} to Day ${idx + 1}$dateLabel'),
-                                backgroundColor: const Color(0xFF10B981),
-                                behavior: SnackBarBehavior.floating,
-                                duration: const Duration(seconds: 1),
-                              ),
-                            );
+                            if (added) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Added ${place.name} to Day ${idx + 1}$dateLabel'),
+                                  backgroundColor: const Color(0xFF10B981),
+                                  behavior: SnackBarBehavior.floating,
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            } else {
+                              _showCannotFitModal(
+                                targetDay: idx,
+                                place: place,
+                              );
+                            }
                           },
                           child: Row(
                             children: [
@@ -982,6 +989,168 @@ class _ExplorePlacesScreenState extends ConsumerState<ExplorePlacesScreen>
                             ],
                           ),
                         ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCannotFitModal({
+    required int targetDay,
+    required ExplorePlaceItem place,
+    String? reason,
+  }) {
+    final isDark = ref.read(isDarkProvider);
+    final schedule = ref.read(dayScheduleProvider);
+    final notifier = ref.read(dayScheduleProvider.notifier);
+
+    // Collect alternative days that can fit this place
+    final List<int> alternativeDays = [];
+    for (int i = 0; i < schedule.length; i++) {
+      if (i == targetDay) continue;
+      final slot = notifier.findFreeSlotForPlace(i, place);
+      if (slot >= 0) {
+        alternativeDays.add(i);
+      }
+    }
+
+    final displayReason = reason ?? 'Flight schedule bounds or airport departure buffer limits scheduling on Day ${targetDay + 1}.';
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: TriaColors.dialogBg(isDark),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40, height: 5,
+                  decoration: BoxDecoration(
+                    color: TriaColors.border(isDark),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.flight_land, color: Color(0xFFEF4444), size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Cannot Fit on Day ${targetDay + 1}',
+                      style: TextStyle(
+                        color: TriaColors.textPrimary(isDark),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '${place.name} cannot be scheduled on Day ${targetDay + 1}.\n$displayReason',
+                style: TextStyle(color: TriaColors.textSecondary(isDark), fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'CHOOSE AN ALTERNATIVE OPTION:',
+                style: TextStyle(
+                  color: TriaColors.textMuted(isDark),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (alternativeDays.isNotEmpty) ...[
+                ...alternativeDays.map((altDay) {
+                  final slotMin = notifier.findFreeSlotForPlace(altDay, place);
+                  final timeStr = minutesToTimeString(slotMin);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2563EB),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        icon: const Icon(Icons.calendar_month, color: Colors.white, size: 18),
+                        label: Text(
+                          'Schedule on Day ${altDay + 1} (Free slot at $timeStr)',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          final item = DayScheduleItem(place: place, dayNumber: altDay + 1);
+                          final added = notifier.addToDay(altDay, item);
+                          if (added) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Scheduled ${place.name} on Day ${altDay + 1} at $timeStr'),
+                                backgroundColor: const Color(0xFF10B981),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  );
+                }),
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    'No other trip days have available free slots for this activity.',
+                    style: TextStyle(color: TriaColors.textMuted(isDark), fontSize: 12, fontStyle: FontStyle.italic),
+                  ),
+                ),
+              ],
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: const Color(0xFFF59E0B).withValues(alpha: 0.5)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  icon: const Icon(Icons.inventory_2_outlined, color: Color(0xFFF59E0B), size: 18),
+                  label: const Text(
+                    'Keep in Unassigned Places Pool',
+                    style: TextStyle(color: Color(0xFFF59E0B), fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    notifier.removeFromDay(targetDay, place.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Kept ${place.name} in Unassigned Places pool'),
+                        backgroundColor: const Color(0xFFF59E0B),
+                        behavior: SnackBarBehavior.floating,
                       ),
                     );
                   },

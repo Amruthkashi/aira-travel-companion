@@ -322,6 +322,42 @@ class AiService {
     }
   }
 
+  /// Request a swapped alternative activity matching traveler's DNA from backend.
+  static Future<ActivityItem?> swapActivity({
+    required Map<String, dynamic> currentActivity,
+    required String destination,
+    required String dayTheme,
+    required Map<String, dynamic> profile,
+  }) async {
+    try {
+      final response = await _dio.post('/api/itinerary/swap', data: {
+        'currentActivity': currentActivity,
+        'destination': destination,
+        'dayTheme': dayTheme,
+        'profile': profile,
+      });
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        return ActivityItem(
+          time: currentActivity['time'] ?? '09:00 AM',
+          activity: data['activity'] ?? 'Alternative Activity',
+          description: data['description'] ?? '',
+          cost: data['cost'] ?? 'Free',
+          locationName: data['locationName'] ?? '',
+          suggestedAttire: data['suggestedAttire'] ?? 'Casual',
+          transport: data['transport'] ?? '',
+          ticketInfo: data['ticketInfo'] ?? '',
+          placeDetails: data['placeDetails'] ?? '',
+        );
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error calling backend swap-activity route: $e');
+      return null;
+    }
+  }
+
   /// Generate a custom packing checklist.
   static Future<List<String>> generatePackingList(
     Map<String, dynamic> profile,
@@ -609,5 +645,104 @@ class AiService {
     } catch (e) {
       throw Exception(_extractDioError(e));
     }
+  }
+
+  /// Real-time live search & information fetching from Wikipedia REST API
+  /// Uses origin=* for CORS support in web browsers
+  static Future<Map<String, String>?> fetchWikipediaPlaceHistory(String query) async {
+    final cleanQuery = query.trim();
+    if (cleanQuery.isEmpty) return null;
+
+    final wikiDio = Dio(BaseOptions(
+      connectTimeout: const Duration(seconds: 8),
+      receiveTimeout: const Duration(seconds: 8),
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'TriaApp/1.0 (travel companion app)',
+      },
+    ));
+
+    // Strategy 1: Direct REST summary lookup by title (fastest, full CORS support)
+    try {
+      final directTitle = cleanQuery.replaceAll(' ', '_');
+      final directUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/${Uri.encodeComponent(directTitle)}';
+      final directRes = await wikiDio.get(directUrl);
+
+      if (directRes.statusCode == 200 && directRes.data != null) {
+        final data = directRes.data;
+        final String extract = (data['extract'] as String?) ?? '';
+        final String description = (data['description'] as String?) ?? '';
+        final String displayTitle = (data['title'] as String?) ?? cleanQuery;
+        final String pageType = (data['type'] as String?) ?? '';
+
+        // Skip disambiguation pages and very short extracts
+        if (extract.length > 80 && pageType != 'disambiguation') {
+          debugPrint('Wikipedia: Direct lookup success for "$cleanQuery"');
+          return {
+            'title': displayTitle,
+            'description': extract,
+            'tagline': description.isNotEmpty ? description : 'Historic Cultural Destination',
+            'source': 'Wikipedia',
+          };
+        }
+      }
+    } catch (e) {
+      debugPrint('Wikipedia direct lookup failed for "$cleanQuery": $e');
+    }
+
+    // Strategy 2: Search API with origin=* (CORS-safe), then fetch top result summary
+    try {
+      final searchUrl =
+          'https://en.wikipedia.org/w/api.php'
+          '?action=query'
+          '&list=search'
+          '&srsearch=${Uri.encodeComponent(cleanQuery)}'
+          '&format=json'
+          '&utf8=1'
+          '&origin=*'    // CRITICAL: allows browser CORS requests
+          '&srlimit=3';
+
+      final searchRes = await wikiDio.get(searchUrl);
+
+      if (searchRes.statusCode == 200 && searchRes.data != null) {
+        final queryData = searchRes.data['query'];
+        final searchList = queryData?['search'] as List? ?? [];
+
+        for (final result in searchList) {
+          final String title = (result['title'] as String?) ?? '';
+          if (title.isEmpty) continue;
+
+          final summaryUrl =
+              'https://en.wikipedia.org/api/rest_v1/page/summary/${Uri.encodeComponent(title)}';
+          try {
+            final summaryRes = await wikiDio.get(summaryUrl);
+            if (summaryRes.statusCode == 200 && summaryRes.data != null) {
+              final data = summaryRes.data;
+              final String extract = (data['extract'] as String?) ?? '';
+              final String description = (data['description'] as String?) ?? '';
+              final String displayTitle = (data['title'] as String?) ?? title;
+              final String pageType = (data['type'] as String?) ?? '';
+
+              if (extract.length > 80 && pageType != 'disambiguation') {
+                debugPrint('Wikipedia: Search fallback success for "$cleanQuery" → "$displayTitle"');
+                return {
+                  'title': displayTitle,
+                  'description': extract,
+                  'tagline': description.isNotEmpty ? description : 'Historic Cultural Destination',
+                  'source': 'Wikipedia',
+                };
+              }
+            }
+          } catch (_) {
+            continue;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Wikipedia search fallback error for "$cleanQuery": $e');
+    }
+
+    debugPrint('Wikipedia: All strategies failed for "$cleanQuery"');
+    return null;
   }
 }
